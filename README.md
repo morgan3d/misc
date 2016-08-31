@@ -18,17 +18,16 @@ Graphics
 ==================================================================
 - oculusSample - Oculus SDK OpenGL Sample. Windows Visual Studio project for initializing and rendering to a DK2 or later HMD using OpenGL. June 2015.
 - terrain - Continuous detail GPU Terrain, with multi-scale texturing and a hardware optimized variant of the geo clipmap. April 2014 http://casual-effects.blogspot.com/2014/04/fast-terrain-rendering-with-continuous.html
+- normal2bump - Compute bump map (height field/displacment) from a normal map. 2014.
+- convertToOBJ - Convert various 3D model formats to OBJ, e.g., IFS, PLY, PLY3, 3DS. 2013
+- cgpp3 - Minimal graphics support routines from Computer Graphics: Principles and Practice 3rd edition for loading a 3D model and image, and displaying and saving images. 2012.
+- glToScreen - Reverse OpenGL projection from my [flipcode article](http://www.flipcode.com/archives/Object_To_Screen_Space.shtml). Pre-2005.
+- glProject - Forward OpenGL projection from my [flipcode article](http://www.flipcode.com/archives/Projecting_3D_Points.shtml). Pre-2005.
+- 2DOBB - 2D oriented bounding box collision test from my [flipcode article](http://www.flipcode.com/archives/2D_OBB_Intersection.shtml). Pre-2005.
 
 C++
 ==================================================================
 - sort - Elegant C++ reference implementations of heapSort, insertionSort, mergeSort, and quickSort. (now maintained in [The Graphics Codex](http://graphicscodex.com)). December 2012
-- glToScreen - Reverse OpenGL projection from my [flipcode article](http://www.flipcode.com/archives/Object_To_Screen_Space.shtml). Pre-2005.
-- glProject - Forward OpenGL projection from my [flipcode article](http://www.flipcode.com/archives/Projecting_3D_Points.shtml). Pre-2005.
-- 2DOBB - 2D oriented bounding box collision test from my [flipcode article](http://www.flipcode.com/archives/2D_OBB_Intersection.shtml). Pre-2005
- <li><a href="C++/normal2bump.cpp">normal2bump.cpp</a> - Compute bump map (height field/displacment) from a normal map (for G3D 8.x)</li>
- <li><a href="C++/normal2bump-G3D10.cpp">normal2bump-G3D10.cpp</a> - Compute bump map (height field/displacment) from a normal map (for G3D 9.x and 10.x)</li>
- <li><a href="C++/convertToOBJ.cpp">convertToOBJ.cpp</a> - Convert various 3D model formats to OBJ, e.g., IFS, PLY, PLY3, 3DS.</li>
- <li><a href="C++/cgpp-support.h">cgpp-support.h</a>, <a href="C++/cgpp-support.cpp">cgpp-support.cpp</a> - Minimal graphics support routines from Computer Graphics: Principles and Practice for loading a 3D model and image, and displaying and saving images.</li>
 
 <!--
 - tachyonVR - Unity 5.4 VR Starter Project. August 2016.
