@@ -1,0 +1,126 @@
+<HTML><HEAD><TITLE>Splay Tree Demonstration</TITLE></HEAD><BODY><H1>Splay Tree Demonstration</H1>
+<HR><P>
+
+<CENTER>
+<SCRIPT LANGUAGE="JavaScript">
+<!--  Begin
+  var MSIE = (navigator.userAgent.indexOf("MSIE") > -1);
+  var Netscape = (navigator.userAgent.indexOf("Netscape") > -1);
+  var Firefox = (navigator.userAgent.indexOf("Firefox") > -1);
+  var Opera = (navigator.userAgent.indexOf("Opera") > -1);
+
+  if (MSIE) {
+    // Internet Explorer; use IE plug-in
+    document.write("<OBJECT classid=\"clsid:CAFEEFAC-0014-0000-0000-ABCDEFFEDCBA\" \
+                   width=1100 height=450 \
+		   codebase=\"http://java.sun.com/products/plugin/autodl/jinstall-1_4_0-win.cab#Version=1,4,0,0\"> \
+		   <PARAM NAME=codebase VALUE=\".\"> \
+		   <PARAM NAME=code VALUE=\"SplayDemo.class\"> \
+		   <I>Your browser (Internet Explorer " + navigator.appVersion + ") does not support \
+		   the Java IE Plug-in.</I></OBJECT>");
+  } else if (Netscape) {
+    // Netscape; use Netscape plug-in
+      document.write("<EMBED type=\"application/x-java-applet;version=1.4\" \
+           codebase=\".\" \
+           code=\"SplayDemo.class\" \
+           width=1100 height=450 \
+           pluginspage=\"http://java.sun.com/products/plugin/index.html#download\" \
+           alt=\"Your browser understands the &lt;EMBED&gt; tag but isn't running the \
+           applet, for some reason.\"> \
+           <NOEMBED>No Java 2 SDK, Standard Edition v 1.3 support for APPLET!!</NOEMBED></EMBED>");
+  } else {
+      document.write("<applet code=SplayDemo.class name=SplayDemo \
+                     width=1100 height=450>" +
+                     "<I>Your browser " + navigator.userAgent + " does not support Java.</I></applet>");
+  }
+//--!></SCRIPT></P>
+</CENTER>
+<HR>
+
+The two trees represent the same ordered set.  The tree on the left is
+a binary search tree with no special balancing.  The tree on the right
+is a splay tree, which maintains balance by performing a splay
+operation before or after every other operation.  The splay operation
+is implemented as three separate cases.  Pressing the 1, 2, or 3
+button will produce a tree for which each case operates.  Pressing the
+? button will produce a random tree.
+
+<P>
+Actions you can perform with the mouse (select using the dropdown
+box):
+<UL>
+ <LI>Access: "get" the selected node in both trees.  In a binary tree,
+ this does nothing.  In a splay tree, it may rebalance the tree.
+ <LI>Insert: Insert a new random node (if there are fewer than 20) in both trees.
+ <LI>Delete: Delete the specified node in both trees.
+ <LI>Rotate: Rotate about the selected node's parent in the tree that was clicked on.
+</UL>
+
+By accessing, inserting, and deleting nodes you can see the difference
+in balance between a binary and splay tree.  Rotate operations allow
+you to manually walk through the operations the splay tree performs to
+maintain balance.
+
+<H2>Source Code</H2>
+<BLOCKQUOTE>
+<TABLE>
+<TR>
+<TD VALIGN=TOP>
+<A HREF="SplayDemo.java">SplayDemo.java</A>
+</TD>
+<TD VALIGN=TOP>
+Splay tree logic and boilerplate to launch the demo as an applet or
+standalone Java program.
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="BinaryTree.java">BinaryTree.java</A>
+</TD>
+<TD>
+A generic binary tree.  The splay tree is built by extending this.
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="Node.java">Node.java</A>
+</TD>
+<TD>
+Binary tree node interface.
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="SplayTree.java">SplayTree.java</A>
+</TD>
+<TD>
+Extension of the binary tree to maintain balance.
+</TD>
+</TR>
+<TR>
+<TD>
+<A HREF="TreeDisplay.java">TreeDisplay.java</A>
+</TD>
+<TD>
+A JComponent that renders binary trees.
+</TD>
+</TR>
+</TABLE>
+</BLOCKQUOTE>
+
+<HR>
+<H2>References</H2> 
+<UL>
+<LI>D.D. Sleator and R. E. Tarjan, <I>Self-adjusting binary trees</I>,
+Proc. Fifteenth Annual ACM Symposium on Theory of Computing, 1983,
+pp. 235-245. 
+
+<LI>T. H. Cormen, C. E. Leiserson, R. L. Rivest,
+Introduction to Algorithms, MIT Press, Cambridge, MA, 1989
+</UL>
+<HR>
+
+<FONT FACE="Arial"><A HREF="http://www.cs.brown.edu/people/morgan">Morgan McGuire</A> &lt;<I><A HREF="mailto:matrix@brown.edu">matrix@brown.edu</A></I>&gt; for <A HREF="http://www.cs.brown.edu/courses/cs250/">CS250</A></FONT>
+
+
+</P></BODY></HTML>
