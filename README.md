@@ -19,6 +19,10 @@ Graphics
 - oculusSample - Oculus SDK OpenGL Sample. Windows Visual Studio project for initializing and rendering to a DK2 or later HMD using OpenGL. June 2015.
 - terrain - Continuous detail GPU Terrain, with multi-scale texturing and a hardware optimized variant of the geo clipmap. April 2014 http://casual-effects.blogspot.com/2014/04/fast-terrain-rendering-with-continuous.html
 
+C++
+==================================================================
+- sort - Elegant C++ reference implementations of heapSort, insertionSort, mergeSort, and quickSort. (now maintained in [The Graphics Codex](http://graphicscodex.com)). December 2012
+
 <!--
 - tachyonVR - Unity 5.4 VR Starter Project. August 2016.
 <li><a href="python/python-oit.zip">Python implementation of Blended Order Independent Transparency</a> contributed by Nicolas P. Rougier, based on the paper by Louis Bavoil and Morgan McGuire</li>
@@ -68,10 +72,6 @@ Scheme
 C/C++
 ===========================================================================
 <li><a href="C++/indent++.zip">indent++</a> Platform-independent command-line program to auto-indent C++ and JavaScript code (similar to the Unix indent program for C), with precompiled OS X binary.</li>
-<li><a href="C++/sort.cpp">sort.cpp</a> Elegant reference implementations of some common sorting                                                 algorithms:                                                                                      heapSort,
-    insertionSort,
-    mergeSort, and
-    quickSort.</li>
 <li><a href="C++/getip.cpp">getip.cpp</a> Get IP address, subnet mask, broadcast address, and MAC address of the network adapter(s) on Unix-based systems.</li>
 <li><a href="C++/kbhit.cpp">_kbhit.cpp</a> _kbhit for Linux/POSIX without using Curses (see also my <a href="http://www.flipcode.com/archives/_kbhit_for_Linux.shtml">flipcode article</a>)
 <li><a href="C++/safesprintf.cpp">safesprintf.cpp</a> - An sprintf implementation that prevents buffer overflows (a newer version appears as the "format" function in the G3D library. See also my <a href="http://www.flipcode.com/archives/Safe_sprintf.shtml">flipcode article</a>)
