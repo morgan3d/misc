@@ -1,0 +1,92 @@
+# $Id: makefile.in,v 1.6 2012/03/18 15:57:15 tom Exp $
+# top-level makefile-template for 'bcpp'
+
+THIS		= bcpp
+
+#### Start of system configuration section. ####
+
+srcdir		= .
+
+
+INSTALL		= /usr/bin/install -c
+INSTALL_PROGRAM	= ${INSTALL}
+INSTALL_DATA	= ${INSTALL} -m 644
+
+prefix		= /usr/local
+exec_prefix	= ${prefix}
+
+bindir		= ${exec_prefix}/bin
+mandir		= ${prefix}/man
+
+BINDIR		= $(DESTDIR)$(bindir)
+MANDIR		= $(DESTDIR)$(mandir)/man1
+manext		= 1
+
+#### End of system configuration section. ####
+
+SHELL		= /bin/sh
+
+DISTFILES = configure $(SRC)
+
+all:
+	cd code && $(MAKE) $@
+
+install: all installdirs
+	cd code && $(MAKE) $@ DESTDIR=$(DESTDIR)
+	$(INSTALL_DATA) $(srcdir)/txtdocs/$(THIS).1 $(MANDIR)/$(THIS).$(manext)
+
+installdirs:
+	mkdir -p $(BINDIR) $(MANDIR)
+
+uninstall:
+	rm -f $(BINDIR)/$(THIS) $(MANDIR)/$(THIS).$(manext)
+
+mostlyclean:
+	cd code && $(MAKE) $@
+	rm -f *.o core *~ *.out *.BAK *.atac
+
+clean: mostlyclean
+	cd code && $(MAKE) $@
+	rm -f $(THIS)
+
+distclean: clean
+	cd code && $(MAKE) $@
+	rm -f makefile code/makefile code/autoconf.h
+	rm -f config.log config.cache config.status
+
+realclean: distclean
+	cd code && $(MAKE) $@
+
+check:
+	cd code && $(MAKE) $@
+
+RELEASE	= `cat $(srcdir)/VERSION`
+RELDIR	= echo "$(THIS)-`sed -e 's/[^0-9]//g' $(srcdir)/VERSION`"
+
+# I keep my sources in RCS, and assign a symbolic release to the current patch
+# level.  The 'manifest' script knows how to build a list of files for a given
+# revision.
+MANIFEST: $(srcdir)/VERSION
+	manifest -r$(RELEASE)
+
+dist: MANIFEST
+	- rm -f .fname .files
+	$(RELDIR) >.fname
+	cat MANIFEST | grep ' ' | egrep -v ' subdirectory$$' | sed -e 's/\ .*//' | uniq >.files
+	rm -rf `cat .fname`
+	TOP=`cat .fname`; mkdir $$TOP `cat .files | grep / | sed -e 's@/.*@@' | sed -e s@\^@$$TOP/@ | uniq`
+	for file in `cat .files`; do \
+	  ln $(srcdir)/$$file `cat .fname`/$$file \
+	    || { echo copying $$file instead; cp $$file `cat .fname`/$$file; }; \
+	done
+	tar -cf - `cat .fname` | gzip >`cat .fname`.tgz
+	rm -rf `cat .fname` .fname .files
+
+# Some of the output will be uuencoded because the test scripts include
+# <CR><LF> terminated ".bat" files for MS-DOS.
+dist-shar: MANIFEST
+	- rm -f .fname .files
+	$(RELDIR) >.fname
+	cat MANIFEST | grep ' ' | egrep -v ' subdirectory$$' | sed -e 's/\ .*//' | uniq >.files
+	shar -M -n`cat .fname` -opart -l50 `cat .files`
+	- rm -f .fname .files

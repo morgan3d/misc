@@ -1,0 +1,12 @@
+; $Id: .vilerc,v 1.4 2002/11/23 16:51:42 tom Exp $
+source ~/.vilerc
+~with define-submode c
+	notabinsert
+	ts=4
+	sw=4
+~endwith
+~with define-submode cpp
+	notabinsert
+	ts=4
+	sw=4
+~endwith

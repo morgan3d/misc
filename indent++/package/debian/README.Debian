@@ -1,0 +1,37 @@
+bcpp for Debian
+----------------
+
+How to check the trustability of the beautifier program:
+
+1) Compiling the code into binary:
+
+cp myprogram.cpp test.cpp
+g++ -c test.cpp -o test.orig.o
+bcpp myprogram.cpp > test.cpp
+g++ -c test.cpp -o test.bcpp.o
+diff test.orig.o test.bcpp.o
+
+*.cpp files before compilation should have the same name, or there would be
+differences in *.o objects.
+
+You can use cmp command instead of diff for comparing the binary files.
+
+2) Comparing the assembler code generated:
+
+cp myprogram.cpp test.cpp
+g++ -S test.cpp -o test.orig.S
+bcpp myprogram.cpp > test.cpp
+g++ -S test.cpp -o test.bcpp.S
+diff test.orig.S test.bcpp.S
+
+If *.cpp file names are different, diff will find differences between the
+files, but they can be easily seen in the diff result.
+
+3) You can check by hand the changes made, excluding whitespace changes:
+
+bcpp myprogram.cpp > myprogram.bcpp.cpp
+diff -wu myprogram.cpp myprogram.bcpp.cpp
+
+See also: http://yolinux.com/HOWTO/C-C++Beautifier-HOWTO.html
+
+ -- Miriam Ruiz <little_miry@yahoo.es>, Mon, 06 Mar 2006 15:46:01 +0100

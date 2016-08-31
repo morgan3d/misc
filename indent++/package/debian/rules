@@ -1,0 +1,97 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+
+# These are used for cross-compiling and for saving the configure script
+# from having to guess our platform (since we know it already)
+DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+
+
+CFLAGS = -Wall -g
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+
+config.status: configure
+	dh_testdir
+	[ ! -d debian/patches ] || $(MAKE) -f /usr/share/quilt/quilt.make patch
+	[ ! -d debian/pixmaps ] || { cd debian/pixmaps && for i in *.sng; do sng "$$i"; done; }
+
+ifneq "$(wildcard /usr/share/misc/config.sub)" ""
+	cp -f /usr/share/misc/config.sub config.sub
+endif
+ifneq "$(wildcard /usr/share/misc/config.guess)" ""
+	cp -f /usr/share/misc/config.guess config.guess
+endif
+
+	CFLAGS="$(CFLAGS) -DBCPP_CONFIG_DIR=\"/etc/bcpp\" -Wl,-z,defs" \
+		./configure \
+			--host=$(DEB_HOST_GNU_TYPE) \
+			--build=$(DEB_BUILD_GNU_TYPE) \
+			--prefix=/usr \
+			--mandir=\$${prefix}/share/man \
+			--infodir=\$${prefix}/share/info
+
+
+build: build-stamp
+
+build-stamp: config.status
+	dh_testdir
+
+	# Add here commands to compile the package.
+	$(MAKE)
+	#docbook-to-man debian/bcpp.sgml > bcpp.1
+
+	touch build-stamp
+
+clean: 
+	dh_testdir
+	dh_testroot
+	rm -fv build-stamp 
+	[ ! -d Makefile ] || $(MAKE) distclean
+	rm -fv config.sub config.guess config.status config.log install
+	rm -fv `find . -name "*.o"`
+	rm -fv code/bcpp makefile code/makefile code/autoconf.h
+	[ ! -d debian/patches ] || $(MAKE) -f /usr/share/quilt/quilt.make unpatch
+	[ ! -d debian/pixmaps ] || rm -vf debian/pixmaps/*.png
+	dh_clean 
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+
+	$(MAKE) install prefix=$(CURDIR)/debian/bcpp/usr
+	dh_install code/bcpp.cfg etc/bcpp/
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs CHANGES
+	dh_installdocs
+	dh_installexamples
+	dh_installman
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install 

@@ -1,0 +1,14 @@
+tmp/code/osx-x86_64-g++4.2/RELEASE/anyobj.o
+tmp/code/osx-x86_64-g++4.2/RELEASE/backup.o
+tmp/code/osx-x86_64-g++4.2/RELEASE/baseq.o
+tmp/code/osx-x86_64-g++4.2/RELEASE/bcpp.o
+tmp/code/osx-x86_64-g++4.2/RELEASE/cmdline.o
+tmp/code/osx-x86_64-g++4.2/RELEASE/config.o
+tmp/code/osx-x86_64-g++4.2/RELEASE/debug.o
+tmp/code/osx-x86_64-g++4.2/RELEASE/execsql.o
+tmp/code/osx-x86_64-g++4.2/RELEASE/hanging.o
+tmp/code/osx-x86_64-g++4.2/RELEASE/html.o
+tmp/code/osx-x86_64-g++4.2/RELEASE/stacklis.o
+tmp/code/osx-x86_64-g++4.2/RELEASE/strings.o
+tmp/code/osx-x86_64-g++4.2/RELEASE/tabs.o
+tmp/code/osx-x86_64-g++4.2/RELEASE/verbose.o

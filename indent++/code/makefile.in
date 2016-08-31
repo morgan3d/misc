@@ -1,0 +1,103 @@
+# $Id: makefile.in,v 1.12 2012/03/18 15:38:59 tom Exp $
+# Makefile-template for 'bcpp'
+
+THIS		= bcpp
+
+#### Start of system configuration section. ####
+
+srcdir		= @srcdir@
+VPATH		= @srcdir@
+
+CXX		= @CXX@
+CXXFLAGS	= @CXXFLAGS@
+EXTRA_CXXFLAGS	= @EXTRA_CXXFLAGS@
+
+INSTALL		= @INSTALL@
+INSTALL_PROGRAM	= @INSTALL_PROGRAM@
+INSTALL_DATA	= @INSTALL_DATA@
+INSTALL_SCRIPT	= @INSTALL_SCRIPT@
+
+LINK		= $(CXX)
+LIBS		= @LIBS@
+LDFLAGS		= @LDFLAGS@
+
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+
+bindir		= @bindir@
+
+BINDIR		= $(DESTDIR)$(bindir)
+
+x		= @EXEEXT@
+o		= .@OBJEXT@
+
+#### End of system configuration section. ####
+
+SHELL		= /bin/sh
+
+OBJS	= \
+	bcpp$o \
+	anyobj$o \
+	backup$o \
+	baseq$o \
+	cmdline$o \
+	config$o \
+	debug$o \
+	execsql$o \
+	hanging$o \
+	html$o \
+	stacklis$o \
+	strings$o \
+	tabs$o \
+	verbose$o
+
+CPPFLAGS	= -I. -I$(srcdir) \
+		-DVERSION=\"`cat $(srcdir)/../VERSION`\" \
+		-DHAVE_CONFIG_H # -DDEBUG -DDEBUG2
+
+PROG	= $(THIS)$x
+
+.SUFFIXES: .cpp $o
+
+.cpp$o:
+	@RULE_CC@
+	@ECHO_CC@$(CXX) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+all:	$(PROG)
+
+$(PROG): $(OBJS)
+	@ECHO_LD@$(LINK) $(LDFLAGS) -o $(PROG) $(OBJS) $(LIBS)
+
+install: all installdirs
+	$(INSTALL_PROGRAM) $(PROG) $(BINDIR)/$(PROG)
+	$(INSTALL_SCRIPT) cb++ $(BINDIR)/cb++
+
+installdirs:
+	mkdir -p $(BINDIR)
+
+uninstall:
+	rm -f $(BINDIR)/$(PROG)
+	rm -f $(BINDIR)/cb++
+
+mostlyclean:
+	rm -f *$o core *~ *.out *.BAK *.atac
+
+clean: mostlyclean
+	rm -f $(PROG)
+
+distclean: clean
+	rm -f makefile config.log config.cache config.status autoconf.h
+
+realclean: distclean
+	rm -f tags TAGS # don't remove configure!
+
+check:	$(PROG)
+	$(SHELL) ./run-test
+
+tags:
+	ctags *.cpp *.h
+
+TAGS:
+	etags *.cpp *.h
+
+$(OBJS):	autoconf.h bcpp.h

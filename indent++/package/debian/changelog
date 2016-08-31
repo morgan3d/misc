@@ -1,0 +1,20 @@
+bcpp (20120318) unstable; urgency=low
+
+  * Add package scripts for testing
+
+ -- Thomas E. Dickey <dickey@invisible-island.net>  Sun, 18 Mar 2012 10:37:27 -0400
+
+bcpp (0.0.20050725-2) unstable; urgency=low
+
+  * Upgraded Standards-Version from 3.6.2 to 3.9.1
+  * Moved to dpkg source v3
+
+ -- Miriam Ruiz <little_miry@yahoo.es>  Sat, 30 Oct 2010 01:21:04 +0200
+
+bcpp (0.0.20050725-1) unstable; urgency=low
+
+  * Initial release. Closes: #355488.
+  * Modified FindConfigFile function in bcpp.cpp so that it gets config files from /etc/bcpp.
+
+ -- Miriam Ruiz <little_miry@yahoo.es>  Mon,  3 Oct 2005 15:43:14 +0200
+

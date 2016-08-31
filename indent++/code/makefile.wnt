@@ -1,0 +1,51 @@
+INTDIR  = .
+OUTDIR  = .
+LINK32=link.exe
+
+CPP_PROJ=/nologo /ML /W3 /GX /D "WIN32" /D "NDEBUG" /D "_CONSOLE"\
+ /Fp"$(INTDIR)/bcpp.pch" /YX /Fo"$(INTDIR)/" /c
+
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
+ advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
+ odbccp32.lib /nologo /subsystem:console /incremental:no\
+ /pdb:"$(OUTDIR)/bcpp.pdb" /machine:I386 /out:"$(OUTDIR)/bcpp.exe"
+
+CXX		=gcc
+CXXFLAGS	=-I$(D) -O2 -Wall
+
+.SUFFIXES:	.cpp .obj
+
+.cpp{$(CPP_OBJS)}.obj:
+   $(CPP) $(CPP_PROJ) $<
+
+EXE     = bcpp.exe
+
+OBJS	= \
+        bcpp.obj \
+        anyobj.obj \
+        backup.obj \
+        baseq.obj \
+        cmdline.obj \
+        config.obj \
+        debug.obj \
+        execsql.obj \
+        hanging.obj \
+        html.obj \
+        stacklis.obj \
+        strings.obj \
+        tabs.obj \
+        verbose.obj
+
+$(EXE) : $(DEF_FILE) $(OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(OBJS)
+<<
+
+clean::
+	- erase *.exe
+    - erase *.obj
+
+$(OBJS) : config.h
+
+bcpp.obj \
+tabs.obj : bcpp.h

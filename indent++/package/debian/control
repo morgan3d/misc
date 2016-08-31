@@ -1,0 +1,18 @@
+Source: bcpp
+Section: devel
+Priority: optional
+Maintainer: Miriam Ruiz <little_miry@yahoo.es>
+Build-Depends: debhelper (>= 7), quilt, autotools-dev
+Standards-Version: 3.9.1
+
+Package: bcpp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: C(++) beautifier
+ bcpp indents C/C++ source programs, replacing tabs with spaces or the
+ reverse. Unlike indent, it does (by design) not attempt to wrap long
+ statements.
+ .
+ This version improves the parsing algorithm by marking the state of all
+ characters, recognizes a wider range of indention structures, and implements
+ a simple algorithm for indenting embedded SQL.

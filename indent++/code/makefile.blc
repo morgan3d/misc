@@ -1,0 +1,34 @@
+# Make file supplied by Chris Elliott <biol75@york.ac.uk>
+
+D=..\code
+
+.SUFFIXES:	.exe .cpp .obj
+
+
+
+SOURCE=        $(D)\bcpp.obj\
+        $(D)\anyobj.obj\
+        $(D)\backup.obj\
+        $(D)\baseq.obj\
+        $(D)\cmdline.obj\
+        $(D)\config.obj\
+        $(D)\debug.obj\
+        $(D)\execsql.obj\
+        $(D)\hanging.obj\
+        $(D)\html.obj\
+        $(D)\stacklis.obj\
+        $(D)\strings.obj\
+        $(D)\tabs.obj\
+        $(D)\verbose.obj
+
+bcpp.exe: $(SOURCE)		
+     bcc32 $(SOURCE)	
+
+clean:
+	erase $(D)\*.obj
+        erase $(D)\*.exe
+        erase $(D)\*.tds
+
+.cpp.obj:
+
+    bcc32 -c -n$(D) $<  

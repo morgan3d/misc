@@ -1,0 +1,56 @@
+MANIFEST for bcpp-20120318, version t2012-03-18
+--------------------------------------------------------------------------------
+MANIFEST                        this file
+CHANGES                         change-log for BCPP
+COPYING                         copyright and license
+README                          top-level README for bcpp
+VERSION                         version of this package
+aclocal.m4                      autoconf macros for BCPP
+bcpp.cfg                        default configuration for bcpp
+bcppall.bat                     run bcpp for a whole directory
+config.guess                    utility script
+config.sub                      utility script
+config_h.in                     template for config.h
+configure                       configure script for BCPP
+configure.in                    configure-script template for BCPP
+configure                       Configuration script for UNIX
+indent.bat                      script for format all C/C++/Java(Script) files
+indent.cfg                      alternate configuration (larger queue)
+install.sh                      install-script
+makefile.in                     top-level makefile templace for BCPP
+code                            subdirectory
+code/.vilerc                    vile settings
+code/anyobj.cpp                 the base class for all objects...
+code/anyobj.h                   interface of anyobj.cpp
+code/backup.cpp                 backup original file, restore if no change is made
+code/baseq.cpp                  objects which are descendents of ANYOBJECT
+code/baseq.h                    interface of baseq.cpp
+code/bcpp.cfg                   sample config-file for bcpp (used in testing also)
+code/bcpp.cpp                   main program (Beautify C++)
+code/bcpp.h                     common interface/defs for bcpp
+code/cb++                       sample unix script, used for regression testing
+code/cmdline.cpp                command-line options-parsing
+code/cmdline.h                  interface of cmdline.cpp
+code/config.cpp                 config-file reader
+code/config.h                   interface of config.cpp
+code/debug.cpp                  debug/trace functions for BCPP
+code/execsql.cpp                module to indent embedded SQL statements
+code/hanging.cpp                compute hanging-indent of multiline statements
+code/html.cpp                   test for HTML vs JavaScript
+code/makefile.blc               makefile for Borland C
+code/makefile.in                makefile template for BCPP program
+code/makefile.unx               UNIX makefile (g++)
+code/makefile.wnt               makefile for M$ Visual C++
+code/run-test                   test-script
+code/stacklis.cpp               container class that stores items in a linked list
+code/stacklis.h                 interface of stacklis.cpp
+code/strings.cpp                simple string-utilities
+code/tabs.cpp                   tab expansion/conversion for BCPP
+code/verbose.cpp                all output to stdout or stderr
+txtdocs                         subdirectory
+txtdocs/bcpp.1                  manual, in UNIX manpage format
+txtdocs/hirachy.txt             text-version of class-hierarchy
+txtdocs/manual.txt              text-version of manual
+wpdocs                          subdirectory
+wpdocs/hirachy.doc              document, in WP51 format
+wpdocs/manual.doc               document, in WP51 format

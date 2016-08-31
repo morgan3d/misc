@@ -1,0 +1,54 @@
+#!/bin/sh
+# $Id: run-test,v 1.7 2003/04/20 21:36:55 tom Exp $
+if (make) ; then
+	if test $# != 0 ; then
+		PATH=.:$PATH
+		export PATH
+
+		BCPP_OPT="-yb"
+		DIFF_OPT="-u"
+
+		rm -rf result
+		mkdir result
+		test -f output/.vilerc && cp output/.vilerc result/
+
+		# top-level directory "input" contains test-files.
+		# subdirectories of "input" contain test-configs.
+		for n in $*
+		do
+			N=`basename $n`
+			if test -f input/$N ; then
+				output=output/$N
+				result=result/$N
+				cp input/$N ${result}
+				echo "** ${result}"
+				./bcpp -fnc bcpp.cfg $BCPP_OPT ${result}
+				rm -f ${result}.orig
+				diff $DIFF_OPT $output $result
+			elif test -f input/$N/.bcpp ; then
+				OUTPUT="output/$N"
+				RESULT="result/$N"
+				if test -d $RESULT ; then
+					echo "? already exists: $RESULT"
+				else
+					mkdir $RESULT
+					test -f output/.vilerc && cp output/.vilerc $RESULT/
+					for NN in input/*
+					do
+						if test -f $NN ; then
+							output=$OUTPUT/`basename $NN`
+							result=$RESULT/`basename $NN`
+							cp $NN ${result}
+							echo "** ${result}"
+							./bcpp -fnc input/$N/.bcpp $BCPP_OPT ${result}
+							rm -f ${result}.orig
+							diff $DIFF_OPT $output $result
+						fi
+					done
+				fi
+			fi
+		done
+	else
+		eval $0 input/*
+	fi
+fi

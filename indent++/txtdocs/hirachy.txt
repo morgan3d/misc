@@ -1,0 +1,110 @@
+
+
+                            Object Hierarchy Diagram
+                                     
+          
+          
+                    Any Object ----+---- QueueList (generic queue object)
+                                   |
+                                   |
+                                   +---- StackList (generic stack object)
+                                   |
+                                   |
+                                   +---- InputStruct
+                                   |
+                                   |
+                                   +---- OutputStruct
+                                   |
+                                   |
+                                   +---- IndentStruct
+                     
+          
+          Notes of class usage:
+          IndentStruct:
+          Even though IndentStruct is defined as a class, it is basically
+          a record structure. I have defined it as a class to help storage
+          of the record data easier, and to automate some of the
+          initialisation process. However, there are no methods (apart from
+          the constructor), that handles any of the object's data. All data
+          is altered directly within the class (i.e don't use methods to
+          change data).
+          
+          InputStruct: 
+          This is basically like the IndentStruct, except it has no defined
+          constructor. The class is used the same was as a normal
+          structure. A destructor isn't implemented as existing data may
+          belong to two, or more other objects.
+          
+          OutputStruct:
+          This has more OO implementation than the previous two objects 
+          (i.e constructor, destructor), but data is accessed the same as
+          any structure. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            Entity RelationShip Diagram
+          
+          
+          
+                        +-----------+              +-------------+
+                        |           |     have    /|             |
+                        | QueueList |--------------| InputStruct |
+                        |           |             \|             |
+                        +-----------+              +-------------+
+                              |
+                              |
+                              |                    +--------------+
+                              |           have    /|              |
+                              +--------------------| OutputStruct |
+                                                  \|              |
+                                                   +--------------+
+          
+          
+                        +-----------+              +--------------+
+                        |           |     have    /|              |
+                        | StackList |--------------| IndentStruct |
+                        |           |             \|              |
+                        +-----------+              +--------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
