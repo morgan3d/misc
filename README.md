@@ -16,10 +16,11 @@ The code in this repository is organized by topic.
 
 Graphics
 ==================================================================
-- tachyonVR - Unity VR Starter Project
+- tachyonVR - Unity 5.4 VR Starter Project. August 2016.
+- oculusSample - Oculus SDK OpenGL Sample. Windows Visual Studio project for initializing and rendering to a DK2 or later HMD using OpenGL. June 2015.
+
 
 <!--
-<li><a href="C++/OculusOpenGLSample.zip">Oculus SDK OpenGL Sample</a> - Visual Studio project for initializing and rendering to a DK2 or later HMD using OpenGL</li>
 <li><a href="python/python-oit.zip">Python implementation of Blended Order Independent Transparency</a> contributed by Nicolas P. Rougier, based on the paper by Louis Bavoil and Morgan McGuire</li>
 <li><a href="C++/Terrain-source.zip">Continuous detail GPU Terrain</a> - with multi-scale texturing and a hardware optimized variant of the geo clipmap. I'm writing an associated blog post</li>
  <li><a href="C++/glToScreen.cpp">glToScreen.cpp</a> - Reverse OpenGL projection (see also my <a href="http://www.flipcode.com/archives/Object_To_Screen_Space.shtml">flipcode article</a>)
