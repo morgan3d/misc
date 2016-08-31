@@ -1,0 +1,77 @@
+#version 120 or 420 compatibility // -*- c++ -*-
+/**
+ \file Terrain_precomputeLighting.pix
+ \author Morgan McGuire, http://cs.williams.edu/~morgan
+
+ Computes:
+ 
+     RGB = ambient illumination
+     A   = light visibility (to be combined with shadow map and light at runtime)
+*/
+#include <compatibility.glsl>
+#include <g3dmath.glsl>
+#include <LightingEnvironment/LightingEnvironment_uniforms.glsl>
+#include <Texture/Texture.glsl>
+
+/** Contains (normalXYZ, elevation) */
+uniform_Texture(2D, heightfield_);
+
+uniform float       metersPerHeightfieldTexel;
+uniform float       heightfieldTexelsPerMeter;
+uniform Vector3     directionToSun;
+
+
+#if __VERSION__ == 120
+#   define result gl_FragColor
+#else
+    out float4 result;
+#endif
+
+void main() {
+    Point3 wsPosition = (gl_FragCoord.xxy - 0.5) * metersPerHeightfieldTexel;
+    Vector3 wsNormal;
+    {
+        float4 temp = texelFetch(heightfield_buffer, int2(gl_FragCoord.xy), 0) * heightfield_readMultiplyFirst + heightfield_readAddSecond;
+        wsNormal = normalize(temp.xyz);
+        wsPosition.y = temp.a;
+    }
+
+    ///////////////////////////////////////////////////////////////////
+    // Compute shadowing
+    float lightVisibility = 1.0;
+
+    // Ray-march towards the sun
+    const int NUM_STEPS = 50;
+    const float MAX_DISTANCE = 100; // meters
+    const float bump = 0.5; // meters
+    const float softShadowDistance = 4.0;
+
+    for (int i = 0; i < NUM_STEPS; ++i) {
+        Point3 ray = wsPosition + directionToSun * (bump + MAX_DISTANCE * float(i) / (float(NUM_STEPS - 1)));
+        float terrainY = texelFetch(heightfield_buffer, int2(ray.xz * heightfieldTexelsPerMeter), 0).a * heightfield_readMultiplyFirst.a + heightfield_readAddSecond.a;
+        lightVisibility = min(lightVisibility, saturate((ray.y + softShadowDistance - terrainY) / softShadowDistance));
+    }
+
+    ///////////////////////////////////////////////////////////////////
+    // Compute AO
+    Color3 ambient = computeLambertianEnvironmentMapLighting(wsNormal);
+
+    // Volumetric AO
+    const int NUM_AO_SAMPLES = 32;
+    const float AO_RADIUS1 = 10;
+    const float AO_RADIUS2 = 25;
+    float ambientVisibility = 0.0;
+    for (int i = 0; i < NUM_AO_SAMPLES; ++i) {
+        Vector3 v = hammersleyCosHemi(i, NUM_AO_SAMPLES);
+        Point3 P1 = v * AO_RADIUS1 + wsPosition;
+        Point3 P2 = v * AO_RADIUS2 + wsPosition;
+        ambientVisibility += 
+            ((texelFetch(heightfield_buffer, int2(P1.xz * heightfieldTexelsPerMeter), 0).a * heightfield_readMultiplyFirst.a + heightfield_readAddSecond.a < P1.y) &&
+             (texelFetch(heightfield_buffer, int2(P2.xz * heightfieldTexelsPerMeter), 0).a * heightfield_readMultiplyFirst.a + heightfield_readAddSecond.a < P2.y)) ? 1.0 : 0.0;
+    }
+
+    // Use at least 10% ambient always
+    ambient *= lerp((ambientVisibility / float(NUM_AO_SAMPLES * 2.0)), 1.0, 0.10);
+
+    result = float4(ambient, lightVisibility);
+}

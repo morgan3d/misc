@@ -1,0 +1,47 @@
+Terrain::Specification {
+    metersPerHeightfieldTexel = 2.0;
+    minElevation = -40;
+    maxElevation = 512;
+    heightfieldFilename = "mountains.png";
+    metersPerMaterialTile = 4.0;
+    numMeshLODLevels = 7;
+    meshBaseLODExtentHeightfieldTexels = 128;
+
+    lowFrequencyTextureFilename = "rock-lambertian.jpg";
+
+    materialTable = {
+        SNOW  = "snow-lambertian.jpg";
+        ROCK  = "rock-lambertian.jpg";
+        DIRT  = "dirt-lambertian.png";
+        SAND  = "sand-lambertian.png";
+        GRASS = "grass-lambertian.png";
+    };
+
+    elevationZoneArray = [
+        ElevationZone {
+            startElevation = -10000;
+            steep = ROCK;
+            flat = SAND;
+        },
+        ElevationZone {
+            startElevation = -30;
+            steep = DIRT;
+            flat = GRASS;
+        },
+        ElevationZone {
+            startElevation = 110;
+            steep = ROCK;
+            flat = DIRT;
+        },
+        ElevationZone {
+            startElevation = 210;
+            steep = ROCK;
+            flat = SNOW;
+        },
+        ElevationZone {
+            startElevation = 390;
+            steep = SNOW;
+            flat = SNOW;
+        },
+    ];
+}

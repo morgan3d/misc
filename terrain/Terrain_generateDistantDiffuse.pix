@@ -1,0 +1,46 @@
+#version 120 or 420 compatibility // -*- c++ -*-
+/** \file Terrain_generateDistantDiffuse.pix
+
+   Precomputes the Terrain::m_distantDiffuse lookup table for
+   average diffuse reflectivity (color) based on slope and
+   elevation.
+
+   \author Morgan McGuire, http://cs.williams.edu/~morgan
+*/
+#include <compatibility.glsl>
+#include <g3dmath.glsl>
+#include "Terrain_material.glsl"
+#include <Texture/Texture.glsl>
+
+#if __VERSION__ == 120
+#   define diffuse gl_FragColor.xyz
+#else
+    out float3 diffuse;
+#endif
+
+uniform_Texture(2DArray, diffuse_);
+uniform float heightfield_readMultiplyFirst;
+uniform float heightfield_readAddSecond;
+
+void main() {
+    float2 relativeCoord = (gl_FragCoord.xy - 0.5) / (g3d_FragCoordExtent - 1.0);
+
+    // Triplanar weight for the horizontal plane
+    float weightYPlane   = relativeCoord.x;
+
+    // Elevation value
+    float textureElevation = relativeCoord.y * heightfield_readMultiplyFirst + heightfield_readAddSecond;
+
+    float verticalBlend, lowFlat, lowSteep, highFlat, highSteep;
+    getTextureIndicesFromElevation(textureElevation, verticalBlend, lowFlat, lowSteep, highFlat, highSteep);
+
+    diffuse += weightYPlane * 
+            lerp(textureLod(diffuse_buffer, float3(0.5, 0.5, lowFlat), maxMaterialLOD).rgb,
+                    textureLod(diffuse_buffer, float3(0.5, 0.5, highFlat), maxMaterialLOD).rgb,
+                    verticalBlend);
+
+    diffuse += (1.0 - weightYPlane) * 
+            lerp(textureLod(diffuse_buffer, float3(0.5, 0.5, lowSteep), maxMaterialLOD).rgb, 
+                    textureLod(diffuse_buffer, float3(0.5, 0.5, highSteep), maxMaterialLOD).rgb,                         
+                    verticalBlend);
+}

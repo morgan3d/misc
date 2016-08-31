@@ -1,0 +1,53 @@
+#version 120 or 420 compatibility // -*- c++ -*-
+/**
+ \file Terrain_generateMIP.pix
+ \author Morgan McGuire, http://cs.williams.edu/~morgan
+*/
+#include <compatibility.glsl>
+#include <g3dmath.glsl>
+
+uniform sampler2D source;
+uniform int       sourceLevel;
+
+#if __VERSION__ == 120
+#   define result gl_FragColor
+#else
+    out float4 result;
+#endif
+
+void main() {
+    result = float4(0.0);
+
+#   if __VERSION__ == 120
+    float weight[9];
+    weight[0] = weight[2] = weight[6] = weight[8] = 1.0 / 16.0;
+    weight[1] = weight[3] = weight[5] = weight[7] = 1.0 / 8.0;
+    weight[4] = 1.0 / 4.0;
+#   else
+    // Weight each point inversely to the number of times
+    // it will be used at this LOD.
+    const float weight[9] = {
+        1.0 / 16.0,  1.0 / 8.0,  1.0 / 16.0, 
+        1.0 /  8.0,  1.0 / 4.0,  1.0 /  8.0, 
+        1.0 / 16.0,  1.0 / 8.0,  1.0 / 16.0
+    };
+#   endif
+
+    // The high-resolution texel under this one
+    float2 center = (gl_FragCoord.xy - 0.5) * 2.0 + 0.5;
+
+    // Clamp to the image bounds
+    float2 sz = float2(textureSize(source, sourceLevel)) - 1.0;
+
+    // This could be done faster with four bilinear taps...no weights needed!
+
+    // Perform all arithmetic on float for performance until
+    // we are forced to convert to an integer.
+    int i = 0;
+    for (float2 offset = float2(-1, -1); offset.y <= 1.0; ++offset.y) {
+        for (offset.x = -1.0; offset.x <= 1.0; ++offset.x, ++i) {
+            float4 v = texelFetch(source, int2(clamp(center + offset, float2(0), sz)), sourceLevel);
+            result += v * weight[i];
+        }
+    }
+}

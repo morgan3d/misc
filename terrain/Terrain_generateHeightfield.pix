@@ -1,0 +1,59 @@
+#version 120 or 420 compatibility // -*- c++ -*-
+/** 
+  \file Terrain_generateHeightfield.pix
+  \author Morgan McGuire, http://cs.williams.edu/~morgan
+*/
+#include <compatibility.glsl>
+#include <g3dmath.glsl>
+
+uniform sampler2D source;
+uniform float sourceMultiplyFirst;
+uniform float sourceAddSecond;
+uniform float metersPerHeightfieldTexel;
+
+uniform float4 writeMultiplyFirst;
+uniform float4 writeAddSecond;
+
+#if __VERSION__ == 120
+#   define result gl_FragColor
+#else
+    out float4 result;
+#endif
+
+
+void main() {
+    int2 center = int2(gl_FragCoord.xy);
+
+    // Elevation 
+    result.w = texelFetch(source, center, 0).r * sourceMultiplyFirst + sourceAddSecond;
+    
+    result.xyz = Vector3(0, 1.0, 0);
+
+    // Radius in fine texels over which we average normals along axes
+    const int r = 4;
+
+    // Radius in fine texels over which we average normals orthogonal to the axes 
+    const int s = 2;
+
+    int2 maxCoord = textureSize(source, 0) - 1;
+
+    // Average height difference
+    Vector3 delta = Vector3(0.0);
+
+    float weightSum = 0.0;
+    for (int shift = -s; shift < +s; ++shift) {
+        float weight = 1.0 / (abs(shift) + 1.0);
+        weightSum += weight;
+        for (int d = 1; d <= r; ++d) {
+            delta.x += (texelFetch(source, clamp(center + int2(d, shift), int2(0), maxCoord), 0).r - texelFetch(source, clamp(center - int2(d, shift), int2(0), maxCoord), 0).r) * weight;
+            delta.z += (texelFetch(source, clamp(center + int2(shift, d), int2(0), maxCoord), 0).r - texelFetch(source, clamp(center - int2(shift, d), int2(0), maxCoord), 0).r) * weight;
+        }
+    }
+
+    delta.xz *= sourceMultiplyFirst / (float(r) * weightSum);
+
+    result.xyz = normalize(cross(Vector3(0.0, delta.z, 2.0 * metersPerHeightfieldTexel * r),
+                 Vector3(2.0 * metersPerHeightfieldTexel * r, delta.x, 0)));
+    
+    result = result * writeMultiplyFirst + writeAddSecond;
+}

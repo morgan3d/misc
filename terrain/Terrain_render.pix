@@ -1,0 +1,382 @@
+#version 120 or 420 compatibility // -*- c++ -*-
+/**
+ \file Terrain_render.pix
+ \author Morgan McGuire, http://cs.williams.edu/~morgan
+*/
+#include <compatibility.glsl>
+#include <g3dmath.glsl>
+#include <noise.glsl>
+#include <gradient.glsl>
+#include <Texture/Texture.glsl>
+#include "Terrain_material.glsl"
+
+////////////////////////////////////////
+
+#expect MODE "enum"
+#define BLACK           1
+#define TEXTURE_PARAM   2
+#define NEON            3
+#define SHADE           4
+#define GBUFFER         5
+
+/** XYZ = normal, W = elevation */
+uniform_Texture(2D, heightfield_);
+uniform float heightfield_invReadMultiplyFirst;
+
+uniform_Texture(2D, lowFrequencyTexture_);
+
+uniform float heightfieldTexelsPerMeter;
+uniform float metersPerHeightfieldTexel;
+
+uniform Vector3 directionToSun;
+
+/** High-resolution materials */
+uniform_Texture(2DArray, diffuse_);
+
+/** The lowest MIP-level, indexed by (planeWeightY, rawElevation) */
+uniform_Texture(2D, distantDiffuse_);
+
+uniform_Texture(2D, precomputedLighting_);
+
+uniform float materialTilesPerMeter;
+
+/** The color region. Outside of this is the depth-only guard band. */
+uniform Point2 lowerCoord, upperCoord;
+
+varying Point3  wsPosition;
+
+#if MODE == NEON
+    varying float debugValue;
+#endif
+
+varying flat float gridLOD;
+
+#if defined(CS_POSITION_CHANGE) || defined(SS_POSITION_CHANGE)
+    varying vec3        csPrevPosition;
+#endif
+
+#if defined(SS_EXPRESSIVE_MOTION)
+    varying vec3        csExpressivePrevPosition;
+#endif
+
+#ifdef SS_POSITION_CHANGE
+    uniform mat4x3      CurrentToPreviousCameraMatrix;
+#endif
+
+#ifdef SS_EXPRESSIVE_MOTION
+    uniform mat4x3      CurrentToExpressivePreviousCameraMatrix;
+#endif
+
+#if defined(SS_POSITION_CHANGE) || defined(SS_EXPRESSIVE_MOTION)
+    uniform mat4        ProjectToScreenMatrix;
+#endif
+
+#if defined(SS_POSITION_CHANGE) || defined(SS_EXPRESSIVE_MOTION) || defined(CS_NORMAL) || defined(WS_NORMAL) || defined(CS_FACE_NORMAL) || defined(WS_FACE_NORMAL) || defined(CS_POSITION) || defined(WS_POSITION)
+    uniform vec4        projInfo;
+#endif
+
+
+#if MODE != GBUFFER
+#   if __VERSION__ == 120
+#       define result gl_FragColor
+#   else
+        out float4 result;
+#   endif
+#endif
+
+/** For debug visualization of texture coordinates */
+float checkerboard(vec2 uv) {
+	uv = fract(uv);
+	return ((uv.x < 0.5 && uv.y < 0.5) || (uv.x > 0.5 && uv.y > 0.5)) ? 0.0 : 1.0;
+}
+
+/** Optimized version of the function below (the GLSL compiler doesn't figure this out on its own) */
+void computeTriplanar(in Point3 pos, in Vector3 normal, out Point3 texCoordNorthSouth, out Point3 texCoordFlat, out Point3 texCoordEastWest) {
+	// Calculate weights for blending
+	vec3 weights = vec3(abs(normal.x), max(0.0, abs(normal.y) - 0.55), abs(normal.z));
+	weights = pow64(weights);
+	weights *= 1.0 / (weights.x + weights.y + weights.z);				
+		
+	// Perform the uv projection on to each plane: these are the texture coordinates
+	texCoordNorthSouth  = Point3(pos.z, sign(normal.x) * 2.0 * pos.x, weights.x);
+	texCoordFlat        = Point3(pos.x, pos.z, weights.y);
+	texCoordEastWest    = Point3(pos.x, sign(normal.z) * 2.0 * pos.z, weights.z);
+}
+
+// Based on https://www.shadertoy.com/view/lsj3z3
+void _computeTriplanar(Point3 pos, Vector3 normal, out Point3 texCoordNorthSouth, out Point3 texCoordFlat, out Point3 texCoordEastWest) {
+    // The y-coordinate does not match the normal due to 
+    // the interpolation and normal-filtering scheme for 
+    // the terrain renderer, so I've hard-coded
+    // the planes to simply stretch along the appropriate
+    // axis.
+     
+    // The steepest expected slope, where 0 = horizontal and 90 = vertical
+	const float steepestSlope = radians(90);
+    		
+	// Calculate weights for blending
+	vec3 weights = max(abs(normal) - vec3(0.0, 0.55, 0.0), 0.0);
+	weights = pow64(weights);
+	weights *= 1.0 / (weights.x + weights.y + weights.z);
+				
+	// cache these as we are using a plane reflected around various
+	// axes so these numbers are shared.
+	//const float cosp = cos(steepestSlope);
+	//const float sinp = sin(steepestSlope);
+		
+	// Set up three planar projections by creating
+    // a 'u' axis and a 'v' axis for each.
+
+	// The mostly-x-facing plane
+	const vec3 p1u = vec3(0.0, 0.0, 1.0);
+    //	const vec3 p1v = vec3(sign(normal.x) * cosp,  sinp, 0.0);
+	const vec3 p1v = vec3(sign(normal.x) * 2.0,  0.0, 0.0);
+
+	// The y-facing plane (zx)
+	const vec3 p2u = vec3(0.0, 0.0, 1.0);
+	const vec3 p2v = vec3(1.0, 0.0, 0.0);
+		
+	// The mostly-z-facing plane
+	const vec3 p3u = vec3(1.0, 0.0, 0.0);
+    //	const vec3 p3v = vec3(0.0, sinp, sign(normal.z) * cosp);
+	const vec3 p3v = vec3(0.0, 0.0, sign(normal.z) * 2.0);
+		
+	// Perform the uv projection on to each plane: these are the texture coordinates
+	texCoordNorthSouth  = Point3(dot(pos, p1u), dot(pos, p1v), weights.x);
+	texCoordFlat        = Point3(dot(pos, p2u), dot(pos, p2v), weights.y);
+	texCoordEastWest    = Point3(dot(pos, p3u), dot(pos, p3v), weights.z);
+}
+
+
+/** Don't bother reading textures that receive less than this weight */
+const float minimumWeight = 0.02;
+
+
+/** Lerps between low and high by verticalBlend and then weights everything by texCoord.z.
+    Avoids making fetches for low-weight locations. */
+Color3 readTextures(float3 texCoord, TextureIndex low, TextureIndex high, float verticalBlend) {
+    // We have to compute gradients outside of the branches, since within
+    // a pixel-quad any given branch may be ignored.
+    Vector2 gradX = dFdx(texCoord.xy);
+    Vector2 gradY = dFdy(texCoord.xy);
+
+    Color3 value = Color3(0);
+
+    float weight = (1.0 - verticalBlend) * texCoord.z;
+    if (weight > minimumWeight) {
+        value += weight * textureGrad(diffuse_buffer, float3(texCoord.xy, low), gradX, gradY).rgb;
+    }
+
+    weight = verticalBlend * texCoord.z;
+    if (weight > minimumWeight) {
+        value += weight * textureGrad(diffuse_buffer, float3(texCoord.xy, high), gradX, gradY).rgb;
+    }
+
+    return value;
+}
+
+
+void shade() {
+    // Outgoing radiance from this pixel
+    Radiance3 L_o = Radiance3(0);
+
+    Vector3 shadingNormal;
+    Point3  shadingPosition;
+    {
+        // Key the shading and normal off the heightfield sampled at pixel (vs. vertex) precision, so that
+        // shading does not change as the terrain morphs LOD.
+        float4 temp = texture2DLod(heightfield_buffer, (wsPosition.xz * heightfieldTexelsPerMeter + 0.5) * heightfield_invSize.xy, 0.0) * heightfield_readMultiplyFirst + heightfield_readAddSecond;
+        shadingNormal   = normalize(temp.xyz);
+        shadingPosition = Point3(wsPosition.x, temp.a, wsPosition.z);
+    }
+
+    // Use these values to bump-map the normal and to arbitrarily darken the surface
+    // for the appearance of detail at multiple scales.
+    Point2 lowFreqTexCoord = wsPosition.xz * materialTilesPerMeter;
+    float lowFreqNoiseValue1 = texture(lowFrequencyTexture_buffer, lowFreqTexCoord * (1.0 / 32.0)).r;
+    float lowFreqNoiseValue2 = texture(lowFrequencyTexture_buffer, lowFreqTexCoord * (1.0 / 500.0)).r;
+
+    // Weights are stored in the z channel of the texture coordinates
+    Point3 texCoordNorthSouth, texCoordFlat, texCoordEastWest;
+    computeTriplanar(shadingPosition * materialTilesPerMeter, shadingNormal + Vector3(0,(lowFreqNoiseValue1 + lowFreqNoiseValue2 - 0.2) * 0.5,0), texCoordNorthSouth, texCoordFlat, texCoordEastWest);
+
+#   if MODE == BLACK
+         L_o.rgb = Color3(0);
+#   elif MODE == NEON
+         L_o.rgb = neonGradient(gridLOD * 0.2);
+#   elif MODE == TEXTURE_PARAM
+	    // draw some checkerboard debug pattern
+	    Color3 diffuse = 
+            checkerboard(texCoordNorthSouth.xy * 2.0) * texCoordNorthSouth.z * neonGradient(0) +
+            checkerboard(texCoordFlat.xy       * 2.0) * texCoordFlat.z       * neonGradient(0.5) +
+            checkerboard(texCoordEastWest.xy   * 2.0) * texCoordEastWest.z   * neonGradient(1.0);
+
+        L_o.rgb = diffuse;
+#   else
+
+        // Alter the elevation used for fetching the elevation zone by procedural noise
+        // to avoid horizontal banding between zones.
+        float textureElevation = wsPosition.y + (lowFreqNoiseValue1 + lowFreqNoiseValue2 - 1.0) * 80;
+
+        Color3 diffuse;
+        if (gridLOD > 1.0) {
+            // Far away: look up the diffuse color in the precomputed map
+            diffuse = textureLod(distantDiffuse_buffer, Point2(texCoordFlat.z, (textureElevation - heightfield_readAddSecond.a) * heightfield_invReadMultiplyFirst), 0).rgb;
+        } else {
+            // Six textures are active: {high, low} x {steepX, steepZ, flat}
+            TextureIndex lowFlat, lowSteep, highFlat, highSteep;
+            float verticalBlend;
+            getTextureIndicesFromElevation(textureElevation, verticalBlend, lowFlat, lowSteep, highFlat, highSteep);
+
+            // Near the camera: full blending
+            diffuse = readTextures(texCoordFlat,        lowFlat,  highFlat,  verticalBlend);
+            diffuse += readTextures(texCoordEastWest,   lowSteep, highSteep, verticalBlend);
+            diffuse += readTextures(texCoordNorthSouth, lowSteep, highSteep, verticalBlend);
+        }
+
+        // Low-frequency noise over the entire scene.
+        {
+            diffuse *= min(1.2,
+                       (noise(lowFreqTexCoord * 0.2, 2) * 0.5 + 0.8) *
+                       (texture(lowFrequencyTexture_buffer, lowFreqTexCoord * (1.0 / 4.5)).r   * 0.9 + 0.6) *
+                       (lowFreqNoiseValue1 * 0.8 + 0.6) *
+                       (lowFreqNoiseValue2 * 0.8 + 0.6));
+        }
+
+        Irradiance3 ambient;
+        float lightVisible;
+        {
+            float4 temp = texture2DLod(precomputedLighting_buffer, (shadingPosition.xz * heightfieldTexelsPerMeter + 0.5) * precomputedLighting_invSize.xy, 0);
+            ambient = temp.rgb;
+            lightVisible = temp.a;
+        }
+        
+        Color3 lightColor = Color3(1.1, 1.0, 0.5) * lightVisible;
+
+        Point3 cameraPos = g3d_CameraToWorldMatrix[3].xyz;
+        Vector3 w_o = normalize(cameraPos - shadingPosition); 
+        Vector3 w_i = directionToSun;
+        Vector3 w_h = normalize(w_i + w_o);
+        L_o.rgb = 
+            diffuse * (max(0.0, dot(shadingNormal, w_i)) * lightColor + ambient) +
+            lightColor * (0.1 * pow6(max(0.0, dot(shadingNormal, w_h))));
+#   endif
+
+#   if MODE != GBUFFER
+        // Writing to a color buffer
+        result.rgb = L_o;
+        result.a   = 1.0;
+#   else
+    {
+#       foreach (NAME, numComponents) in (TRANSMISSIVE, 3), (LAMBERTIAN, 4), (GLOSSY, 4)
+#          ifdef $(NAME)
+                $(NAME) = vec$(numComponents)(0);
+#         endif
+#      endforeach
+
+#      ifdef EMISSIVE
+            // Write the shading value directly to the emissive channel
+            EMISSIVE.rgb = L_o;
+#      endif
+
+       ///////////////////////// NORMALS //////////////////////////////
+
+#      ifdef CS_NORMAL
+            vec3 csN = mat3(g3d_WorldToCameraMatrix) * shadingNormal;
+#      endif
+
+#      if defined(WS_FACE_NORMAL) || defined(CS_FACE_NORMAL)
+            vec3 wsFaceNormal = normalize(cross(dFdy(wsPosition), dFdx(wsPosition)));
+#      endif
+
+#      ifdef CS_FACE_NORMAL
+            vec3 csFaceNormal = (g3d_WorldToCameraMatrix * vec4(wsFaceNormal, 0.0));
+#      endif
+
+#      foreach (NAME, name) in (WS_NORMAL, shadingNormal), (CS_NORMAL, csN), (WS_FACE_NORMAL, wsFaceNormal), (CS_FACE_NORMAL, csFaceNormal)
+#          ifdef $(NAME)
+                $(NAME).xyz = $(name) * $(NAME)_writeMultiplyFirst.xyz + $(NAME)_writeAddSecond.xyz;
+#          endif
+#      endforeach
+
+        //////////////////////// POSITIONS /////////////////////////////
+        // NVIDIA drivers miscompile this unless we write WS_POSITION after the normals
+
+#      if defined(CS_POSITION) || defined(CS_POSITION_CHANGE) || defined(SS_POSITION_CHANGE) || defined(SS_EXPRESSIVE_MOTION) || defined(CS_Z)
+            vec3 csPosition = g3d_WorldToCameraMatrix * vec4(wsPosition, 1.0);
+#      endif
+
+#      ifdef CS_POSITION_CHANGE
+            vec3 csPositionChange = csPosition - csPrevPosition;
+#      endif
+
+#      if defined(SS_POSITION_CHANGE) || defined(SS_EXPRESSIVE_MOTION)
+            // gl_FragCoord.xy has already been rounded to a pixel center, so regenerate the true projected position.
+            // This is needed to generate correct velocity vectors in the presence of Projection::pixelOffset
+            vec4 accurateHomogeneousFragCoord = ProjectToScreenMatrix * vec4(csPosition, 1.0);
+#      endif
+
+#      ifdef SS_POSITION_CHANGE
+            vec2 ssPositionChange;
+            {
+                if (csPrevPosition.z >= 0.0) {
+                    // Projects behind the camera; write zero velocity
+                    ssPositionChange = vec2(0.0);
+                } else {
+                    vec4 temp = ProjectToScreenMatrix * vec4(csPrevPosition, 1.0);
+                    // We want the precision of division here and intentionally do not convert to multiplying by an inverse.
+                    // Expressing the two divisions as a single vector division operation seems to prevent the compiler from
+                    // computing them at different precisions, which gives non-zero velocity for static objects in some cases.
+                    // Note that this forces us to compute accurateHomogeneousFragCoord's projection twice, but we hope that
+                    // the optimizer will share that result without reducing precision.
+                    vec4 ssPositions = vec4(temp.xy, accurateHomogeneousFragCoord.xy) / vec4(temp.ww, accurateHomogeneousFragCoord.ww);
+
+                    ssPositionChange = ssPositions.zw - ssPositions.xy;
+                }
+            }
+#      endif
+
+#      ifdef SS_EXPRESSIVE_MOTION
+            vec2 ssExpressiveMotion;
+            {
+                if (csExpressivePrevPosition.z >= 0.0) {
+                    // Projects behind the camera; write zero velocity
+                    ssExpressiveMotion = vec2(0.0);
+                } else {
+                    vec4 temp = ProjectToScreenMatrix * vec4(csExpressivePrevPosition, 1.0);
+                    // We want the precision of division here and intentionally do not convert to multiplying by an inverse.
+                    // Expressing the two divisions as a single vector division operation seems to prevent the compiler from
+                    // computing them at different precisions, which gives non-zero velocity for static objects in some cases.
+                    // Note that this forces us to compute accurateHomogeneousFragCoord's projection twice, but we hope that
+                    // the optimizer will share that result without reducing precision.
+                    vec4 ssPositions = vec4(temp.xy, accurateHomogeneousFragCoord.xy) / vec4(vec2(temp.w), vec2(accurateHomogeneousFragCoord.w));
+
+                    ssExpressiveMotion = ssPositions.zw - ssPositions.xy;
+                }
+            }
+#      endif
+
+#      foreach (NAME, name, components) in (WS_POSITION, wsPosition, xyz), (CS_POSITION, csPosition, xyz), (CS_POSITION_CHANGE, csPositionChange, xyz), (SS_POSITION_CHANGE, ssPositionChange, xy), (SS_EXPRESSIVE_MOTION, ssExpressiveMotion, xy)
+#          ifdef $(NAME)
+                $(NAME).$(components) = $(name) * $(NAME)_writeMultiplyFirst.$(components) + $(NAME)_writeAddSecond.$(components);
+#          endif
+#      endforeach
+
+
+#      ifdef CS_Z
+            CS_Z.r = csPosition.z * CS_Z_writeMultiplyFirst.x + CS_Z_writeAddSecond.x;
+#      endif
+    }
+#   endif
+}
+
+
+void main() {
+    // Only shade within the color region if there is a guard band
+    if ((gl_FragCoord.x > lowerCoord.x) && 
+        (gl_FragCoord.y > lowerCoord.y) && 
+        (gl_FragCoord.x < upperCoord.x) && 
+        (gl_FragCoord.y < upperCoord.y)) {
+        shade();
+    }
+}

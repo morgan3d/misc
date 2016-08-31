@@ -1,0 +1,28 @@
+#version 120 or 420 compatibility // -*- c++ -*-
+/** 
+  \file Terrain_blurLighting.pix
+  \author Morgan McGuire, http://cs.williams.edu/~morgan
+*/
+#include <compatibility.glsl>
+#include <g3dmath.glsl>
+
+uniform sampler2D source;
+
+#if VERSION == 120
+#   define result gl_FragColor
+#else
+    out float4 result;
+#endif
+
+void main() {
+    float2 invSize = 1.0 / textureSize(source, 0);
+
+    result = float4(0.0);
+
+    // Use four taps to average 9 pixels, weighting the center highest
+    for (float x = -0.5; x <= +0.5; ++x) {
+        for (float y = -0.5; y <= +0.5; ++y) {
+            result += texture2DLod(source, (gl_FragCoord.xy + Vector2(x, y)) * invSize, 0) * 0.25;
+        }
+    }
+}

@@ -1,0 +1,146 @@
+#version 120 or 420 compatibility // -*- c++ -*-
+/**
+ \file Terrain_render.vrt
+ \author Morgan McGuire, http://cs.williams.edu/~morgan
+*/
+#include <compatibility.glsl>
+#include <g3dmath.glsl>
+#include <Texture/Texture.glsl>
+#include <noise.glsl>
+
+/*
+ This shader would ideally match triangles at the
+ edge of a grid level exactly to the next level by computing
+ the equivalent tessellation and bilateral interpolation...
+ but the transition point is usually so far from the camera
+ that the fraction of a pixel difference this would make
+ in the result is not worth handling.
+*/
+
+/** Store LOD in the Y coordinate, store XZ on the texel grid resolution */
+attribute Point3 g3d_Vertex;
+
+/** For wireframe */
+uniform float verticalOffset;
+
+/** XYZ = normal, W = elevation */
+uniform_Texture(2D, heightfield_);
+uniform float heightfield_invReadMultiplyFirst;
+uniform float heightfieldTexelsPerMeter;
+uniform float metersPerHeightfieldTexel;
+
+uniform float baseGridSizeTexels;
+uniform float invBaseGridSizeTexels;
+
+varying Point3 wsPosition;
+
+#if defined(CS_POSITION_CHANGE) || defined(SS_POSITION_CHANGE)
+    uniform mat4x3      PreviousObjectToCameraMatrix;
+    varying Point3      csPrevPosition;
+#endif
+
+#if defined(SS_EXPRESSIVE_MOTION)
+    uniform mat4x3      ExpressivePreviousObjectToCameraMatrix;
+    varying Point3      csExpressivePrevPosition;
+#endif
+
+/** Polygons far from the camera use a less expensive shading method.*/
+varying flat float gridLOD;
+
+#if MODE == NEON
+    varying float debugValue;
+#endif
+
+
+Vector2 roundToIncrement(Vector2 value, float increment) {
+    return round(value * (1.0 / increment)) * increment;
+}
+
+void main() {
+    Point3 wsCamera = g3d_CameraToWorldMatrix[3].xyz;
+
+    float gridLevel = g3d_Vertex.y;
+
+    // Based on the grid, used for snapping the grid
+    float mipMetersPerHeightfieldTexel = metersPerHeightfieldTexel * exp2(gridLevel);
+
+    // Translation of the grid at this vertex
+    Vector2 objectToWorld = roundToIncrement(wsCamera.xz, mipMetersPerHeightfieldTexel);
+
+    wsPosition = Point3(g3d_Vertex.x * metersPerHeightfieldTexel + objectToWorld.x, 0.0, g3d_Vertex.z * metersPerHeightfieldTexel + objectToWorld.y);
+
+    // Where is the grid point in the grid's object space? 
+    // This will determine the level used for elevation fetch
+    Point3 osPosition = wsPosition - wsCamera;
+
+    // Reach size = 1 at the border of the level 0 grid, which has radius baseGridSizeTexels/2,
+    // but never go below 1.0 / 4.0, the "-1" level.
+    float size = max(0.5, maxComponent(abs(osPosition.xz * 2.0 * invBaseGridSizeTexels)));
+
+    // The heightfield texture level must be negatively biased to hit max resolution 
+    // before the highest resolution grid, otherwise texture swim will result on
+    // nearby surfaces. Increase the magnitude of the negative bias term towards -inf if transitions
+    // are too obvious. Decrease it towards zero if tessellation is being wasted on surfaces
+    // that are too blocky.
+    gridLOD = max(log2(size) - 0.75, 0.0);
+
+	// We want to sample from index (wsPosition.xz * heightfieldTexelsPerMeter + 0.5), but
+    // at the appropriate texture resolution and using texture coordinates.
+    float lowMIP = floor(gridLOD);
+    float highMIP = lowMIP + 1.0;
+
+    float fractionalLevel = gridLOD - lowMIP;
+
+    // How many high-level texels to offset to achieve a half-texel offset at this MIP level
+    float highMIPHalfTexelOffset = exp2(lowMIP);
+    float lowMIPHalfTexelOffset = highMIPHalfTexelOffset * 0.5;
+
+	Point2 lowMIPTexCoord  = (wsPosition.xz * heightfieldTexelsPerMeter + lowMIPHalfTexelOffset)  * heightfield_invSize.xy;
+	Point2 highMIPTexCoord = (wsPosition.xz * heightfieldTexelsPerMeter + highMIPHalfTexelOffset) * heightfield_invSize.xy;
+
+    // Manual trilinear interpolation
+    float lowMIPValue;
+    
+    if (lowMIP > 0) {
+        lowMIPValue = textureLod(heightfield_buffer, lowMIPTexCoord, lowMIP).w;
+    } else {
+        // At the lowest LOD, smooth out sharp corners (which often occur because
+        // the input is 8 bit). Providing this branch costs about 0.1 ms but dramatically
+        // improves quality.
+        const float smoothness = 0.35;
+        lowMIPValue  = 
+         (textureLod(heightfield_buffer, Vector2( heightfield_invSize.x,  heightfield_invSize.y) * smoothness + lowMIPTexCoord, lowMIP).w +
+          textureLod(heightfield_buffer, Vector2( heightfield_invSize.x, -heightfield_invSize.y) * smoothness + lowMIPTexCoord, lowMIP).w +
+          textureLod(heightfield_buffer, Vector2(-heightfield_invSize.x, -heightfield_invSize.y) * smoothness + lowMIPTexCoord, lowMIP).w +
+          textureLod(heightfield_buffer, Vector2(-heightfield_invSize.x,  heightfield_invSize.y) * smoothness + lowMIPTexCoord, lowMIP).w) * 0.25;
+
+        // Break up very flat surfaces
+        lowMIPValue += (noise(wsPosition.xz * 0.5, 3) - 0.5) * 0.75 * heightfield_invReadMultiplyFirst;
+    }
+    float highMIPValue = textureLod(heightfield_buffer, highMIPTexCoord, highMIP).w;
+    wsPosition.y = (lerp(lowMIPValue, highMIPValue, fractionalLevel) * heightfield_readMultiplyFirst.w + heightfield_readAddSecond.w) + verticalOffset;
+
+#   if MODE == NEON
+        debugValue = gridLOD * 0.2;
+        // Show heightfield texel boundaries:
+        // debugValue = mod(lowMIPTexCoord * textureSize(heightfield_buffer, int(lowMIP)).x, 1.0);
+#   endif
+
+    if (max(abs(lowMIPTexCoord.x - 0.5), abs(lowMIPTexCoord.y - 0.5)) > 0.5) {
+        // Fold down edges
+        wsPosition.y = -100;
+    }
+
+    // Homogeneous version
+    Vector4 wsPositionh = Vector4(wsPosition, 1.0);
+
+#   if defined(CS_POSITION_CHANGE) || defined(SS_POSITION_CHANGE)
+        csPrevPosition = (PreviousObjectToCameraMatrix * wsPositionh).xyz;
+#   endif
+
+#   if defined(SS_EXPRESSIVE_MOTION)
+        csExpressivePrevPosition = (ExpressivePreviousObjectToCameraMatrix * wsPositionh).xyz;
+#   endif
+
+    gl_Position = wsPositionh * gl_ModelViewProjectionMatrixTranspose;
+}

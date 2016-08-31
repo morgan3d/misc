@@ -16,13 +16,12 @@ The code in this repository is organized by topic.
 
 Graphics
 ==================================================================
-- tachyonVR - Unity 5.4 VR Starter Project. August 2016.
 - oculusSample - Oculus SDK OpenGL Sample. Windows Visual Studio project for initializing and rendering to a DK2 or later HMD using OpenGL. June 2015.
-
+- terrain - Continuous detail GPU Terrain, with multi-scale texturing and a hardware optimized variant of the geo clipmap. April 2014 http://casual-effects.blogspot.com/2014/04/fast-terrain-rendering-with-continuous.html
 
 <!--
+- tachyonVR - Unity 5.4 VR Starter Project. August 2016.
 <li><a href="python/python-oit.zip">Python implementation of Blended Order Independent Transparency</a> contributed by Nicolas P. Rougier, based on the paper by Louis Bavoil and Morgan McGuire</li>
-<li><a href="C++/Terrain-source.zip">Continuous detail GPU Terrain</a> - with multi-scale texturing and a hardware optimized variant of the geo clipmap. I'm writing an associated blog post</li>
  <li><a href="C++/glToScreen.cpp">glToScreen.cpp</a> - Reverse OpenGL projection (see also my <a href="http://www.flipcode.com/archives/Object_To_Screen_Space.shtml">flipcode article</a>)
  <li><a href="C++/glProject.cpp">glProject.cpp</a> - Forward OpenGL projection (see also my <a href="http://www.flipcode.com/archives/Projecting_3D_Points.shtml">flipcode article</a>)
  <li><a href="C++/2DOBB.h">2DOBB.h</a> - 2D oriented bounding box collision test (see also my <a href="http://www.flipcode.com/archives/2D_OBB_Intersection.shtml">flipcode article</a>)
