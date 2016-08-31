@@ -42,9 +42,9 @@ JavaScript
 
 Java
 ==================================================================
-
 - **javasandbox** - ClassLoader for dynamic class reloading, useful for plugins. Executes arbitrary Java code in a protected sandbox. 2008.
 - **redblack** - Red-black Tree implementation and demo. 2008.
+- **javadoom** - Simple Doom-style ray caster written for a data structures course. 2008.
 - **javarasterizer** - Simple rasterizer written for a data structures course. 2008.
 - **splay** - Splay Tree applet and source code. 2003.
 
