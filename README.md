@@ -49,27 +49,17 @@ Java
 - **splay** - Splay Tree applet and source code. 2003.
 
 
+Scheme
+==================================================================
+- **infix.scm* - Recursive descent infix parser and macro for Scheme. 2003.
+
 <!--
+TODO:
+
  <li><a href="http://cs.williams.edu/~morgan/cs136-s08/darwin2.0/">Darwin 2.0</a> - AI programming game with isometric 3D graphics using concurrency
  <li><a href="http://cs.williams.edu/~morgan/darwin/">Darwin 2.1</a> - AI programming game with isometric 3D graphics using coroutines (no explicit synchronization needed!)
 
 - tachyonVR - Unity 5.4 VR Starter Project. August 2016.
-<li><a href="python/python-oit.zip">Python implementation of Blended Order Independent Transparency</a> contributed by Nicolas P. Rougier, based on the paper by Louis Bavoil and Morgan McGuire</li>
 
-
-<p class="heading">
-Scheme
-</p>
-<div class="info">
-<ul><li><a href="Scheme/infix.scm">infix.scm</a> - Recursive descent infix parser and macro for Scheme</li>
-</ul>
-</div>
-
-C/C++
-===========================================================================
-<li><a href="C++/indent++.zip">indent++</a> Platform-independent command-line program to auto-indent C++ and JavaScript code (similar to the Unix indent program for C), with precompiled OS X binary.</li>
-<li><a href="C++/getip.cpp">getip.cpp</a> Get IP address, subnet mask, broadcast address, and MAC address of the network adapter(s) on Unix-based systems.</li>
-<li><a href="C++/kbhit.cpp">_kbhit.cpp</a> _kbhit for Linux/POSIX without using Curses (see also my <a href="http://www.flipcode.com/archives/_kbhit_for_Linux.shtml">flipcode article</a>)
-<li><a href="C++/safesprintf.cpp">safesprintf.cpp</a> - An sprintf implementation that prevents buffer overflows (a newer version appears as the "format" function in the G3D library. See also my <a href="http://www.flipcode.com/archives/Safe_sprintf.shtml">flipcode article</a>)
 
 -->
