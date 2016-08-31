@@ -43,6 +43,7 @@ JavaScript
 Java
 ==================================================================
 
+- **redblack** - Red-black Tree implementation and demo. 2008.
 - **splay** - Splay Tree applet and source code. 2003.
 
 <!--
