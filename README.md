@@ -35,32 +35,26 @@ C++
 
 JavaScript
 ==================================================================
-
 - **cardgen** - HTML5/Javascript/CSS playing card template for creating custom decks. May 2015.
 - **relay** - Node.js based relay server and sample application demonstrating its use. 2013
 - **treeList** - Lightweight selectable and scrollable tree list UI. 2012.
+
+
+Java
+==================================================================
+
+- **splay** - Splay Tree applet and source code. 2003.
 
 <!--
 - tachyonVR - Unity 5.4 VR Starter Project. August 2016.
 <li><a href="python/python-oit.zip">Python implementation of Blended Order Independent Transparency</a> contributed by Nicolas P. Rougier, based on the paper by Louis Bavoil and Morgan McGuire</li>
 
-<p class="heading">
-JavaScript
-</p>
-<div class="info">
-  <ul><li><a href="http://codeheartjs.com">codeheart.js</a> - JavaScript framework for learning to program web and mobile game apps</li>
-    <li><a href="http://casual-effects.com/markdeep">Markdeep</a> - An extension of Markdown that works client side in a browser without a plugin and supports diagrams, titles, and LaTeX math</li>
-</ul>
-</div>
-
-<p class="heading">
 Java
 </p>
 <div class="info">
 <ul>
  <li><a href="java/Sandbox.java">Sandbox.java</a> - ClassLoader for dynamic class reloading, useful for plugins.
  <li><a href="RedBlack/RedBlack.java">RedBlack.java</a>, <a href="RedBlack/Demo.java">Demo.java</a> - Simple Red-Black tree demo.
- <li><a href="Splay">Splay Tree</a> applet and source code
  <li><a href="http://cs.williams.edu/~morgan/cs136-s08/darwin2.0/">Darwin 2.0</a> - AI programming game with isometric 3D graphics using concurrency
  <li><a href="http://cs.williams.edu/~morgan/darwin/">Darwin 2.1</a> - AI programming game with isometric 3D graphics using coroutines (no explicit synchronization needed!)
 </ul>
