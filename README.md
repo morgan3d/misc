@@ -43,6 +43,7 @@ JavaScript
 Java
 ==================================================================
 
+- **javasandbox** - Execute arbitrary Java code in a protected sandbox. 2008.
 - **redblack** - Red-black Tree implementation and demo. 2008.
 - **splay** - Splay Tree applet and source code. 2003.
 
