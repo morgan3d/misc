@@ -28,6 +28,8 @@ Graphics
 C++
 ==================================================================
 - **sort** - Elegant C++ reference implementations of heapSort, insertionSort, mergeSort, and quickSort. (now maintained in [The Graphics Codex](http://graphicscodex.com)). December 2012
+- **getip** - Obtain the current machine's IP address. Pre-2005.
+- **kbhit** - Linux/OS X implementation of Windows console `kbhit()`. Pre-2005.
 - **sprintf** - Safe `sprintf` (now maintained in [G3D](http://g3d.cs.williams.edu) as `format()`). Pre-2005.
 
 JavaScript
