@@ -1,0 +1,167 @@
+<!-- This is a simple page for testing the relay API.  Run it in two
+     browser windows. 
+
+Open Source under the BSD license:
+
+Copyright (c) 2012, Morgan McGuire
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ -->
+<html>
+  <head>
+    <!-- Load Socket.IO from our web server, which is separate from the
+	 application's server. -->
+    <script src="socket.io/socket.io.min.js"></script>
+    <script>
+        // Tell Socket.IO where to find the Flash component if the browser needs it.
+        WEB_SOCKET_SWF_LOCATION = 'socket.io/WebSocketMain.swf';
+    </script>
+
+    <style>
+      body {
+         font-family: "Helvetica", "Arial";
+      }
+
+      h1 {
+         margin-bottom: 0px;
+      } 
+
+      .button {
+         display: inline-block;
+         cursor: default;
+         width: 100px;
+         text-align: center;
+         background: #CCC;
+         padding: 5px;
+         border: 1px #999 solid;
+         font-size: 14px;
+         box-shadow: 1px 3px 4px rgba(0,0,0,0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Relay Demo</h1>
+    by <a href="http://casual-effects.com/">Morgan McGuire</a>
+
+    <p>
+      This page shows how to use the relay.js to support a server running
+      within a web browser.  Open this page on two web browsers, on the
+      same machine or different ones.
+    </p>
+
+    <br/>Relay URL: <input type="text" name="relayURL" id="relayURL" value="http://localhost:1080" style="border: inset 1px; font-size: 13px;"></input>
+    <br/><br/>
+
+    <div id="server" style="background: #F0FFFF; border: 1px solid #CCDDDD; padding: 5px;">
+      <h2>Server</h2>
+      <span onclick="launchServer();" class="button">START</span>
+      <span onclick="socket.emit('message', {clientID: '*', data: 'there'});" class="button">SEND MSG</span>
+      <span onclick="socket.disconnect();" class="button">STOP</span>
+      <br/><br/>
+      <div id="serverMessages" style="border: 1px solid #000; width: 100%; color: #0F0; background: #044; font-family: monospace;"></div>
+    </div>
+
+    <br/><br/>
+    
+    <div id="client" style="background: #FFFFF0; border: 1px solid #DDDDCC; padding: 5px;">
+      <h2>Client</h2>
+      <span onclick="launchClient();" class="button">CONNECT</span>
+      <span onclick="socket.emit('message', {data: 'hi'});" class="button">SEND MSG</span>
+      <span onclick="socket.disconnect();" class="button">DISCONNECT</span>
+      <br/><br/>
+      <div id="messages" style="border: 1px solid #000; width: 100%; color: #0F0; background: #440; font-family: monospace;"></div>
+    </div>
+
+<script>
+// Read the address from a text box
+function relayURL() {
+    return document.getElementById('relayURL').value;
+}
+
+// Make the output visible
+var messages       = document.getElementById('messages');
+var serverMessages = document.getElementById('serverMessages');
+
+var socket  = null;
+var clients = [ ];
+
+var GAME_NAME   = 'My Game';
+var SERVER_NAME = 'USA1';
+
+// Work around a bug reconnecting after disconnect in the Socket.IO library.  This resets
+// the socket library state (https://github.com/LearnBoost/socket.io-client/issues/251)
+function resetSocketIO(socket) {
+   for (var  url in io.sockets) {
+      delete io.sockets[url]; 
+   }
+   io.j = [];
+}
+
+
+function launchServer() {
+    document.getElementById('client').style.display = 'none';
+
+    serverMessages.innerHTML += 'Connecting to relay at ' + relayURL() + '...<br/>'; 
+
+    socket = io.connect(relayURL());
+
+    socket.on('connect', function() {
+        serverMessages.innerHTML += 'Connected to relay<br/>';
+        socket.emit('server init', {gameName: GAME_NAME, serverName: SERVER_NAME});
+        });
+    
+    socket.on('client connect', function(msg) {
+        serverMessages.innerHTML += msg.clientID + ' connected<br/>';
+        clients.push(msg.clientID);
+    });
+
+    socket.on('message', function(msg) {
+        serverMessages.innerHTML += msg.clientID + ': ' + msg.data + '<br/>';
+    });
+
+    socket.on('client disconnect', function(msg) {
+        serverMessages.innerHTML += msg.clientID + ' disconnected<br/>';
+    });
+
+    socket.on('disconnect', function(msg) { 
+        serverMessages.innerHTML += 'Disconnected from relay<br/>';
+        socket = null;
+        clients = [];
+        resetSocketIO();
+    });
+}
+
+
+function launchClient() {
+    document.getElementById('server').style.display = 'none';
+    messages.innerHTML += 'Connecting to relay at ' + relayURL() + '...<br/>'; 
+    socket = io.connect(relayURL());
+
+    socket.on('connect', function() {
+        messages.innerHTML += 'Connected to relay<br/>';
+
+        socket.emit('client init', {gameName: GAME_NAME, serverName: SERVER_NAME});
+        });
+    
+    socket.on('disconnect', function(msg) { 
+        messages.innerHTML += 'Disconnected from relay<br/>';
+        socket = null;
+        resetSocketIO();
+    });
+
+    // Receive a message from the server:
+    socket.on('message', function(msg) {
+        messages.innerHTML += 'Server: ' + msg.data + '<br/>';
+    });
+
+}
+
+</script>
+
+  </body>
+</html>

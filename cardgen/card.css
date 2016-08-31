@@ -1,0 +1,110 @@
+/* ------------------ User-defined properties ----------------------- */
+
+.card .default {
+    display: block;
+    position: absolute;
+    text-align: center;
+    font-size: 6mm;
+}
+
+/* Examples of per-card properties as CSS selectors. You'll probably
+   want to change these, or add your own */
+
+.card .name {
+    top: 4mm;
+    width: 100%;
+    font-weight: bold;
+    font-variant: small-caps;
+}
+
+.card .cost {
+    top: 82.5mm;
+    left: 3mm;
+    width: 1cm;
+    font-size: 5mm;
+}
+
+.card .flavor {
+    font-size: 4.5mm;
+    top: 55mm;
+    width: 75%;
+    left: 12.5%;
+    right: 12.5%;
+    text-align: justify;
+}
+
+.card .image {
+    background-size: contain;
+    background-repeat: no-repeat no-repeat;
+    background-position: center;
+    top: 12mm;
+    left: 10%;
+    width: 80%;
+    height: 3.5cm;
+}
+
+/* A special object to be included inside others */
+div.coin {
+    display: inline-block;
+    background-image: url('coin.png');
+    background-size: cover; 
+    text-align: center;
+    width: 5.5mm;
+    height: 5.5mm;
+    padding-left: 0.4mm;
+}
+
+/* ------------------------ Standard properties --------------------- */
+/* You'll probably only want to change these a little */
+
+
+body {
+    margin: 0px;
+    background:#FFF;
+}
+
+div.card {
+    display: inline-block;
+    position: relative;
+}
+
+/* Dimensions of common cards 
+   from https://boardgamegeek.com/geeklist/48357/card-size-database */
+.dominion {
+    width: 59mm;
+    height: 91mm;
+    border: 1mm solid #000;
+    border-radius: 5mm;
+    /* See https://boardgamegeek.com/filepage/57516/adobe-photoshop-cs3-custom-blank-card-template-eng for a full template*/
+    background-image: url('dominion-action-background.png');
+    background-size: cover; 
+}
+
+.citadels {
+    width: 57mm;
+    height: 89mm;
+    border: 1mm solid #000;
+    border-radius: 5mm;
+}
+
+.magic {
+    width: 63mm;
+    height: 88mm;
+    border: 1mm solid #000;
+    border-radius: 5mm;
+}
+
+.poker {
+    width: 2.5in;
+    height: 3.5in;
+    border: 1mm solid #000;
+    border-radius: 4mm;
+}
+
+.bridge {
+    width: 2.25in;
+    height: 3.5in;
+    border: 1mm solid #000;
+    border-radius: 4mm;
+}
+

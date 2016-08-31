@@ -16,18 +16,26 @@ The code in this repository is organized by topic.
 
 Graphics
 ==================================================================
-- oculusSample - Oculus SDK OpenGL Sample. Windows Visual Studio project for initializing and rendering to a DK2 or later HMD using OpenGL. June 2015.
-- terrain - Continuous detail GPU Terrain, with multi-scale texturing and a hardware optimized variant of the geo clipmap. April 2014 http://casual-effects.blogspot.com/2014/04/fast-terrain-rendering-with-continuous.html
-- normal2bump - Compute bump map (height field/displacment) from a normal map. 2014.
-- convertToOBJ - Convert various 3D model formats to OBJ, e.g., IFS, PLY, PLY3, 3DS. 2013
-- cgpp3 - Minimal graphics support routines from Computer Graphics: Principles and Practice 3rd edition for loading a 3D model and image, and displaying and saving images. 2012.
-- glToScreen - Reverse OpenGL projection from my [flipcode article](http://www.flipcode.com/archives/Object_To_Screen_Space.shtml). Pre-2005.
-- glProject - Forward OpenGL projection from my [flipcode article](http://www.flipcode.com/archives/Projecting_3D_Points.shtml). Pre-2005.
-- 2DOBB - 2D oriented bounding box collision test from my [flipcode article](http://www.flipcode.com/archives/2D_OBB_Intersection.shtml). Pre-2005.
+- **oculusSample** - Oculus SDK OpenGL Sample. Windows Visual Studio project for initializing and rendering to a DK2 or later HMD using OpenGL. June 2015.
+- **terrain** - Continuous detail GPU Terrain, with multi-scale texturing and a hardware optimized variant of the geo clipmap. April 2014 http://casual-effects.blogspot.com/2014/04/fast-terrain-rendering-with-continuous.html
+- **normal2bump** - Compute bump map (height field/displacment) from a normal map. 2014.
+- **convertToOBJ** - Convert various 3D model formats to OBJ, e.g., IFS, PLY, PLY3, 3DS. 2013
+- **cgpp3** - Minimal graphics support routines from Computer Graphics: Principles and Practice 3rd edition for loading a 3D model and image, and displaying and saving images. 2012.
+- **glToScreen** - Reverse OpenGL projection from my [flipcode article](http://www.flipcode.com/archives/Object_To_Screen_Space.shtml). Pre-2005.
+- **glProject** - Forward OpenGL projection from my [flipcode article](http://www.flipcode.com/archives/Projecting_3D_Points.shtml). Pre-2005.
+- **2DOBB** - 2D oriented bounding box collision test from my [flipcode article](http://www.flipcode.com/archives/2D_OBB_Intersection.shtml). Pre-2005.
 
 C++
 ==================================================================
-- sort - Elegant C++ reference implementations of heapSort, insertionSort, mergeSort, and quickSort. (now maintained in [The Graphics Codex](http://graphicscodex.com)). December 2012
+- **sort** - Elegant C++ reference implementations of heapSort, insertionSort, mergeSort, and quickSort. (now maintained in [The Graphics Codex](http://graphicscodex.com)). December 2012
+- **sprintf** - Safe `sprintf` (now maintained in [G3D](http://g3d.cs.williams.edu) as `format()`). Pre-2005.
+
+JavaScript
+==================================================================
+
+- **cardgen** - HTML5/Javascript/CSS playing card template for creating custom decks. May 2015.
+- **relay** - Node.js based relay server and sample application demonstrating its use. 2013
+- **treeList** - Lightweight selectable and scrollable tree list UI. 2012.
 
 <!--
 - tachyonVR - Unity 5.4 VR Starter Project. August 2016.
@@ -39,9 +47,6 @@ JavaScript
 <div class="info">
   <ul><li><a href="http://codeheartjs.com">codeheart.js</a> - JavaScript framework for learning to program web and mobile game apps</li>
     <li><a href="http://casual-effects.com/markdeep">Markdeep</a> - An extension of Markdown that works client side in a browser without a plugin and supports diagrams, titles, and LaTeX math</li>
-<li><a href="TreeList/TreeListDemo.html">TreeList.js</a> - Lightweight selectable and scrollable tree list UI</li>
-<li><a href="relay/relay/relay.js">relay.js</a> - Node.js based relay server and <a href="relay/clientserver/index.html">index.html</a> sample application demonstrating its use.</li>
-<li><a href="cardgen/cardgen.zip">cardgen.zip</a> - HTML5/Javascript/CSS playing card template for creating custom decks.</li>
 </ul>
 </div>
 

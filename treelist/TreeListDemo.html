@@ -1,0 +1,100 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="TreeList.css"/>
+    <script src="TreeList.js"></script>
+
+    <!--
+    <style>
+      /* http://jsfiddle.net/simurai/UsvLN/ */
+      ::-webkit-scrollbar {
+      -webkit-appearance: none;
+      width: 7px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+      border-radius: 4px;
+      background-color: rgba(0,0,0,.5);
+      -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+      }
+    </style>
+    -->
+  </head>
+  <body style="font-family: 'Myriad Pro', 'Helvetica', 'Arial';">
+
+    <h1>Lightweight Javascript TreeList UI demo</h1>
+    
+    This TreeList was designed to support continual programmatic
+    manipulation from Javascript and selection.  There are easier ways
+    to create a similar control directly from UL elements if you do
+    not need all of these features.  The demo is the control
+    advertising its own features:
+
+    <br/><br/>
+
+    <div id="featureTree" style="width:320px; height:200px; overflow-y: scroll; overflow-x: hidden; border: solid 1px #000; padding-right: 4px; margin-right: 4px; font-size:20px; margin-left: 100px;"></div>
+
+    <p>
+      Download <a href="TreeList.js">TreeList.js</a> and <a href="TreeList.css">TreeList.css</a>.
+      <br/>By Morgan McGuire
+    </p>
+    <p>
+      Some alternatives (most were too complicated for me to bother with):
+      <ul>
+        <li><a href="http://destroydrop.com/javascripts/tree/">dTree</a> - nice API, draws lines</li>
+        <li><a href="http://www.treemenu.org/">TreeMenu</a> - Also draws lines</li>
+        <li><a href="http://www.dynamicdrive.com/dynamicindex1/navigate1.htm">Simple Tree Menu</a></li>
+        <li><a href="http://www.codeproject.com/Articles/3321/JScript-Tree-List-Control-v3-0">Tree List Control</a> - actually a full tree table</li>
+        <li><A href="http://www.coderage.com/tree_control/doc/tree/doc/index.html">Javascript Tree Control</a></li>
+        <li>Lots of jQuery plugins </li>        
+      </ul>
+    </p>
+    
+
+
+    <script>
+     // These can be ANY kind of Javascript object--not limited to Strings
+     var lightweight = 'Lightweight';
+     var jssize = '5kb js uncompressed';
+     var csssize = '1kb css uncompressed';
+     var deps = 'No libraries';
+     var fast = 'Fast';
+    
+     function SomeObject(html) {
+        this.html = html;
+     }
+     SomeObject.prototype.toHTML = function () { return this.html; };
+     
+     var scroll = 'Scrollable';
+     var selectable = 'Selectable';
+     var fullHTML = new SomeObject('Include <i>arbitrary</i> <b>HTML</b> in titles');
+
+     var tree = new TreeList('featureTree');
+
+     tree.addChild(null, lightweight);
+       tree.addChild(lightweight, jssize);
+       tree.addChild(lightweight, csssize);
+       tree.addChild(lightweight, deps);
+       tree.addChild(lightweight, fast);
+
+     tree.addChild(null, scroll);
+     tree.addChild(null, selectable);
+     tree.addChild(null, fullHTML);
+
+     // Fast way to add a number of elements
+     tree.addSubtree([null,
+                        ['Browser-Independent',
+                            'Chrome', 
+                            ['Safari',
+                               'iOS',
+                               'OS X'],
+                             'Firefox',
+                             'IE'],
+                         ['Fast',
+                            'Super-fast iOS events',
+                            'CSS for transitions',
+                             new SomeObject('O(<i>n</i>) addSubtree')]]);
+    </script>
+
+
+  </body>
+</html>
