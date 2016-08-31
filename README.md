@@ -14,6 +14,12 @@ github's file size and other restrictions. These are:
 
 The code in this repository is organized by topic.
 
+Unity
+==================================================================
+- tachyon - Unity 5.4 starter project for a Pong-like 3D game. Particle systems, events, gamepad, logic, physics, etc. August 2016.
+- tachyonVR - Unity 5.4 VR starter project for a Pong-like 3D game. Teleporting, fast rendering, Vive controllers, etc. August 2016.
+
+
 Graphics
 ==================================================================
 - **oculusSample** - Oculus SDK OpenGL Sample. Windows Visual Studio project for initializing and rendering to a DK2 or later HMD using OpenGL. June 2015.
@@ -59,7 +65,6 @@ TODO:
  <li><a href="http://cs.williams.edu/~morgan/cs136-s08/darwin2.0/">Darwin 2.0</a> - AI programming game with isometric 3D graphics using concurrency
  <li><a href="http://cs.williams.edu/~morgan/darwin/">Darwin 2.1</a> - AI programming game with isometric 3D graphics using coroutines (no explicit synchronization needed!)
 
-- tachyonVR - Unity 5.4 VR Starter Project. August 2016.
 
 
 -->
