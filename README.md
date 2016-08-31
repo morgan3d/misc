@@ -43,24 +43,19 @@ JavaScript
 Java
 ==================================================================
 
-- **javasandbox** - Execute arbitrary Java code in a protected sandbox. 2008.
+- **javasandbox** - ClassLoader for dynamic class reloading, useful for plugins. Executes arbitrary Java code in a protected sandbox. 2008.
 - **redblack** - Red-black Tree implementation and demo. 2008.
+- **javarasterizer** - Simple rasterizer written for a data structures course. 2008.
 - **splay** - Splay Tree applet and source code. 2003.
 
+
 <!--
+ <li><a href="http://cs.williams.edu/~morgan/cs136-s08/darwin2.0/">Darwin 2.0</a> - AI programming game with isometric 3D graphics using concurrency
+ <li><a href="http://cs.williams.edu/~morgan/darwin/">Darwin 2.1</a> - AI programming game with isometric 3D graphics using coroutines (no explicit synchronization needed!)
+
 - tachyonVR - Unity 5.4 VR Starter Project. August 2016.
 <li><a href="python/python-oit.zip">Python implementation of Blended Order Independent Transparency</a> contributed by Nicolas P. Rougier, based on the paper by Louis Bavoil and Morgan McGuire</li>
 
-Java
-</p>
-<div class="info">
-<ul>
- <li><a href="java/Sandbox.java">Sandbox.java</a> - ClassLoader for dynamic class reloading, useful for plugins.
- <li><a href="RedBlack/RedBlack.java">RedBlack.java</a>, <a href="RedBlack/Demo.java">Demo.java</a> - Simple Red-Black tree demo.
- <li><a href="http://cs.williams.edu/~morgan/cs136-s08/darwin2.0/">Darwin 2.0</a> - AI programming game with isometric 3D graphics using concurrency
- <li><a href="http://cs.williams.edu/~morgan/darwin/">Darwin 2.1</a> - AI programming game with isometric 3D graphics using coroutines (no explicit synchronization needed!)
-</ul>
-</div>
 
 <p class="heading">
 Scheme
