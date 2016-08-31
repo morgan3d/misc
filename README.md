@@ -57,7 +57,7 @@ Java
 
 Scheme
 ==================================================================
-- **infix.scm* - Recursive descent infix parser and macro for Scheme. 2003.
+- **infix** - Recursive descent infix parser and macro for Scheme. 2003.
 
 <!--
 TODO:
