@@ -11,6 +11,7 @@ github's file size and other restrictions. These are:
 - [codeheart.js](http://codeheartjs.com) Javascript 2D game library
 - [Markdeep](https://casual-effects.com/markdeep) Document beautification tool
 - [iCompile](http://g3d.cs.williams.edu/g3d/G3D10/build/manual/icompile-manual.html) Zero-configuration build system
+- [include.js](https://morgan3d.github.io/include.js/) Cross-domain, cross-browser HTML include tag
 
 The code in this repository is organized by topic.
 
