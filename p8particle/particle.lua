@@ -36,16 +36,16 @@ function process_particles()
 
    -- draw the particle by directly manipulating the
    -- correct nibble on the screen
-   local addr = 0x6000 + shr(particle.x, 1) + flr(particle.y) * 64
-   local pixelPair = peek(addr)
+   local addr = 0x6000 + shr(particle.x, 1) + shl(band(particle.y, 0xffff), 6)
+   local pixel_pair = peek(addr)
    if band(particle.x, 1) == 1 then
     -- even x; we're writing to the high bits
-    pixelPair = band(pixelPair, 0x0f) + shl(particle.color, 4)
+    pixel_pair = band(pixel_pair, 0x0f) + shl(particle.color, 4)
    else
     -- odd x; we're writing to the low bits
-    pixelPair = band(pixelPair, 0xf0) + particle.color
+    pixel_pair = band(pixel_pair, 0xf0) + particle.color
    end
-   poke(addr, pixelPair)
+   poke(addr, pixel_pair)
    
    p += 1
   end -- if alive
