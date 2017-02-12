@@ -56,6 +56,10 @@ Java
 - **splay** - Splay Tree applet and source code. 2003.
 
 
+Lua/PICO-8
+==================================================================
+- **platformer** - Full featured character simulation for a 2D platformer. 2017.
+
 Scheme
 ==================================================================
 - **infix** - Recursive descent infix parser and macro for Scheme. 2003.
