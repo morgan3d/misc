@@ -12,6 +12,9 @@ with the following features:
 * early jump grace period (http://kpulv.com/106/Jump_Input_Buffering/)
 * late jump grace period (http://kpulv.com/123/Platforming_Ledge_Forgiveness/)
 
-It is programmed in the style of pico-8 lua with the assumption of 8x8 pixel sprites. 
-See [`platformer.lua`](platformer.lua) for the fully-commented version and
+This is programmed in the style of PICO-8 lua with the assumption of 8x8 pixel sprites (which
+is why it has only lower-case letters and is designed to minimize tokens).  See
+[`platformer.lua`](platformer.lua) for the fully-commented version and
 [`platformer-min.lua`](platformer-min.lua) for a more minimalist version.
+
+![](platformer.gif)
