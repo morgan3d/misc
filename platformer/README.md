@@ -1,5 +1,7 @@
 ![](platformer.gif)
 
+Morgan McGuire, 2017. Open Source under the BSD or MIT license--your choice!
+
 This is code demonstrating how to simulate player-character movement in a 2D platformer
 with the following features:
 
