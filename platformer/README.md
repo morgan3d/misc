@@ -20,3 +20,10 @@ is why it has only lower-case letters and is designed to minimize tokens).  See:
 * `platformer.lua` for the fully-commented version and
 * `platformer-min.lua` for a more minimalist version.
 
+This assumes the following functions:
+
+* `hsolid(x, y1, y2)` returns true if pixel (x, y1) or (x, y2) is solid with respect to
+   horizontal movement
+* `vsolid(x1, y, x2)` returns true if pixel (x1, y) or (x2, y) is solid with respect to
+   horizontal movement
+* `friction(x, y)` returns the friction multiplier (tuned for 0-8) for the block at pixel (x, y)
