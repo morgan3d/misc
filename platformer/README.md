@@ -1,3 +1,5 @@
+![](platformer.gif)
+
 This is code demonstrating how to simulate player-character movement in a 2D platformer
 with the following features:
 
@@ -13,8 +15,8 @@ with the following features:
 * late jump grace period (http://kpulv.com/123/Platforming_Ledge_Forgiveness/)
 
 This is programmed in the style of PICO-8 lua with the assumption of 8x8 pixel sprites (which
-is why it has only lower-case letters and is designed to minimize tokens).  See
-[`platformer.lua`](platformer.lua) for the fully-commented version and
-[`platformer-min.lua`](platformer-min.lua) for a more minimalist version.
+is why it has only lower-case letters and is designed to minimize tokens).  See:
 
-![](platformer.gif)
+* `platformer.lua` for the fully-commented version and
+* `platformer-min.lua` for a more minimalist version.
+
