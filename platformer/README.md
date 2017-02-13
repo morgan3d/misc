@@ -27,5 +27,5 @@ This assumes the following functions:
 * `hsolid(x, y1, y2)` returns true if pixel (x, y1) or (x, y2) is solid with respect to
    horizontal movement
 * `vsolid(x1, y, x2)` returns true if pixel (x1, y) or (x2, y) is solid with respect to
-   horizontal movement
+   vertical movement
 * `friction(x, y)` returns the friction multiplier (tuned for 0-8) for the block at pixel (x, y)
