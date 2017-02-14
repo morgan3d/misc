@@ -1,84 +1,39 @@
 pico-8 cartridge // http://www.pico-8.com
 version 8
 __lua__
--- waterfall particle demo
+-- fast particle system
 -- by morgan mcguire @casualeffects
-
-particle_array, particle_array_length = {}, 0
-
-emitter_array = {
- { count = 12, x = 30, y = 10, dx = 0.25, rnd_dx = 0.5, dy = 0, rnd_dy = 0.4, life = 20, rnd_life = 15, color = 7 },
- { count = 10, x = 38, y = 30, dx = 0.25, rnd_dx = 0.5, dy = 0.7, rnd_dy = 0.4, life = 15, rnd_life = 15, color = 6 },
- 
- { count = 10, x = 64, y = 25, dx = 0.5, rnd_dx = 0.5, dy = 0, rnd_dy = 0.5, life = 20, rnd_life = 30, color = 7 },
- { count = 20, x = 80, y = 40, dx = 0.0125, rnd_dx = 1, dy = 0.7, rnd_dy = 0.4, life = 20, rnd_life = 15, color = 6 },
- { count = 5,  x = 76, y = 40, dx = 0.125, rnd_dx = 0.75, dy = 0.7, rnd_dy = 0.4, life = 5, rnd_life = 10, color = 13 },
-
- { count = 10, x = 100, y = 70, dx = 0.25, rnd_dx = 0.5, dy = 0, rnd_dy = 0.5, life = 10, rnd_life = 30, color = 6 },
-
- { count = 10, x = 110, y = 55, dx = 0.25, rnd_dx = 0.5, dy = 0, rnd_dy = 0.5, life = 10, rnd_life = 30, color = 7 },
- { count = 10, x = 113, y = 70, dx = 0.25, rnd_dx = 0.5, dy = 0, rnd_dy = 0.5, life = 10, rnd_life = 30, color = 6 },
-
- { count = 6, x = 60, y = 80, dx = 0.125, rnd_dx = 0.25, dy = 0, rnd_dy = 0.5, life = 5, rnd_life = 15, color = 6 },
- { count = 6, x = 70, y = 95, dx = 0.25, rnd_dx = 0.25, dy = 0, rnd_dy = 0.5, life = 5, rnd_life = 15, color = 6 },
-
- { count = 1,  x = 65, y = 10, dx = 0.25, rnd_dx = 1, dy = 0, rnd_dy = 0.25, life = 20, rnd_life = 10, color = 7 },
- { count = 1,  x = 30, y = 8, dx = 0.25, rnd_dx = 1, dy = 0, rnd_dy = 0.25, life = 20, rnd_life = 10, color = 7 },
- { count = 1,  x = 100, y = 30, dx = 0.25, rnd_dx = 1, dy = 0, rnd_dy = 0.25, life = 20, rnd_life = 10, color = 7 },
- { count = 1,  x = 100, y = 30, dx = 0.25, rnd_dx = 1, dy = 0, rnd_dy = 0.25, life = 20, rnd_life = 10, color = 6 },
- { count = 1,  x = 50, y = 30, dx = -0.125, rnd_dx = 0.5, dy = 0, rnd_dy = 0.25, life = 20, rnd_life = 20, color = 7 },
-
- { count = 1,  x = 75, y = 70, dx = -0.25, rnd_dx = 0.3, dy = 0, rnd_dy = 0.25, life = 20, rnd_life = 10, color = 13 },
-}
+-- http://casual-effects.com
+-- Released as BSD-license open source February 2017.
 
 
-function _draw()
- palt(0, false)
- spr(0, 0, 0, 16, 16)
- 
- draw_particles()
-
- -- create new particles
- for emitter in all(emitter_array) do
-  for i = 1, emitter.count do
-   add_particle(emitter.x, emitter.y, 
-                emitter.dx + rnd(emitter.rnd_dx), emitter.dy + rnd(emitter.rnd_dy), 
-                emitter.life + rnd(emitter.rnd_life), emitter.color)
-  end
- end
-
- -- print(stat(1), 0, 0, 9)
-end
-
-
-function add_particle(x, y, dx, dy, life, color)
- add(particle_array, {x = x, y = y, dx = dx, dy = dy, life = life or 8, color = color or 6})
+function add_particle(x, y, dx, dy, life, color, ddy)
  particle_array_length += 1
+
+ -- grow if needed
+ if (#particle_array < particle_array_length) add(particle_array, 0)
+ 
+ -- insert into the next available spot
+ particle_array[particle_array_length] = {x = x, y = y, dx = dx, dy = dy, life = life or 8, color = color or 6, ddy = ddy or 0.0625}
 end
 
 
-function draw_particles()
+function process_particles()
  -- @casualeffects particle system
+ -- http://casual-effects.com
+
  -- simulate particles during rendering for efficiency
  local p = 1
  while p <= particle_array_length do
   local particle = particle_array[p]
-
-  -- gravity
-  particle.dy += 0.0625
   
-  -- advance state
-  particle.x += particle.dx
-  particle.y += particle.dy
-  particle.life -= 1
-  
-  -- the bitwise expression will be negative if either coordinate is negative or greater than 127
-  if particle.life < 0 or band(bor(particle.x, particle.y), 0xff80) != 0 then
+  -- the bitwise expression will have the high (negative) bit set
+  -- if either coordinate is negative or greater than 127, or life < 0
+  if bor(band(0x8000, particle.life), band(bor(particle.x, particle.y), 0xff80)) != 0 then
 
    -- delete dead particles efficiently. pico8 doesn't support
    -- table.setn, so we have to maintain an explicit length variable
-   particle_array[p] = particle_array[particle_array_length]
-   particle_array[particle_array_length] = nil
+   particle_array[p], particle_array[particle_array_length] = particle_array[particle_array_length], nil
    particle_array_length -= 1
 
   else
@@ -96,10 +51,76 @@ function draw_particles()
    end
    poke(addr, pixel_pair)
    
+   -- acceleration
+   particle.dy += particle.ddy
+  
+   -- advance state
+   particle.x += particle.dx
+   particle.y += particle.dy
+   particle.life -= 1
+
    p += 1
   end -- if alive
  end -- while
 end
+
+------------------------------------------------------------------
+-- everything below here is part of the demo
+
+particle_array, particle_array_length = {}, 0
+
+emitter_array = {
+ { count = 10, x = 30, y = 10, dx = 0.25, rnd_dx = 0.5, dy = 0, rnd_dy = 0.4, life = 19, rnd_life = 15, color = 7 },
+ { count = 10, x = 38, y = 30, dx = 0.25, rnd_dx = 0.5, dy = 0.7, rnd_dy = 0.4, life = 14, rnd_life = 15, color = 6 },
+ 
+ { count = 8, x = 64, y = 25, dx = 0.5, rnd_dx = 0.5, dy = 0, rnd_dy = 0.5, life = 19, rnd_life = 30, color = 7 },
+ { count = 12, x = 80, y = 40, dx = 0.0125, rnd_dx = 1, dy = 0.7, rnd_dy = 0.4, life = 19, rnd_life = 15, color = 6 },
+ { count = 5,  x = 76, y = 40, dx = 0.125, rnd_dx = 0.75, dy = 0.7, rnd_dy = 0.4, life = 5, rnd_life = 10, color = 13 },
+
+ { count = 10, x = 100, y = 70, dx = 0.25, rnd_dx = 0.5, dy = 0, rnd_dy = 0.5, life = 9, rnd_life = 30, color = 6 },
+
+ { count = 10, x = 110, y = 55, dx = 0.25, rnd_dx = 0.5, dy = 0, rnd_dy = 0.5, life = 9, rnd_life = 30, color = 7 },
+ { count = 7, x = 113, y = 70, dx = 0.25, rnd_dx = 0.5, dy = 0, rnd_dy = 0.5, life = 9, rnd_life = 30, color = 6 },
+ { count = 2, x = 91, rnd_x = 10, y = 55, dx = 0.25, rnd_dx = 0.5, dy = 0, rnd_dy = 0.5, life = 8, rnd_life = 10, color = 6 },
+
+ { count = 6, x = 60, y = 80, dx = 0.125, rnd_dx = 0.25, dy = 0, rnd_dy = 0.5, life = 4, rnd_life = 15, color = 6 },
+ { count = 6, x = 70, y = 95, dx = 0.25, rnd_dx = 0.25, dy = 0, rnd_dy = 0.5, life = 4, rnd_life = 15, color = 6 },
+
+ { count = 1,  x = 65, y = 10, dx = 0.25, rnd_dx = 1, dy = 0, rnd_dy = 0.25, life = 19, rnd_life = 10, color = 7 },
+ { count = 2,  x = 30, y = 8, dx = 0.25, rnd_dx = 1, dy = 0, rnd_dy = 0.25, life = 18, rnd_life = 10, color = 7 },
+ { count = 1,  x = 100, y = 30, dx = 0.25, rnd_dx = 1, dy = 0, rnd_dy = 0.25, life = 18, rnd_life = 10, color = 7 },
+ { count = 1,  x = 100, y = 30, dx = 0.25, rnd_dx = 1, dy = 0, rnd_dy = 0.25, life = 20, rnd_life = 10, color = 6 },
+ { count = 1,  x = 50, y = 30, dx = -0.125, rnd_dx = 0.5, dy = 0, rnd_dy = 0.25, life = 19, rnd_life = 20, color = 7 },
+
+ { count = 1,  x = 75, y = 70, dx = -0.25, rnd_dx = 0.3, dy = 0, rnd_dy = 0.25, life = 18, rnd_life = 10, color = 13 },
+
+ { count = 17,  x = 79, rnd_x = 45, y = 117, dx = -0.25, rnd_dx = 0.3, dy = -2.25, rnd_dy = 0.5, life = 19, rnd_life = 10, ddy = 0, color = 5 },
+
+ { count = 10,  x = 36, rnd_x = 14, y = 80, dx = -0.25, rnd_dx = 0.3, dy = -2, rnd_dy = 0.5, life = 8, rnd_life = 10, ddy = 0, color = 5 },
+
+ { count = 1,  x = 104, y = 119, rnd_y = 5, dx = 1.5, rnd_dx = 0.3, dy = 0, rnd_dy = 0, life = 8, rnd_life = 10, ddy = 0, color = 6 },
+}
+
+
+function _draw()
+ palt(0, false)
+ spr(0, 0, 0, 16, 16)
+ 
+ process_particles()
+
+ -- create new particles
+ for emitter in all(emitter_array) do
+  for i = 1, emitter.count do
+   add_particle(emitter.x + rnd(emitter.rnd_x or 0), emitter.y + rnd(emitter.rnd_y or 0), 
+                emitter.dx + rnd(emitter.rnd_dx), emitter.dy + rnd(emitter.rnd_dy),
+                emitter.life + rnd(emitter.rnd_life), emitter.color, emitter.ddy)
+  end
+ end
+
+ print(stat(1), 0, 0, 9)
+end
+
+
 
 __gfx__
 303bbbb3bbab33330055330553111756d0d5551d6aa6dd555565155351555333b55333d51bb333b6b3335d3bb631533300b3d553111351153331511111111110

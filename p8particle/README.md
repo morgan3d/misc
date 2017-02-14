@@ -33,3 +33,11 @@ either number, then the coordinates are out of bounds.
 The second trick is that I'm directly writing to PICO-8 video memory. Since the pixels are
 4-bit ("one nibble"), I have to do some masking to ensure that the code writes to the correct
 nibble. I haven't found a way to avoid that branch without incuring more operations.
+
+Because PICO-8 doesn't support Lua's table.setn, I manually manage the array length. 
+This gives O(1) insertion and removal. The particles are reordered during simulation.
+It is possible to still achieve O(1) without reordering, but the constant overhead is
+higher, then.
+
+The waterfall demo is written so that the top portion is the reusable particle system
+and the bottom portion is the demo.
