@@ -60,6 +60,7 @@ Lua/PICO-8
 ==================================================================
 - **platformer** - Full featured character simulation for a 2D platformer. 2017.
 - **p8particle** - Very fast single-pixel particle system for PICO-8. 2017.
+- **p8sort** - Very fast PICO-8 sort. 2017.
 
 Scheme
 ==================================================================
