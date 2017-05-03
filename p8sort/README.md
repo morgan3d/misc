@@ -6,4 +6,4 @@ sort I'd found, and about 30x faster than a simple insertion sort on arrays of s
 The image below shows that each of the sorts is correct (insertion sort is also stable), and
 gives profile results for them. Lower is better on timing.
 
-![](results.png)
+![](https://github.com/morgan3d/misc/blob/master/p8sort/result.png?raw=true)
