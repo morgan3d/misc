@@ -1,10 +1,3 @@
+This is a web tool for escaping PICO-8 UPPERCASE characters...so that they print as lowercase characters. If you need this, then you'll understand what it does and why.
 
-<script>
-function escapePICO8(str) {
-    return str.replace(/[A-Z]/g, function (match) {
-        return '\\' + march.charCodeAt(0);
-    }
-}
-</script>
-
-
+To run it, go to [this page](https://morgan3d.github.io/misc/p8escape/index.html).
