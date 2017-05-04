@@ -22,14 +22,15 @@ function convert() {
 <style>
   @font-face {
   font-family: PICO8;
-  src: url('PICO-8.ttf');
+  src: url('PICO-8-mono-upper.ttf');
   }
   
   body {
   margin: 20px;
   font-family: Helvetica, Arial;
   font-weight: 100;
-  color: #555;
+  color: #444;
+  background:#EEE;
   }
 
   input {
@@ -43,14 +44,14 @@ function convert() {
   input#dst {
   font-family: PICO8, monospace;
   background: #83769C;
-  color: #FFF1E8
+  color: #FFF1E8;
   }
 </style>
 <title>
   PICO-8 Escape Upper Case Strings
 </title>
 <body>
-  <h1>PICO-8 Escape Upper Case Strings</h1>
+  <h1><span style="font-family:PICO8; font-size: 75%">PICO-8</span> Escape Upper Case Strings</h1>
   
   <b>Source string</b>
   <br/>Use upper case for upper case. Do not add surrounding quotes.
@@ -67,7 +68,7 @@ function convert() {
   <hr/>
   <script>convert()</script>
  
-  By <a href="https://twitter.com/CasualEffects">@CasualEffects</a>. This tool is open source at <a href="https://github.com/morgan3d/misc/tree/master/p8escape">my github</a>. 
+  by <a href="https://twitter.com/CasualEffects">@CasualEffects</a>. This tool is open source at <a href="https://github.com/morgan3d/misc/tree/master/p8escape">my github</a>. 
 </body>
 </html>
 
