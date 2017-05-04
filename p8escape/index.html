@@ -1,16 +1,73 @@
 <html>
 <script>
 function escapePICO8(str) {
-    return str.replace(/[A-Z]/g, function (match) {
-        return '\\' + march.charCodeAt(0);
-    }
+  return str.replace(/[a-zA-Z]/g, function (match) {
+     var c = match.charCodeAt(0);
+     if (c >= 97) {
+        // lower case source: convert to upper and escape
+        return '\\' + (c - 32);
+     } else {
+        // upper case source: convert to lower
+        return String.fromCharCode(c + 32);
+     }
+  });
+}
+
+function convert() {
+   var src = document.getElementById('src').value;
+   src = src.replace(/\"/g, '\\\"');
+   document.getElementById('dst').value = '"' + escapePICO8(src) + '" -- "' + src.toLowerCase() + '"';
 }
 </script>
+<style>
+  @font-face {
+  font-family: PICO8;
+  src: url('PICO-8.ttf');
+  }
+  
+  body {
+  margin: 20px;
+  font-family: Helvetica, Arial;
+  font-weight: 100;
+  color: #555;
+  }
+
+  input {
+  width: 100%;
+  margin-top: 4px;
+  padding: 4px;
+  border: 1px solid #000;
+  font-size: 100%;
+  }
+  
+  input#dst {
+  font-family: PICO8, monospace;
+  background: #83769C;
+  color: #FFF1E8
+  }
+</style>
 <title>
-  PICO-8 Escape Uppercase Strings
+  PICO-8 Escape Upper Case Strings
 </title>
 <body>
-  This tool is open source at <a href="https://github.com/morgan3d/misc/tree/master/p8escape">Morgan McGuire's github</a>. (<a href="https://twitter.com/CasualEffects">@CasualEffects</a>)
+  <h1>PICO-8 Escape Upper Case Strings</h1>
+  
+  <b>Source string</b>
+  <br/>Use upper case for upper case. Do not add surrounding quotes.
+  <br/><input id="src" oninput="convert()" onchange="convert()" onkeypress="convert()" value="Hello World"></input>
+  <br/>
+  <br/>
+  <br/>
+  <b>Encoded string</b>
+  <br/>Paste this directly in to PICO-8. It will <code>print</code> the way the source <i>looked</i>.
+  <br/><input id="dst"></input>
+  <br/>
+  <br/>
+  <br/>
+  <hr/>
+  <script>convert()</script>
+ 
+  By <a href="https://twitter.com/CasualEffects">@CasualEffects</a>. This tool is open source at <a href="https://github.com/morgan3d/misc/tree/master/p8escape">my github</a>. 
 </body>
 </html>
 
