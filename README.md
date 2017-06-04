@@ -67,6 +67,10 @@ Scheme
 ==================================================================
 - **infix** - Recursive descent infix parser and macro for Scheme. 2003.
 
+Other
+==================================================================
+- **xenon** - 16-bit Windows 3.1 video game written in Visual Basic. 1995.
+
 <!--
 TODO:
 
