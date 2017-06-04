@@ -1,0 +1,4 @@
+FOR77M1.FRM
+MUTUAL.BAS
+ProjWinSize=160,418,248,215
+ProjWinShow=2

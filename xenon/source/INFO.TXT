@@ -1,0 +1,26 @@
+    Xenon 1.00S is a Windows Shareware Game from Morgan Systems.
+Designed and programmed by brothers Morgan and Max McGuire (18 and
+16 years old!), it takes full advantage of SVGA and high end sound 
+cards under Windows.
+    One to Five players control robots in various arenas (from 
+Suburbs to Castles to Mountains).  Each robot can move about
+and fire projectiles.
+    The is fun for a single player, bunch of friends or the whole
+family with beautiful scenery, cute robots and an editible quote 
+list.
+
+	Features:
+
+	+ Smooth Animations
+	+ Three Layers of Graphics
+	+ Driving Robots
+	+ Computer Players
+	+ 256 color and 24-Bit graphics
+	+ Digital Sound Effects
+	+ Custom Interface Windows
+	+ 12 Arenas
+	+ 5 Page Write file of Instructions/Hints
+	+ Registration Information
+
+Distributors Note:
+	Because this is a high-end, Windows 3.1/3.11 specializeed game, the palette may appear improperly on low color systems, and it may not work properly under Windows 95 and NT.
