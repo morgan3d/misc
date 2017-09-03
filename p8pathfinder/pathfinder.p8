@@ -73,16 +73,17 @@ function find_path
   if node_to_id(p, graph) == goal_id then
    -- we're done.  generate the
    -- path to the goal by
-   -- retracing steps
-   path = {goal}
+   -- retracing steps. reuse
+   -- 'p' as the path
+   p = {goal}
 
    while shortest.prev do
     shortest = best_table[node_to_id(shortest.prev, graph)]
-    add(path, shortest.last)
+    add(p, shortest.last)
    end
 
    -- we've found the shortest path
-   return path
+   return p
   end -- if
 
   -- consider each neighbor n of
