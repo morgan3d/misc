@@ -1,8 +1,9 @@
 /**
  Linux (POSIX) implementation of _kbhit().
- Morgan McGuire, morgan@cs.brown.edu
+ Morgan McGuire, morgan@casual-effectcs.com
  */
 #include <stdio.h>
+#include <sys/ioctl.h>
 #include <sys/select.h>
 #include <termios.h>
 #include <stropts.h>
