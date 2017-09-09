@@ -62,6 +62,8 @@ Lua/PICO-8
 - **p8particle** - Very fast single-pixel particle system for PICO-8. 2017.
 - **p8sort** - Very fast PICO-8 sort. 2017.
 - **p8escape** - Allow lowercase characters in printed PICO-8 strings. This is actually a web utility, not PICO-8 code itself. 2017
+- **p8controller** - Minimal-memory PICO-8 controller image for instruction screens. 2017.
+- **p8pathfinder** - Fully general PICO-8 A* (A-star) and Dijkstra pathfinding in a single function. 2017.
 
 Scheme
 ==================================================================
