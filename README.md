@@ -7,10 +7,10 @@ and may not compile on modern machines.
 Some additional open source projects that I _do_ actively support are hosted elsewhere due to
 github's file size and other restrictions. These are:
 
-- [The G3D Innovation Engine](http://g3d.cs.williams.edu) C++ 3D graphics library
-- [codeheart.js](http://codeheartjs.com) Javascript 2D game library
+- [The G3D Innovation Engine](http://casual-effects.com/g3d) C++ 3D graphics library
+- [codeheart.js](http://casual-effects.com/codeheart) Javascript 2D game library
 - [Markdeep](https://casual-effects.com/markdeep) Document beautification tool
-- [iCompile](http://g3d.cs.williams.edu/g3d/G3D10/build/manual/icompile-manual.html) Zero-configuration build system
+- [iCompile](http://casual-effects.com/g3d/G3D10/build/manual/icompile-manual.html) Zero-configuration build system
 - [include.js](https://morgan3d.github.io/include.js/) Cross-domain, cross-browser HTML include tag
 
 The code in this repository is organized by topic.
