@@ -7,10 +7,10 @@ and may not compile on modern machines.
 Some additional open source projects that I _do_ actively support are hosted elsewhere due to
 github's file size and other restrictions. These are:
 
-- [The G3D Innovation Engine](http://casual-effects.com/g3d) C++ 3D graphics library
+- [The G3D Innovation Engine](https://casual-effects.com/g3d) C++ 3D graphics library
 - [codeheart.js](http://casual-effects.com/codeheart) Javascript 2D game library
 - [Markdeep](https://casual-effects.com/markdeep) Document beautification tool
-- [iCompile](http://casual-effects.com/g3d/G3D10/build/manual/icompile-manual.html) Zero-configuration build system
+- [iCompile](https://casual-effects.com/g3d/G3D10/build/manual/icompile-manual.html) Zero-configuration build system
 - [include.js](https://morgan3d.github.io/include.js/) Cross-domain, cross-browser HTML include tag
 
 The code in this repository is organized by topic.
@@ -38,13 +38,14 @@ C++
 - **indent++** - Pretty-printer for indenting existing C++ files (handy for printing assignments when grading). 2012.
 - **getip** - Obtain the current machine's IP address. Pre-2005.
 - **kbhit** - Linux/OS X implementation of Windows console `kbhit()`. Pre-2005.
-- **sprintf** - Safe `sprintf` (now maintained in [G3D](http://g3d.cs.williams.edu) as `format()`). Pre-2005.
+- **sprintf** - Safe `sprintf` (now maintained in [G3D](https://casual-effects.com/g3d) as `format()`). Pre-2005.
 
 JavaScript
 ==================================================================
 - **cardgen** - HTML5/Javascript/CSS playing card template for creating custom decks. May 2015.
 - **relay** - Node.js based relay server and sample application demonstrating its use. 2013
 - **treeList** - Lightweight selectable and scrollable tree list UI. 2012.
+- **jsmaze** - Recursive perfect maze generator, with wrapping and imperfect options. 2018.
 
 
 Java
