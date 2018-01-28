@@ -84,7 +84,7 @@ void main() {
     // that are too blocky.
     gridLOD = max(log2(size) - 0.75, 0.0);
 
-	// We want to sample from index (wsPosition.xz * heightfieldTexelsPerMeter + 0.5), but
+    // We want to sample from index (wsPosition.xz * heightfieldTexelsPerMeter + 0.5), but
     // at the appropriate texture resolution and using texture coordinates.
     float lowMIP = floor(gridLOD);
     float highMIP = lowMIP + 1.0;
@@ -95,8 +95,8 @@ void main() {
     float highMIPHalfTexelOffset = exp2(lowMIP);
     float lowMIPHalfTexelOffset = highMIPHalfTexelOffset * 0.5;
 
-	Point2 lowMIPTexCoord  = (wsPosition.xz * heightfieldTexelsPerMeter + lowMIPHalfTexelOffset)  * heightfield_invSize.xy;
-	Point2 highMIPTexCoord = (wsPosition.xz * heightfieldTexelsPerMeter + highMIPHalfTexelOffset) * heightfield_invSize.xy;
+    Point2 lowMIPTexCoord  = (wsPosition.xz * heightfieldTexelsPerMeter + lowMIPHalfTexelOffset)  * heightfield_invSize.xy;
+    Point2 highMIPTexCoord = (wsPosition.xz * heightfieldTexelsPerMeter + highMIPHalfTexelOffset) * heightfield_invSize.xy;
 
     // Manual trilinear interpolation
     float lowMIPValue;
