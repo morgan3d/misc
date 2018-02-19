@@ -1,4 +1,4 @@
-/** Creates a w x h maze with corridors of 0 and walls of 1 expressed
+/** Creates a w x h maze with corridors of 0 and walls of 255 expressed
     as an array of arrays using floodfill.
 
     If wrap is true, then the maze is on a torus. Otherwise it is on
@@ -30,12 +30,15 @@ function makeMaze(w, h, wrap, imperfect) {
         w += ~(w & 1); h += ~(h & 1);
     }
 
+    
     // Allocate and initialize to solid
+    const SOLID = 255, EMPTY = 0;
     let maze = new Array(w);
     for (let x = 0; x < w; ++x) {
-        maze[x] = new Array(h).fill(1);
+        maze[x] = new Array(h).fill(SOLID);
     }
 
+    // Carve hallways
     let directions = [{x:-1, y:0}, {x:1, y:0}, {x:0, y:1}, {x:0, y:-1}];
     let stack = [{x:1 + floor(w / 2 - 2) * 2, y:1 + floor(h / 2 - 2) * 2, step:{x:0, y:0}}];
     while (stack.length) {
@@ -48,7 +51,7 @@ function makeMaze(w, h, wrap, imperfect) {
             maze[cur.x][cur.y] = 0;
 
             // Carve the wall back towards the source
-            maze[(cur.x - cur.step.x + w) % w][(cur.y - cur.step.y + h) % h] = 0;
+            maze[(cur.x - cur.step.x + w) % w][(cur.y - cur.step.y + h) % h] = EMPTY;
 
             // Fisher-Yates shuffle directions
             for (let i = 3; i > 0; --i) {
@@ -79,18 +82,20 @@ function makeMaze(w, h, wrap, imperfect) {
         
         // Remove some random walls, preserving the edges if not wrapping.
         for (let i = Math.ceil(imperfect * w * h / 4); i > 0; --i) {
-            maze[floor(random() * (w * 0.5 - bdry * 2)) * 2 + 1][floor(random() * (h * 0.5 - bdry * 2)) * 2 + bdry * 2] = 0;
-            maze[floor(random() * (w * 0.5 - bdry * 2)) * 2 + bdry * 2][floor(random() * (h * 0.5 - bdry * 2)) * 2 + 1] = 0;
+            maze[floor(random() * (w * 0.5 - bdry * 2)) * 2 + 1][floor(random() * (h * 0.5 - bdry * 2)) * 2 + bdry * 2] = EMPTY;
+            maze[floor(random() * (w * 0.5 - bdry * 2)) * 2 + bdry * 2][floor(random() * (h * 0.5 - bdry * 2)) * 2 + 1] = EMPTY;
         }
         
         // Reconnect single-wall islands
         for (let y = 0; y < h; y += 2) {
             for (let x = 0; x < w; x += 2) {
-                let a = maze[x][(y + 1) % h], b = maze[x][(y - 1 + h) % h], c = maze[(x + 1) % w][y], d = maze[(x - 1 + w) % w][y];
+                let a = maze[x][(y + 1) % h], b = maze[x][(y - 1 + h) % h],
+                    c = maze[(x + 1) % w][y], d = maze[(x - 1 + w) % w][y];
+                
                 if (a + b + c + d === 0) {
                     // This is an island. Restore one adjacent wall at random
                     let dir = directions[floor(random() * 4)];
-                    maze[(x + w + dir.x) % w][(y + h + dir.y) % h] = 1;
+                    maze[(x + w + dir.x) % w][(y + h + dir.y) % h] = SOLID;
                 }
             } // x
         } // y
@@ -131,8 +136,8 @@ function mazeToMap(maze, hallWidth, wallWidth) {
 }
 
 
-/** Draws 0 as empty, 1 as solid, and 2 as half-solid (which is useful for visualizing doors
-    you've added). */
+/** Draws 0 as empty, 255 as solid, strings as their first character, 
+    and everything else as half-solid. */
 function mapToString(map) {
     let width = map.length, height = map[0].length;
 
@@ -140,7 +145,7 @@ function mapToString(map) {
     for (let y = 0; y < height; ++y) {
         for (let x = 0; x < width; ++x) {
             let c = map[x][y];
-            s += (c === 2) ? '&#x2592;' : (c === 0) ? ' ' : '&#x2588;';
+            s += (c === 255) ? '&#x2588;' : (c === 0) ? ' ' : c.codePointAt ? c[0] : '&#x2592;';
         }
         s += '\n';
     }

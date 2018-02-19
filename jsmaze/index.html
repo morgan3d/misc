@@ -6,7 +6,7 @@
     @import url('https://fonts.googleapis.com/css?family=Play');
     body { font-family: 'Play', sans-serif; width: 800px; line-height: 120%; margin-left: auto; margin-right: auto; margin-top: 20px; color: #444}
     input.slider { position:relative; top:2px; width: 80px }
-    #display {line-height:65%; letter-spacing: -1px; transform-origin: 0 0; background: linear-gradient(to bottom, rgba(255,250,234,1) 0%,rgba(252,208,75,1) 100%); color: #000 }
+    #display { line-height:65%; letter-spacing: -1px; transform-origin: 0 0; background: linear-gradient(to bottom, rgba(255,250,234,1) 0%,rgba(252,208,75,1) 100%); color: #000 }
   </style>
   
   <center>
@@ -36,7 +36,9 @@
          let map = mazeToMap(maze, hallWidth, wallWidth);
       
          let display = document.getElementById("display");
-         display.style.transform = "scale(" + (2 / (hallWidth + wallWidth)) + ")";
+         let scale = 2 / (hallWidth + wallWidth);
+         display.style.transform = "scale(" + scale + ")";
+         display.style.textShadow = "" + (1.5 / scale) + "px " + (2 / scale) + "px " + (5 / scale) + "px rgba(0,0,0,0.35)";
          display.innerHTML = mapToString(map);
       }
       regenerate();
