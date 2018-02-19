@@ -15,12 +15,12 @@
     <br>[<a href="maze.js">source code</a>]
   </center>
   <p>
-    The maze is always solvable. Every spot is reachable in the maze. With Multipath at minimum, there is a unique path. With Fill at maximum,
+    The maze is always solvable. Every spot is reachable in the maze. With Shortcuts at minimum, there is a unique path. With Fill at maximum,
     that path touches every cell.
   </p>
   <button onclick="regenerate()">Regen</button>
   <input style="margin-left:13px" type="checkbox" id="wrap" autocomplete="off" onchange="regenerate()"><label for="wrap">Tile</label>
-  <span style="padding-left:16px">Multipath</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="imperfection">
+  <span style="padding-left:16px">Shortcuts</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="imperfection">
   <span style="padding-left:16px">Hall</span> <input class="slider" type="range" min="1" max="5" value="3" autocomplete="off" onchange="regenerate()" id="hallWidth">
   <span style="padding-left:16px">Wall</span> <input class="slider" type="range" min="1" max="8" value="1" autocomplete="off" onchange="regenerate()" id="wallWidth">
   <span style="padding-left:16px">Fill</span> <input class="slider" type="range" min="0" max="100" value="100" autocomplete="off" onchange="regenerate()" id="fill">
