@@ -20,6 +20,7 @@ function makeMaze(w, h, wrap, imperfect) {
     h = h || w;
     imperfect = Math.min(1, Math.max(0, imperfect || 0));
     let random = Math.random;
+    let floor = Math.floor;
 
     if (wrap) {
         // Ensure even size
@@ -36,7 +37,7 @@ function makeMaze(w, h, wrap, imperfect) {
     }
 
     let directions = [{x:-1, y:0}, {x:1, y:0}, {x:0, y:1}, {x:0, y:-1}];
-    let stack = [{x:1 + Math.floor(w / 2 - 2) * 2, y:1 + Math.floor(h / 2 - 2) * 2, step:{x:0, y:0}}];
+    let stack = [{x:1 + floor(w / 2 - 2) * 2, y:1 + floor(h / 2 - 2) * 2, step:{x:0, y:0}}];
     while (stack.length) {
         let cur = stack.pop();
 
@@ -51,7 +52,7 @@ function makeMaze(w, h, wrap, imperfect) {
 
             // Fisher-Yates shuffle directions
             for (let i = 3; i > 0; --i) {
-                let j = Math.floor(random() * (i + 1));
+                let j = floor(random() * (i + 1));
                 [directions[i], directions[j]] = [directions[j], directions[i]];
             }
             
@@ -76,23 +77,20 @@ function makeMaze(w, h, wrap, imperfect) {
     if (imperfect > 0) {
         var bdry = wrap ? 0 : 1;
         
-        // Blow away some random walls, preserving the edges if not wrapping.
+        // Remove some random walls, preserving the edges if not wrapping.
         for (let i = Math.ceil(imperfect * w * h / 4); i > 0; --i) {
-            maze[Math.floor(random() * (w * 0.5 - bdry * 2)) * 2 + 1][Math.floor(random() * (h * 0.5 - bdry * 2)) * 2 + bdry * 2] = 0;
-            maze[Math.floor(random() * (w * 0.5 - bdry * 2)) * 2 + bdry * 2][Math.floor(random() * (h * 0.5 - bdry * 2)) * 2 + 1] = 0;
+            maze[floor(random() * (w * 0.5 - bdry * 2)) * 2 + 1][floor(random() * (h * 0.5 - bdry * 2)) * 2 + bdry * 2] = 0;
+            maze[floor(random() * (w * 0.5 - bdry * 2)) * 2 + bdry * 2][floor(random() * (h * 0.5 - bdry * 2)) * 2 + 1] = 0;
         }
         
         // Reconnect single-wall islands
         for (let y = 0; y < h; y += 2) {
             for (let x = 0; x < w; x += 2) {
-                let a = maze[x][(y + 1) % h];
-                let b = maze[x][(y - 1 + h) % h];
-                let c = maze[(x + 1) % w][y];
-                let d = maze[(x - 1 + w) % w][y];
+                let a = maze[x][(y + 1) % h], b = maze[x][(y - 1 + h) % h], c = maze[(x + 1) % w][y], d = maze[(x - 1 + w) % w][y];
                 if (a + b + c + d === 0) {
                     // This is an island. Restore one adjacent wall at random
-                    let dir = Math.floor(random() * 4) * Math.PI / 2;
-                    maze[(x + w + Math.round(Math.cos(dir))) % w][(y + h + Math.round(Math.sin(dir))) % h] = 1;
+                    let dir = directions[floor(random() * 4)];
+                    maze[(x + w + dir.x) % w][(y + h + dir.y) % h] = 1;
                 }
             } // x
         } // y
