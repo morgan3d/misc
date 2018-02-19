@@ -6,7 +6,7 @@
     @import url('https://fonts.googleapis.com/css?family=Play');
     body { font-family: 'Play', sans-serif; width: 800px; line-height: 120%; margin-left: auto; margin-right: auto; margin-top: 20px; color: #444; font-size: 14px}
     input.slider { position:relative; top: 2px; width: 72px }
-    #display { font-family: 'Lucida Console', monospace; line-height:65%; letter-spacing: -1px; transform-origin: 0 0; color: #000; font-size: 14px }
+    #display { font-family: 'Lucida Console', monospace; line-height:85%; letter-spacing: -0.75px; transform-origin: 0 0; color: #000; font-size: 14px }
     button  { font-family: 'Play', sans-serif; font-size: 0.9em; height: 26px }
   </style>
   
@@ -49,8 +49,8 @@
          }
       
          let display = document.getElementById("display");
-         let scale = 2.05 / (hallWidth + wallWidth);
-         display.style.transform = "scale(" + scale + ")";
+         let scale = 2 / (hallWidth + wallWidth);
+         display.style.transform = "scale(" + scale + "," + (scale * 0.7) + ")";
          display.style.textShadow = "" + (1.5 / scale) + "px " + (2 / scale) + "px " + (5 / scale) + "px rgba(0,0,0,0.35)";
 
          let hsl = "" + (Math.random() * 360) + ",40%,70%";
