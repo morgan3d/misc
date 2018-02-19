@@ -1,31 +1,45 @@
 <!doctype html>
 <html>
-  <title>Perfect maze generator</title>
+  <title>Maze generator</title>
   <script src="maze.js"></script>
-  <style>input.slider { position:relative; top:2px; width: 80px }</style>
+  <style>
+    @import url('https://fonts.googleapis.com/css?family=Play');
+    body { font-family: 'Play', sans-serif; width: 800px; line-height: 120%; margin-left: auto; margin-right: auto; margin-top: 20px; color: #444}
+    input.slider { position:relative; top:2px; width: 80px }
+    #display {line-height:65%; letter-spacing: -1px; transform-origin: 0 0; background: linear-gradient(to bottom, rgba(255,250,234,1) 0%,rgba(252,208,75,1) 100%); color: #000 }
+  </style>
   
-  Maze generator by <a href="https://casual-effects.com">Casual Effects</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<a href="maze.js">Source Code</a>]
-  <br><br>
-  <input type="checkbox" id="wrap" autocomplete="off" onchange="regenerate()"><label for="wrap">Wrap</label>
-  <span style="padding-left:50px">Imperfection</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="imperfection">
-  <span style="padding-left:50px">Hall Width</span> <input class="slider" type="range" min="1" max="4" value="3" autocomplete="off" onchange="regenerate()" id="hallWidth">
-  <span style="padding-left:50px">Wall Width</span> <input class="slider" type="range" min="1" max="4" value="1" autocomplete="off" onchange="regenerate()" id="wallWidth">
-  
-  <pre style="line-height:75%; transform-origin: 0 0" id="display"></pre>
-  
+  <center>
+    <b style="font-size: 120%; color:#DDAF08">Maze Generator by <a style="color:#DDAF08" href="https://casual-effects.com">Casual Effects</a></b>
+    <br>[<a href="maze.js">source code</a>]
+  </center>
+  <p>
+    The maze is always solvable. Every spot is reachable in the maze. With multiconnection set to zero, there is a unique path.
+  </p>
+  <input type="checkbox" id="wrap" autocomplete="off" onchange="regenerate()"><label for="wrap">Tileable</label>
+  <span style="padding-left:50px">Multiconnection</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="imperfection">
+  <span style="padding-left:50px">Hall Width</span> <input class="slider" type="range" min="1" max="5" value="3" autocomplete="off" onchange="regenerate()" id="hallWidth">
+  <span style="padding-left:50px">Wall Width</span> <input class="slider" type="range" min="1" max="8" value="1" autocomplete="off" onchange="regenerate()" id="wallWidth">
+
+  <div style="display: inline-block">
+    <pre id="display"></pre>
+  </div>
   
   <script>
       function regenerate() {
          let wrap = document.getElementById("wrap").checked !== false;
          let imperfection = parseInt(document.getElementById("imperfection").value) / 100;
-         let m = makeMaze(96, 64, wrap, imperfection);
+         let maze = makeMaze(114, 60, wrap, imperfection);
 
          let hallWidth = parseInt(document.getElementById("hallWidth").value);
          let wallWidth = parseInt(document.getElementById("wallWidth").value);
+         let map = mazeToMap(maze, hallWidth, wallWidth);
+      
          let display = document.getElementById("display");
-         display.style.transform = "scale(" + (1.5 / (hallWidth + wallWidth)) + ")";
-         display.innerHTML = mazeToString(m, hallWidth, wallWidth);
+         display.style.transform = "scale(" + (2 / (hallWidth + wallWidth)) + ")";
+         display.innerHTML = mapToString(map);
       }
       regenerate();
   </script>
+
 </html>
