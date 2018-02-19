@@ -1,13 +1,13 @@
 /** Creates a w x h maze with corridors of 0 and walls of 255 expressed
     as an array of arrays using floodfill.
 
-    If wrap is true, then the maze is on a torus. Otherwise it is on
-    a rectangle.
+    If wrap is true, then the maze is on a torus. Otherwise it is on a rectangle.
 
-    Imperfect is the maximum fraction of additional connections
-    (creating loops). The default is zero. The maximum is 1.
+    Imperfect is the maximum fraction of additional connections (creating loops). The default
+    is zero. The maximum is 1.
 
-    Every square is always reachable.
+    Fill is how much of the space (very roughly) the maze should fill. 1.0 fills the entire
+    space. 0.0 gives a very thin and stringy result.
 
     Morgan McGuire
     @CasualEffects
@@ -15,12 +15,15 @@
 
     BSD License
 */
-function makeMaze(w, h, wrap, imperfect) {
-    w = w || 32;
-    h = h || w;
-    imperfect = Math.min(1, Math.max(0, imperfect || 0));
+function makeMaze(w, h, wrap, imperfect, fill) {
     let random = Math.random;
     let floor = Math.floor;
+
+    w = floor(w || 32);
+    h = floor(h || w);
+    imperfect = Math.min(1, Math.max(0, imperfect || 0));
+    if (fill === undefined) { fill = 1; }
+    let res = 1 - Math.min(Math.max(0, fill * 0.9 + 0.1), 1);
 
     if (wrap) {
         // Ensure even size
@@ -30,25 +33,51 @@ function makeMaze(w, h, wrap, imperfect) {
         w += ~(w & 1); h += ~(h & 1);
     }
 
-    
     // Allocate and initialize to solid
-    const SOLID = 255, EMPTY = 0;
+    const SOLID = 255, RESERVED = 127, EMPTY = 0;
     let maze = new Array(w);
     for (let x = 0; x < w; ++x) {
         maze[x] = new Array(h).fill(SOLID);
     }
 
-    // Carve hallways
+    // Reserve some regions
+    if (res > 0) {
+        for (let x = 1; x < w; x += 2) {
+            for (let y = 1, m = maze[x]; y < h; y += 2) {
+                if (random() < res) { m[y] = RESERVED; }
+            } // y
+        } // x
+    }
+
+
+    // Find a non-reserved cell from which to begin carving
+    let cur = {x:1 + floor(w / 2 - 2) * 2, y:1 + floor(h / 2 - 2) * 2, step:{x:0, y:0}};
+    while (maze[cur.x][cur.y] !== SOLID) {
+        cur.x = floor(random() * (w - 4) / 2) * 2 + 1;
+        cur.y = floor(random() * (h - 4) / 2) * 2 + 1;
+    }
+    
+    // Carve hallways recursively
+    let stack = [cur];
     let directions = [{x:-1, y:0}, {x:1, y:0}, {x:0, y:1}, {x:0, y:-1}];
-    let stack = [{x:1 + floor(w / 2 - 2) * 2, y:1 + floor(h / 2 - 2) * 2, step:{x:0, y:0}}];
+
+    // Don't start reserving until a path of at least this length has been carved
+    let ignoreReserved = Math.max(w, h);
+
+    function unexplored(x, y) {
+        let c = maze[x][y];
+        return (c === SOLID) || ((c === RESERVED) && (ignoreReserved > 0));
+    }
+    
     while (stack.length) {
         let cur = stack.pop();
 
         // Unvisited?
-        if (maze[cur.x][cur.y]) {
+        if (unexplored(cur.x, cur.y)) {
             
             // Mark visited
-            maze[cur.x][cur.y] = 0;
+            maze[cur.x][cur.y] = EMPTY;
+            --ignoreReserved;
 
             // Carve the wall back towards the source
             maze[(cur.x - cur.step.x + w) % w][(cur.y - cur.step.y + h) % h] = EMPTY;
@@ -69,7 +98,7 @@ function makeMaze(w, h, wrap, imperfect) {
                     y = (y + h) % h;
                 }
                 
-                if ((x >= 0) && (y >= 0) && (x < w) && (y < h) && maze[x][y]) {
+                if ((x >= 0) && (y >= 0) && (x < w) && (y < h) && unexplored(x, y)) {
                     // In bounds and not visited
                     stack.push({x:x, y:y, step:step});
                 }
@@ -77,13 +106,23 @@ function makeMaze(w, h, wrap, imperfect) {
         } // if unvisited
     } // while unvisited
 
+    
     if (imperfect > 0) {
         var bdry = wrap ? 0 : 1;
+
+        // Removes if not  attached to some passage
+        function remove(x, y) {
+            let a = maze[x][(y + 1) % h], b = maze[x][(y - 1 + h) % h],
+                c = maze[(x + 1) % w][y], d = maze[(x - 1 + w) % w][y];
+            if (Math.min(a, b, c, d) === EMPTY) {
+                maze[x][y] = EMPTY;
+            }
+        }
         
         // Remove some random walls, preserving the edges if not wrapping.
-        for (let i = Math.ceil(imperfect * w * h / 4); i > 0; --i) {
-            maze[floor(random() * (w * 0.5 - bdry * 2)) * 2 + 1][floor(random() * (h * 0.5 - bdry * 2)) * 2 + bdry * 2] = EMPTY;
-            maze[floor(random() * (w * 0.5 - bdry * 2)) * 2 + bdry * 2][floor(random() * (h * 0.5 - bdry * 2)) * 2 + 1] = EMPTY;
+        for (let i = Math.ceil(imperfect * w * h / 3); i > 0; --i) {
+            remove(floor(random() * (w * 0.5 - bdry * 2)) * 2 + 1, floor(random() * (h * 0.5 - bdry * 2)) * 2 + bdry * 2);
+            remove(floor(random() * (w * 0.5 - bdry * 2)) * 2 + bdry * 2, floor(random() * (h * 0.5 - bdry * 2)) * 2 + 1);
         }
         
         // Reconnect single-wall islands
@@ -92,7 +131,7 @@ function makeMaze(w, h, wrap, imperfect) {
                 let a = maze[x][(y + 1) % h], b = maze[x][(y - 1 + h) % h],
                     c = maze[(x + 1) % w][y], d = maze[(x - 1 + w) % w][y];
                 
-                if (a + b + c + d === 0) {
+                if (a === EMPTY && b === EMPTY && c === EMPTY && d === EMPTY) {
                     // This is an island. Restore one adjacent wall at random
                     let dir = directions[floor(random() * 4)];
                     maze[(x + w + dir.x) % w][(y + h + dir.y) % h] = SOLID;
@@ -100,6 +139,15 @@ function makeMaze(w, h, wrap, imperfect) {
             } // x
         } // y
     }
+
+    // Unreserve everything
+    if (res > 0) {
+        for (let x = 1; x < w; x += 2) {
+            for (let y = 1, m = maze[x]; y < h; y += 2) {
+                if (m[y] === RESERVED) { m[y] = SOLID; }
+            } // y
+        } // x
+    } // res
 
     return maze;
 }
@@ -145,7 +193,7 @@ function mapToString(map) {
     for (let y = 0; y < height; ++y) {
         for (let x = 0; x < width; ++x) {
             let c = map[x][y];
-            s += (c === 255) ? '&#x2588;' : (c === 0) ? ' ' : c.codePointAt ? c[0] : '&#x2592;';
+            s += (c === 255) ? '&#x2588;' : (c === 0) ? ' ' : c.codePointAt ? c[0] : '&#x2591;';
         }
         s += '\n';
     }

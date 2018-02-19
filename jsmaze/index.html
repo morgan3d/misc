@@ -5,8 +5,9 @@
   <style>
     @import url('https://fonts.googleapis.com/css?family=Play');
     body { font-family: 'Play', sans-serif; width: 800px; line-height: 120%; margin-left: auto; margin-right: auto; margin-top: 20px; color: #444}
-    input.slider { position:relative; top:2px; width: 80px }
-    #display { line-height:65%; letter-spacing: -1px; transform-origin: 0 0; background: linear-gradient(to bottom, rgba(255,250,234,1) 0%,rgba(252,208,75,1) 100%); color: #000 }
+    input.slider { position:relative; top:2px; width: 75px }
+    #display { font-family: monospace; line-height:65%; letter-spacing: -1px; transform-origin: 0 0; color: #000 }
+    button  { font-family: 'Play', sans-serif; font-size: 0.9em; height: 26px }
   </style>
   
   <center>
@@ -14,12 +15,15 @@
     <br>[<a href="maze.js">source code</a>]
   </center>
   <p>
-    The maze is always solvable. Every spot is reachable in the maze. With multiconnection set to zero, there is a unique path.
+    The maze is always solvable. Every spot is reachable in the maze. With Multipath at minimum, there is a unique path. With Fill at maximum,
+    that path touches every cell.
   </p>
-  <input type="checkbox" id="wrap" autocomplete="off" onchange="regenerate()"><label for="wrap">Tileable</label>
-  <span style="padding-left:50px">Multiconnection</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="imperfection">
-  <span style="padding-left:50px">Hall Width</span> <input class="slider" type="range" min="1" max="5" value="3" autocomplete="off" onchange="regenerate()" id="hallWidth">
-  <span style="padding-left:50px">Wall Width</span> <input class="slider" type="range" min="1" max="8" value="1" autocomplete="off" onchange="regenerate()" id="wallWidth">
+  <button onclick="regenerate()">Regen</button>
+  <input style="margin-left:15px" type="checkbox" id="wrap" autocomplete="off" onchange="regenerate()"><label for="wrap">Tile</label>
+  <span style="padding-left:20px">Multipath</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="imperfection">
+  <span style="padding-left:20px">Hall Width</span> <input class="slider" type="range" min="1" max="5" value="3" autocomplete="off" onchange="regenerate()" id="hallWidth">
+  <span style="padding-left:20px">Wall Width</span> <input class="slider" type="range" min="1" max="8" value="1" autocomplete="off" onchange="regenerate()" id="wallWidth">
+  <span style="padding-left:20px">Fill</span> <input class="slider" type="range" min="0" max="100" value="100" autocomplete="off" onchange="regenerate()" id="fill">
 
   <div style="display: inline-block">
     <pre id="display"></pre>
@@ -29,16 +33,20 @@
       function regenerate() {
          let wrap = document.getElementById("wrap").checked !== false;
          let imperfection = parseInt(document.getElementById("imperfection").value) / 100;
-         let maze = makeMaze(114, 60, wrap, imperfection);
+         let fill = parseInt(document.getElementById("fill").value) / 100;
+         let maze = makeMaze(114, 60, wrap, imperfection, fill);
 
          let hallWidth = parseInt(document.getElementById("hallWidth").value);
          let wallWidth = parseInt(document.getElementById("wallWidth").value);
          let map = mazeToMap(maze, hallWidth, wallWidth);
       
          let display = document.getElementById("display");
-         let scale = 2 / (hallWidth + wallWidth);
+         let scale = 2.05 / (hallWidth + wallWidth);
          display.style.transform = "scale(" + scale + ")";
          display.style.textShadow = "" + (1.5 / scale) + "px " + (2 / scale) + "px " + (5 / scale) + "px rgba(0,0,0,0.35)";
+
+         let hsl = "" + (Math.random() * 360) + ",40%,70%";
+         display.style.background = "linear-gradient(to bottom, hsla(" + hsl + ",0.1) 0%, hsla(" + hsl + ",1) 100%)";
          display.innerHTML = mapToString(map);
       }
       regenerate();
