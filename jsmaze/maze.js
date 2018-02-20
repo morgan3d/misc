@@ -23,13 +23,18 @@ function makeMaze(w, h, wrap, imperfect, fill, deadEndArray) {
     const SOLID = 255, RESERVED = 127, EMPTY = 0;
     let random = Math.random, floor = Math.floor;
 
+    function randomInt(x) { return floor(random() * x); }
+
+    // Knuth-Fisher-Yates shuffle of an Array
+    function shuffle(a) { for (let i = a.length - 1; i > 0; --i) { let j = randomInt(i + 1); [a[i], a[j]] = [a[j], a[i]]; } }
+
     // Argument cleanup
     if (deadEndArray === undefined) { deadEndArray = []; }
     w = floor(w || 32);
     h = floor(h || w);
     imperfect = Math.min(1, Math.max(0, imperfect || 0));
     if (fill === undefined) { fill = 1; }
-    let reserveProb = 1 - Math.min(Math.max(0, fill * 0.9 + 0.1), 1);
+    let reserveProb = (1 - Math.min(Math.max(0, fill * 0.9 + 0.1), 1))**1.6;
 
     if (wrap) {
         // Ensure even size
@@ -54,17 +59,9 @@ function makeMaze(w, h, wrap, imperfect, fill, deadEndArray) {
         } // x
     }
 
-
-    // Find a non-reserved cell from which to begin carving
-    let cur = {x:1 + floor(w / 2 - 2) * 2, y:1 + floor(h / 2 - 2) * 2, step:{x:0, y:0}};
-    while (maze[cur.x][cur.y] !== SOLID) {
-        cur.x = floor(random() * (w - 4) / 2) * 2 + 1;
-        cur.y = floor(random() * (h - 4) / 2) * 2 + 1;
-    }
-    
     // Carve hallways recursively
-    let stack = [cur];
-    deadEndArray.push(cur);
+    let stack = [{x:floor(w / 4) * 2 - 3, y:floor(h / 4) * 2 - 3, step:{x:0, y:0}}];
+    deadEndArray.push(stack[0]);
     let directions = [{x:-1, y:0}, {x:1, y:0}, {x:0, y:1}, {x:0, y:-1}];
 
     // Don't start reserving until a path of at least this length has been carved
@@ -74,7 +71,7 @@ function makeMaze(w, h, wrap, imperfect, fill, deadEndArray) {
         let c = maze[x][y];
         return (c === SOLID) || ((c === RESERVED) && (ignoreReserved > 0));
     }
-    
+  
     while (stack.length) {
         let cur = stack.pop();
 
@@ -89,10 +86,7 @@ function makeMaze(w, h, wrap, imperfect, fill, deadEndArray) {
             maze[(cur.x - cur.step.x + w) % w][(cur.y - cur.step.y + h) % h] = EMPTY;
 
             // Fisher-Yates shuffle directions
-            for (let i = 3; i > 0; --i) {
-                let j = floor(random() * (i + 1));
-                [directions[i], directions[j]] = [directions[j], directions[i]];
-            }
+            shuffle(directions);
             
             // Push neighbors if not visited
             let deadEnd = true;
@@ -100,6 +94,7 @@ function makeMaze(w, h, wrap, imperfect, fill, deadEndArray) {
                 let step = directions[i];
                 let x = cur.x + step.x * 2;
                 let y = cur.y + step.y * 2;
+                
                 if (wrap) {
                     x = (x + w) % w;
                     y = (y + h) % h;
@@ -112,9 +107,7 @@ function makeMaze(w, h, wrap, imperfect, fill, deadEndArray) {
                 }
             } // for each direction
             
-            if (deadEnd) {
-                deadEndArray.push(cur);
-            }
+            if (deadEnd) { deadEndArray.push(cur); }
         } // if unvisited
     } // while unvisited
 
@@ -133,8 +126,8 @@ function makeMaze(w, h, wrap, imperfect, fill, deadEndArray) {
         
         // Remove some random walls, preserving the edges if not wrapping.
         for (let i = Math.ceil(imperfect * w * h / 3); i > 0; --i) {
-            remove(floor(random() * (w * 0.5 - bdry * 2)) * 2 + 1, floor(random() * (h * 0.5 - bdry * 2)) * 2 + bdry * 2);
-            remove(floor(random() * (w * 0.5 - bdry * 2)) * 2 + bdry * 2, floor(random() * (h * 0.5 - bdry * 2)) * 2 + 1);
+            remove(randomInt(w * 0.5 - bdry * 2) * 2 + 1, randomInt(h * 0.5 - bdry * 2) * 2 + bdry * 2);
+            remove(randomInt(w * 0.5 - bdry * 2) * 2 + bdry * 2, randomInt(h * 0.5 - bdry * 2) * 2 + 1);
         }
         
         // Reconnect single-wall islands
@@ -145,7 +138,7 @@ function makeMaze(w, h, wrap, imperfect, fill, deadEndArray) {
                 
                 if (a === EMPTY && b === EMPTY && c === EMPTY && d === EMPTY) {
                     // This is an island. Restore one adjacent wall at random
-                    let dir = directions[floor(random() * 4)];
+                    let dir = directions[randomInt(4)];
                     maze[(x + w + dir.x) % w][(y + h + dir.y) % h] = SOLID;
                 }
             } // x
