@@ -65,6 +65,7 @@ Lua/PICO-8
 - **p8escape** - Allow lowercase characters in printed PICO-8 strings. This is actually a web utility, not PICO-8 code itself. 2017
 - **p8controller** - Minimal-memory PICO-8 controller image for instruction screens. 2017.
 - **p8pathfinder** - Fully general PICO-8 A* (A-star) and Dijkstra pathfinding in a single function. 2017.
+- **p8scale** - Enhanced HQx 2x, 3x, 4x scaling with transparency and better curves
 
 Scheme
 ==================================================================
