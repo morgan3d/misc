@@ -1,12 +1,16 @@
 // Polyfill
 if (HTMLCollection.prototype.forEach === undefined) { HTMLCollection.prototype.forEach = [].forEach }
 
-function showMenu(event) { event.target.classList.add('activeMenu'); }
+function showMenu(e) {
+    closeAllMenus()
+    this.classList.add('activeMenu')
+    e.stopPropagation()
+}
 
 function closeAllMenus() { document.getElementsByClassName('activeMenu').forEach(function (node) { node.classList.remove('activeMenu') }) }
 
 (function() {
-function on(n,f){window.addEventListener(n,f)}
+function on(e, f) { window.addEventListener(e, f) }
 
 // Show menu event handler
 on('load', function (event) { document.getElementsByClassName('menuLabel').forEach(function(node) { node.onclick = showMenu }) })
@@ -18,7 +22,7 @@ on('keydown', function (event) { (event.key === "Escape") && closeAllMenus() }, 
 var style = document.createElement('style')
 style.type = 'text/css'
 style.innerHTML =`
-#m{position:absolute;top:43px;font-size:13px;user-select:none}
+#m {position:absolute;top:43px;font-size:13px;user-select:none}
 
 #m div{display:inline-block;vertical-align:top}
 
@@ -28,7 +32,7 @@ style.innerHTML =`
 /* Menu label (hover) */
 #m .menuLabel:hover{background:#eee}
 
-/* Drop-down menu (hidden) */
+/* Drop-down menu */
 #m div div{position:absolute;display:block;min-width:120px;overflow:auto;background:#fff;box-shadow:0px 2px 6px 0px rgba(0,0,0,.5);z-index:4;padding:4px 2px 2px 30px;margin-left:-8px;margin-top:4px}
 
 /* Drop-down menu (hidden) */
@@ -47,6 +51,6 @@ style.innerHTML =`
 #m div div a .material-icons{font-size:120%;color:rgba(0,0,0,.55)}
 
 /* Line between menu items */
-#m div div hr{border:none;height:1px;background:rgba(0,0,0,.15);margin-top:5px -2px 5px -30px}`.replace(/#m/g, '#menubar')
+#m div div hr{border:none;height:1px;background:rgba(0,0,0,.15);margin-top:5px -2px 5px -30px}`.replace(/#m /g, '#menubar ')
 document.getElementsByTagName('head')[0].appendChild(style)
 })();
