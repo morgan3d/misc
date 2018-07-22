@@ -46,6 +46,7 @@ JavaScript
 - **relay** - Node.js based relay server and sample application demonstrating its use. 2013
 - **treeList** - Lightweight selectable and scrollable tree list UI. 2012.
 - **jsmaze** - Recursive perfect maze generator, with wrapping and imperfect options. 2018.
+- **jsmenu** - Lightweight library for dropdown menus. 2018.
 
 
 Java
