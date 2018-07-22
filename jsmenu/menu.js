@@ -34,7 +34,7 @@ style.innerHTML =`
 #m span:not(.activeMenu) + div{visibility:hidden}
 
 /* Menu item */
-#m div div a{color:#000;text-decoration:none;display:block;padding:4px;margin-top:4px 0 4px}
+#m div div a{color:#000;text-decoration:none;display:block;padding:4px;margin:4px 0 4px}
 
 /* Left-aligned icon within a menu item */
 #m div div a .icon{position:absolute;left:9px}
@@ -46,6 +46,6 @@ style.innerHTML =`
 #m div div a .material-icons{font-size:120%;color:rgba(0,0,0,.55)}
 
 /* Line between menu items */
-#m div div hr{border:none;height:1px;background:rgba(0,0,0,.15);margin-top:5px -2px 5px -30px}`.replace(/#m /g, '#menubar ')
+#m div div hr{border:none;height:1px;background:rgba(0,0,0,.15);margin:5px -2px 5px -30px}`.replace(/#m /g, '#menubar ')
 document.getElementsByTagName('head')[0].appendChild(style)
 })();
