@@ -43,9 +43,10 @@ C++
 JavaScript
 ==================================================================
 - **cardgen** - HTML5/Javascript/CSS playing card template for creating custom decks. May 2015.
-- **relay** - Node.js based relay server and sample application demonstrating its use. 2013
+- **relay** - Node.js based relay server and sample application demonstrating its use. 2013.
 - **treeList** - Lightweight selectable and scrollable tree list UI. 2012.
 - **jsmaze** - Recursive perfect maze generator, with wrapping and imperfect options. 2018.
+- **jsvectorify** - Vector operations and operator overloading. 2018.
 - **jsmenu** - Lightweight library for dropdown menus. 2018.
 
 
