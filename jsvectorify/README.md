@@ -232,7 +232,7 @@ Credits and License
 ===========================================
 
 `vectorify.js` is by Morgan McGuire and available under the MIT License (see
-[`LICENSE`](LICENSE).  It uses the MIT License [`recast`](https://github.com/benjamn/recast)
+[`LICENSE`](LICENSE)).  It uses the MIT License [`recast`](https://github.com/benjamn/recast)
 library by Ben Newman and the BSD-2-Clause
 [`estraverse`](https://github.com/estools/estraverse) library from ECMAScript Tooling.
 
