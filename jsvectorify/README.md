@@ -191,9 +191,15 @@ Performance
 
 As of Nov 2018, Firefox executes the generated code nearly as fast as hand-written code
 special-cased with static knowledge of the types involved. Chrome is fast for vectors but about
-8x slower than hand-written for operations involving only Numbers. Safari is about as fast as
+8x slower than hand-written for operations involving only Numbers. Edge and Safari and about as fast as
 Firefox, except for cases where the right-hand side of a mutating operator is computed (e.g.,
-`a[x+1] += b`), which slows it down about 4x compared to hand-written code.
+`a[x+1] += b`), which slows them down about 4x compared to hand-written code. In the worst case,
+all browsers can run certain arithmetic operations about 60x slower for the mutating operator case.
+This is still quite fast and hasn't impacted net application performance for the cases where I've used
+it, but is a really shocking slowdown given that inlining should allow the browser to optimize this
+case well. This worst case seems to affect Firefox significantly less than the others.
+
+
 
 
 Debugging
