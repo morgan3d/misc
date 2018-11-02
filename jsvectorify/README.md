@@ -28,7 +28,7 @@ Usage
 In your HTML file:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HTML
-<script src="github...vectorify.js"></script>
+<script src="https://morgan3d.github.io/misc/jsvectorify/lib/vectorify.js"></script>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -43,7 +43,9 @@ eval(vectorify(function() {
    ...
 }))();
 
+
 // or
+
 
 // Leave you program unmodified, but create a single vectorified function.
 // This preserves peak performance for scalar operations outside of this function.
@@ -54,9 +56,11 @@ let f = eval(vectorify(function() {
    ...
 }));
 
+
 // or
 
-// Returns a string of the processed code. That string must be eval() or run in 
+
+// Returns a string of the processed code. You can eval() or run the result in 
 // in an environment where the vector.js routines are defined.
 let s = vectorify(`
    ... your code here ...
@@ -66,10 +70,12 @@ let s = vectorify(`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `vectorify` does not eval the source itself because if it did so, the wrong scope would be
-used.
+used for evaluating free variables.
 
-You can probably use the library directly from Node.js and other non-browser
-contexts; it may require some library/module wrapping.
+You can probably use the library directly from Node.js and other non-browser contexts; it may
+require some library/module wrapping. If you're curious about that, then you already know more
+than I do, so I can't help you.
+
 
 Design
 ==========================================
