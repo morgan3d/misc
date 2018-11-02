@@ -27,4 +27,6 @@ test(`({x:1,y:5} + {x:4,y:3}).y`, 8);
 test(`({x:1,y:2} + {x:4,y:3}).y`, 5);
 test(`([1,2] + [4,3])[0]`, 5);
 test(`([3] * [6])[0]`, 18);
+test(`(function() { let v = [1, 2]; let b = v; v += [4,2]; return b[0]; }())`, 5);
+test(`(function() { let v = Object.freeze([1, 2]); let b = v; v += [4,2]; return b[0]; }())`, 1);
 console.log('Done with tests');

@@ -143,6 +143,47 @@ The `cross` function assumes the vector is of the form `[x, y, z]` or `{x:, y:, 
 routines make no assumptions about length or structure of vectors.
 
 
+Immutable Vectors
+==========================================
+
+The operators follow normal Object variable rules for aliasing and assignment, by default. For example:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ JavaScript
+function vec3(x, y, z) { return Object.freeze({x:x, y:y, z:z}); }
+
+let v = vec3(1,2,3);
+let b = v;
+
+v += 4;
+
+// note that b === v
+
+console.log(b.x); // prints 5
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+However, if the first input argument to an operator or function is frozen, then the output will
+be frozen as well. 
+
+In this case, rather than the mutating operators giving an error, they construct new output
+arguments.  This means that if you use `Object.freeze` when you create your original vectors
+then they will have semantics similar to JavaScript Strings or Numbers. For example:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ JavaScript
+function vec3(x, y, z) { return Object.freeze({x:x, y:y, z:z}); }
+
+let v = vec3(1,2,3);
+let b = v;
+v += 4; // same as v = v + 4 since v is immutable
+
+// here, b !== v
+
+console.log(b.x); // prints 1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Note that the semantics will _not_ be the same as GLSL vectors or C++ structs because
+individual elements will also be immutable.
+
+
 Performance
 ==========================================
 
