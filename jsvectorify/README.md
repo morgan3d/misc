@@ -152,7 +152,7 @@ The vector operators follow normal Object variable rules for aliasing and assign
 default. For example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ JavaScript
-function vec3(x, y, z) { return Object.freeze({x:x, y:y, z:z}); }
+function vec3(x, y, z) { return {x:x, y:y, z:z}; }
 
 let v = vec3(1,2,3);
 let b = v;
