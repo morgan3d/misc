@@ -23,7 +23,7 @@ function vectorify(program) {
                 if (fcnName && (node.operator.length === 1)) {
                     // Binary functional operation
                     return create.callExpression(create.identifier(fcnName), [node.left, node.right]);
-                } else if (fcnName) {
+                } else if (fcnName && (node.operator[1] === '=')) {
                     // Mutating binary operation
                     
                     // Is there a more complicated lvalue than identifier.identifier?
