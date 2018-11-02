@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+npm install browserify
+npm install recast
+npm install estraverse
+npm install @babel/core @babel/cli @babel/preset-env
+mkdir tmp
+mkdir tmp/src
+mkdir tmp/es5
+
+browserify need-recast.js -o tmp/src/recast.js
+cp vector-vectorify.js tmp/src/
+cp vector-operators.js tmp/src/
+npx babel tmp/src --presets=@babel/env --out-file tmp/es5
+uglifyjs --keep-fnames --beautify beautify=false,ascii-only=true -o vectorify.js --preamble "/* vectorify.js by Morgan McGuire from https://casual-effects.com */" tmp/es5/*
