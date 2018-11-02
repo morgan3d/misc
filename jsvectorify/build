@@ -15,4 +15,5 @@ browserify need-recast.js -o tmp/src/recast.js
 cp vector-vectorify.js tmp/src/
 cp vector-operators.js tmp/src/
 npx babel tmp/src --presets=@babel/env --out-file tmp/es5/vectorify.js
-uglifyjs --keep-fnames --beautify beautify=false,ascii-only=true -o lib/vectorify.js --preamble "/* vectorify.js by Morgan McGuire from https://casual-effects.com */" tmp/es5/vectorify.js
+uglifyjs -c -m --reserved vectorify,_add,_mul,_div,_sub,dot,floor,round,trunc,ceil,pow,abs,sqrt,min,max,clamp,exp,maxComponent,minComponent,magnitude,direction,cross,cloneVector,copyVector --beautify beautify=false,ascii-only=true -o lib/vectorify.js --preamble "/* vectorify.js by Morgan McGuire from https://casual-effects.com */" tmp/es5/vectorify.js
+#--keep-fnames
