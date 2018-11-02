@@ -77,31 +77,6 @@ require some library/module wrapping. If you're curious about that, then you alr
 than I do, so I can't help you.
 
 
-Design
-==========================================
-
-The goal of this operator overloading technique primarily to provide convenience and clean
-syntax. It strives to give good performance while retaining near-native performance for scalar
-operations with the best JavaScript implementations and preserving line numbers for error
-messages and debugging. Performance on vector operations is necessarily lower than could be
-achieved by changing the language semantics, which is the cost of the relatively seamless
-integration.
-
-I developed this for working with JavaScript as a high-level scripting engine for games in
-WebGL or embedded in a binary engine, where low-level, numerically-intense operations are
-performed in hand-written JavaScript or C++ that avoids allocation and these abstractions.
-That is, you probably shouldn't write your particle system integrator using this library, but
-you should write the high-level scene graph logic with it.
-
-This library doesn't support matrix-vector product because there are many different ways to
-represent matrices and some domain knowledge is needed to handle something like "matrix * rgb"
-as intended. 
-
-Matrices themselves are not supported for the pointwise operators because doing so via
-recursive processing of arrays-of-arrays or similar would slow down the more critical vector
-case.
-
-
 Features
 ==========================================
 
@@ -186,6 +161,30 @@ console.log(b.x); // prints 1
 Note that the semantics will _not_ be the same as GLSL vectors or C++ structs because
 individual elements will also be immutable if the entire object is frozen.
 
+Design
+==========================================
+
+The goal of this operator overloading technique primarily to provide convenience and clean
+syntax. It strives to give good performance while retaining near-native performance for scalar
+operations with the best JavaScript implementations and preserving line numbers for error
+messages and debugging. Performance on vector operations is necessarily lower than could be
+achieved by changing the language semantics, which is the cost of the relatively seamless
+integration.
+
+I developed this for working with JavaScript as a high-level scripting engine for games in
+WebGL or embedded in a binary engine, where low-level, numerically-intense operations are
+performed in hand-written JavaScript or C++ that avoids allocation and these abstractions.
+That is, you probably shouldn't write your particle system integrator using this library, but
+you should write the high-level scene graph logic with it.
+
+This library doesn't support matrix-vector product because there are many different ways to
+represent matrices and some domain knowledge is needed to handle something like "matrix * rgb"
+as intended. 
+
+Matrices themselves are not supported for the pointwise operators because doing so via
+recursive processing of arrays-of-arrays or similar would slow down the more critical vector
+case.
+
 
 Performance
 ==========================================
@@ -197,6 +196,38 @@ Firefox, except for cases where the right-hand side of a mutating operator is co
 `a[x+1] += b`), which slows it down about 4x compared to hand-written code.
 
 
+Debugging
+==========================================
+
+Code that has been vectorified can interact with non-vectorified code without a problem and run
+in debuggers, throw exceptions, etc. `vectorify` also does not modify your variable names, so
+you can interact with them in a console or debugger as usual.
+
+The vectorified code will likely give incorrect line numbers and not appear in a debugger if
+you use it exactly as shown in the simple examples above. For more complicated programs, there
+is a workaround for this.
+
+Because `vectorify` preserves line numbers, comments, and even whitespace in its rewriting,
+if you process code and then inject it back into your program as code instead of running
+`eval`, a debugger will be able to handle it correctly and show you the original source line for 
+the problem (and even expose the same variable names). There are a few ways to do this.
+The three easiest are:
+
+1. Read the source from a `<script type='vectorify'>` tag, and then replace that
+   tag with the vectorified code at runtime (`document.getElementsByTagName`...`node.parentNode.replaceChild(document.createElement('script')...`).
+   
+2. Read the source and then inject the output into an `iframe`.
+
+3. Process the code offline. The output of `vectorify` is not as pretty as infix math (that's
+   kind of the point of using it), but it is still extremely readable.
+
+I suspect that it is also possible to use a "source map" for this, but the source map produced
+by `vectorify` internally is relative to the input string, not the place in your program where
+it was introduced. So, I haven't exposed that yet. The most likely solution here is to use the
+form that grabs source from a function and somehow extract the relative location of that
+function in the original source file.
+
+
 Credits and License
 ===========================================
 
@@ -204,3 +235,8 @@ Credits and License
 [`LICENSE`](LICENSE).  It uses the MIT License [`recast`](https://github.com/benjamn/recast)
 library by Ben Newman and the BSD-2-Clause
 [`estraverse`](https://github.com/estools/estraverse) library from ECMAScript Tooling.
+
+The name "vectorify" is a ridiculous one chosen with inspiration from "browserify". I
+intentionally avoided the name "vectorize", which generally means collecting parallel scalar
+code and turning it into vector operations; this library enables vectors but doesn't
+"vectorize" scalar code for you.
