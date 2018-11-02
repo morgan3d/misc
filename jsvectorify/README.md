@@ -69,7 +69,7 @@ let s = vectorify(`
 `);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`vectorify` does not eval the source itself because if it did so, the wrong scope would be
+`vectorify` does not `eval` the source itself because if it did so, the wrong scope would be
 used for evaluating free variables.
 
 You can probably use the library directly from Node.js and other non-browser contexts; it may
@@ -88,16 +88,18 @@ achieved by changing the language semantics, which is the cost of the relatively
 integration.
 
 I developed this for working with JavaScript as a high-level scripting engine for games in
-WebGL or embedded in a binary engine, where low-level, numerically intense operations are
-performed in hand-written JavaScript or C++ that avoids allocation and these abstractions.  You
-probably shouldn't write your particle system integrator using this library, but you could
-write the high-level scene graph logic in it.
+WebGL or embedded in a binary engine, where low-level, numerically-intense operations are
+performed in hand-written JavaScript or C++ that avoids allocation and these abstractions.
+That is, you probably shouldn't write your particle system integrator using this library, but
+you should write the high-level scene graph logic with it.
 
 This library doesn't support matrix-vector product because there are many different ways to
-represent matrices and some domain knowledge is needed to handle something like matrix * rgb,
-versus straight indexing. Matrices themselves are not supported for the pointwise operators
-because doing so via recursive processing of arrays-of-arrays or similar would slow down the
-more critical vector case. 
+represent matrices and some domain knowledge is needed to handle something like "matrix * rgb"
+as intended. 
+
+Matrices themselves are not supported for the pointwise operators because doing so via
+recursive processing of arrays-of-arrays or similar would slow down the more critical vector
+case.
 
 
 Features
@@ -107,12 +109,12 @@ The library provides pointwise vector operations (a.k.a. Hadamard or array) oper
 arithmetic and common math routines, as well as appropriate definitions for vector functions
 such as min, minComponent, copy, and dot product.
 
-This library it does not introduce a special vector class but works with whatever Object or
-Array arguments are provided, and seamlessly works for Numbers mixed with them. So, your
+`vectorify.js` does not introduce a special vector class. It works with whatever Object or
+Array arguments are provided, and seamlessly operates on Numbers mixed with them. So, your
 vectors can look like `{x:1, y:2}`, `{r:0, g:1, b:1, a:0.5}`, `[7, 4, 1]`, or another other
 structure. If they have a specific prototype such as the Box2D vector class, then that will be
 preserved by the operations. Methods are not added to the `Math` object so that you have direct
-access to those routines when operating on scalars for efficiency.
+access to the original routines when operating on scalars for efficiency.
 
 Operator overloading works for Arrays of the same length, Objects with the same keys, and an
 Array or Object and a scalar right value. It assumes that the values in the Array or Object are
@@ -146,7 +148,8 @@ routines make no assumptions about length or structure of vectors.
 Immutable Vectors
 ==========================================
 
-The operators follow normal Object variable rules for aliasing and assignment, by default. For example:
+The vector operators follow normal Object variable rules for aliasing and assignment, by
+default. For example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ JavaScript
 function vec3(x, y, z) { return Object.freeze({x:x, y:y, z:z}); }
@@ -165,7 +168,7 @@ However, if the first input argument to an operator or function is frozen, then 
 be frozen as well. 
 
 In this case, rather than the mutating operators giving an error, they construct new output
-arguments.  This means that if you use `Object.freeze` when you create your original vectors
+arguments.  This means that if you use `Object.freeze` when you create your original vectors,
 then they will have semantics similar to JavaScript Strings or Numbers. For example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ JavaScript
@@ -181,7 +184,7 @@ console.log(b.x); // prints 1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Note that the semantics will _not_ be the same as GLSL vectors or C++ structs because
-individual elements will also be immutable.
+individual elements will also be immutable if the entire object is frozen.
 
 
 Performance
