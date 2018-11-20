@@ -1,5 +1,16 @@
 function vectorify(program) {
-    let src = (typeof program === 'string') ? program : program.toString();
+    let src, args;
+    if (typeof program === 'string') {
+        src = program;
+    } else {
+        // Wrapped in a string. Get the source and then strip the
+        // function declaration.
+        src = program.toString();
+        src = src.replace(/^[ \t\n]*(function\s+\().*(\)[ \n\t]*{)/, function(match, fcn, a, ignore) {
+            args = a.split(',');
+            return '';
+        }).replace(/}[ \t\n]*$/, '');
+    }
 
     let ast = _recast.parse(src);
 
@@ -55,5 +66,16 @@ function vectorify(program) {
         }
     });
     
-    return _recast.print(ast).code;
+    const body = _recast.print(ast).code;
+    if (typeof program === 'string') {
+        return body;
+    } else {
+        // Create a function
+        for (let i = 0; i < args.length; ++i) {
+            args[i] = args[i].trim();
+        }
+        args.push(body);
+
+        return Function.constructor.apply(null, args);
+    }
 }

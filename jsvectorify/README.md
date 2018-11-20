@@ -37,24 +37,36 @@ In your JavaScript file:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ JavaScript
 
 // Vectorify an entire program:
-(new Function(vectorify(function() {
+vectorify(function() {
    ... your code here ...
-   let a = {x: 1, y:2};
+   let c = {x: 1, y:2};
    ...
-}))();
+})();
 
 
 // or
 
 
-// Leave you program unmodified, but create a single vectorified function.
+// Leave you program unmodified, but create a single vectorified function in 
+// the *global* environment. This preserves peak performance for scalar 
+// operations outside of this function. The function can be used by regular code.
+let f = vectorify(function(a, b) {
+   ... your code here ...
+   let c = {x: 1, y:2};
+   ...
+});
+
+
+// or
+
+// Leave you program unmodified, but create a single vectorified function in the *current* scope.
 // This preserves peak performance for scalar operations outside of this function.
 // The function can be used by regular code.
-let f = new Function(vectorify(function() {
+let f = eval(vectorify(function() {
    ... your code here ...
-   let a = {x: 1, y:2};
+   let c = {x: 1, y:2};
    ...
-}));
+}.toString()));
 
 
 // or
