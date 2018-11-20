@@ -37,7 +37,7 @@ In your JavaScript file:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ JavaScript
 
 // Vectorify an entire program:
-eval(vectorify(function() {
+(new Function(vectorify(function() {
    ... your code here ...
    let a = {x: 1, y:2};
    ...
@@ -50,7 +50,7 @@ eval(vectorify(function() {
 // Leave you program unmodified, but create a single vectorified function.
 // This preserves peak performance for scalar operations outside of this function.
 // The function can be used by regular code.
-let f = eval(vectorify(function() {
+let f = new Function(vectorify(function() {
    ... your code here ...
    let a = {x: 1, y:2};
    ...
@@ -60,7 +60,7 @@ let f = eval(vectorify(function() {
 // or
 
 
-// Returns a string of the processed code. You can eval() or run the result in 
+// Returns a string of the processed code. You can eval() or construct a function from it, or run the result in 
 // in an environment where the vector.js routines are defined.
 let s = vectorify(`
    ... your code here ...
