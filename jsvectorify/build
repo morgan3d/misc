@@ -1,19 +1,32 @@
 #!/usr/bin/env bash
 
-npm install browserify
-npm install recast
-npm install estraverse
-npm install @babel/core @babel/cli @babel/preset-env
+bundleops=1;install=1
+#bundleops=0;installtools=0
 
-mkdir tmp
-mkdir tmp/src
-mkdir tmp/es5
-mkdir lib
+mkdir -p tmp/src
+mkdir -p tmp/es5
+mkdir -p lib
 
-browserify need-recast.js -o tmp/src/recast.js
+if [ "$installtools" == 1 ]
+ then
+   npm install browserify
+   npm install recast 
+   npm install estraverse
+   npm install uglify-js -g
+   npm install @babel/core @babel/cli @babel/preset-env
+   browserify need-recast.js -o tmp/src/recast.js
+fi
 
 cp vector-vectorify.js tmp/src/
 cp vector-operators.js tmp/src/
+if [ "$bundleops" != 1 ]
+  then
+      rm tmp/src/vector-operators.js
+fi
 npx babel tmp/src --presets=@babel/env --out-file tmp/es5/vectorify.js
-uglifyjs -c -m --reserved vectorify,_add,_mul,_div,_sub,dot,floor,round,trunc,ceil,pow,abs,sqrt,min,max,clamp,exp,maxComponent,minComponent,magnitude,direction,cross,cloneVector,copyVector --beautify beautify=false,ascii-only=true -o lib/vectorify.js --preamble "/* vectorify.js by Morgan McGuire from https://casual-effects.com */" tmp/es5/vectorify.js
-#--keep-fnames
+uglifyjs --compress --mangle --beautify beautify=false,ascii-only=true -o lib/vectorify.js --preamble "/* vectorify.js by Morgan McGuire from https://casual-effects.com */" tmp/es5/vectorify.js
+# --mangle toplevel,reserved=['window','exports','Math','require','_recast','vectorify','_add','_mul','_div','_sub','dot','floor','round','trunc','ceil','pow','abs','sqrt','min','max','clamp','exp','maxComponent','minComponent','magnitude','direction','cross','cloneVector','copyVector']
+# --mangle-props 1 --keep-fnames 
+ls -al lib/vectorify.js
+
+
