@@ -16,10 +16,11 @@ function vectorify(program) {
 
     const opTable = Object.freeze({ '+': '_add', '-': '_sub', '*': '_mul', '/': '_div' });
     const create = _recast.types.builders;
-    
+
     ast.program = _estraverse.replace(ast.program, {
         enter: function(node) {
-            if (node.type === 'UnaryExpression') {
+            if ((node.type === 'UnaryExpression') && (node.argument.type !== 'Literal')) {
+                
                 if (node.operator === '-') {
                     // Unary minus
                     return create.callExpression(create.identifier('_neg'), [node.argument]);
@@ -28,7 +29,9 @@ function vectorify(program) {
                     return node.argument;
                 }
                 
-            } else if ((node.type === 'BinaryExpression') || (node.type === 'AssignmentExpression')) {
+            } else if (((node.type === 'BinaryExpression') &&
+                        ((node.left.type !== 'Literal') || (node.right.type !== 'Literal'))) ||
+                       (node.type === 'AssignmentExpression')) {
                 
                 let fcnName = opTable[node.operator[0]];
                 if (fcnName && (node.operator.length === 1)) {
