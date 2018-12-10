@@ -48,6 +48,7 @@ JavaScript
 - **jsmaze** - Recursive perfect maze generator, with wrapping and imperfect options. 2018.
 - **jsvectorify** - Vector operations and operator overloading. 2018.
 - **jsmenu** - Lightweight library for dropdown menus. 2018.
+- **jsloadmanager** - Caching and post-processing for recursive resource loading via XMLHttpRequest/fetch. 2018.
 
 
 Java
