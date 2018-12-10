@@ -13,6 +13,11 @@ The routines are:
 - dataManager.fetch()
 - dataManager.end()
  
+No source dependencies. Requires ES5 for the Map class and for..of loop,
+which all modern browsers support. That is, doesn't work on Internet
+Explorer, but works on everything else including Safari, Firefox, 
+Chrome, Edge, Opera, mobile versions, etc.
+
 ----------------------------------------------------
 
 This implementation uses XMLHttpRequest internally. There is a newer
