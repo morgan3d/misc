@@ -22,7 +22,7 @@ that uses Promises; it is more elegant in some ways but also more
 complicated because it relies on more language features. Since the
 current implementation is working fine, I don't intend to port to
 the Fetch API until some critical feature of (such as the explicit
-headers or credentialing) it is required.
+headers or credentialing) is required.
 
 ----------------------------------------------------
 
