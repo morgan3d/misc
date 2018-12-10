@@ -1,6 +1,6 @@
 // Calls to mutate are emitted by mutating operator processing, for example +=.
 // This is use to avoid double-evaluation of r-values.
-function _mutate(obj, key, val, op) {
+function _mutate(obj, key, op, val) {
     return obj[key] = op(obj[key], val);
 }
 
