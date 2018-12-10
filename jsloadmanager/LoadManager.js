@@ -267,8 +267,8 @@ LoadManager.prototype.fetch = function (url, type, postProcess, callback, errorC
         if (errorCallback) { errorCallback(rawEntry.failureMessage, url); }
     } else {
         // Schedule the callback
-        postProcess.callbackArray.push(callback);
-        postProcess.errorCallbackArray.push(errorCallback);
+        postEntry.callbackArray.push(callback);
+        postEntry.errorCallbackArray.push(errorCallback);
     }
 }
 
