@@ -134,9 +134,12 @@ LoadManager.prototype.fetch = function (url, type, postProcess, callback, errorC
     console.assert(this.status !== 'complete',
                    'Cannot call LoadManager.fetch() after LoadManager.end()');
 
-    ++this.pendingRequests;
     let rawEntry = this.resource.get(url);
+    
     if (! rawEntry) {
+        ++this.pendingRequests;
+        
+        // Not in the cache, so create it
         rawEntry = {
             url:            url,
             raw:            undefined,
@@ -144,6 +147,7 @@ LoadManager.prototype.fetch = function (url, type, postProcess, callback, errorC
             failureMessage: undefined,
             post:           new Map()
         };
+        
         this.resource.set(url, rawEntry);
 
         function onLoadSuccess() {
