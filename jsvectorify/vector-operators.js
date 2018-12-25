@@ -204,6 +204,7 @@ function copyVector(a, b) {
     return Object.assign(b, a);
 }
 
+
 function cloneVector(a) {
     if (Array.isArray(a)) {
         let c = a.slice(0);
@@ -245,8 +246,10 @@ function magnitude(a) {
     return Math.sqrt(dot(a, a));
 }
 
+// Returns a zero magnitude if the vector is zero
 function direction(a) {
-    return _mul(a, 1.0 / magnitude(a));
+    const m = magnitude(a);
+    return (m > 0) ? _mul(a, 1.0 / m) : cloneVector(a);
 }
 
 // Used by min and max. Assumes 'this' is bound to the corresponding Math function.
