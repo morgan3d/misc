@@ -21,8 +21,8 @@
   that uses Promises; it is more elegant in some ways but also more
   complicated because it relies on more language features. Since the
   current implementation is working fine, I don't intend to port to
-  the Fetch API until some critical feature (such as the explicit
-  headers or credentialing) is required.
+  the Fetch API until some critical feature of (such as the explicit
+  headers or credentialing) it is required.
 
   ----------------------------------------------------
 
@@ -62,7 +62,7 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     {
       callback : function () {...},
-      errorCallback : function () {...},
+      errorCallback : function (why) {...},
 
       // If true, parse JSON locally so that better error messages
       // can be provided than via server validation.
@@ -103,6 +103,7 @@ function LoadManager(options) {
     // Invoke when pendingRequests hits zero if status is not 'failure'
     this.callback = options.callback;
     this.errorCallback = options.errorCallback;
+    this.parseJSONLocally = options.parseJSONLocally || false;
 }
 
 
@@ -175,7 +176,6 @@ LoadManager.prototype.fetch = function (url, type, postProcess, callback, errorC
         function onLoadFailure() {
             if (LM.status === 'failure') { return; }
             rawEntry.status = 'failure';
-            rawEntry.failureMessage = '';
 
             // Run all failure callbacks
             for (let [p, v] of rawEntry.post) {
@@ -185,28 +185,41 @@ LoadManager.prototype.fetch = function (url, type, postProcess, callback, errorC
             }
             LM.status = 'failure';
             LM.resource = null;
-            if (LM.errorCallback) { LM.errorCallback(); }
+            if (LM.errorCallback) { LM.errorCallback(rawEntry.failureMessage + ' for ' + rawEntry.url); }
         }        
         
         // Fire off the asynchronous request
         if (type === 'image') {
-            // Allow loading from other domains and reading the pixels (CORS).
-            // Works only if the other site allows it; which github does and
-            // for which we can use a proxy and an XMLHttpRequest as an
-            // annoying workaround if necessary.
             const image = new Image();
             rawEntry.raw = image;
             if (LM.crossOrigin) {
+                // Allow loading from other domains and reading the pixels (CORS).
+                // Works only if the other site allows it; which github does and
+                // for which we can use a proxy and an XMLHttpRequest as an
+                // annoying workaround if necessary.
                 image.crossOrigin = LM.crossOrigin;
             }
             image.onload = onLoadSuccess;
             image.onerror = onLoadFailure;
-            image.src = url + (LM.forceReload ? '?' : '');
+            image.src = url + (LM.forceReload ? ('?refresh=' + Date.now()) : '');
         } else {
             const xhr = new XMLHttpRequest();
 
             // Force a check for the latest file using a query string
-            xhr.open('GET', url + (LM.forceReload ? '?' : ''), true);
+            xhr.open('GET', url + (LM.forceReload ? ('?refresh=' + Date.now()) : ''), true);
+
+            if (LM.forceReload) {
+                // Set headers attempting to force a real refresh;
+                // Chrome still doesn't always obey these in some
+                // recent versions, which is why we also set the
+                // query above.
+                xhr.setRequestHeader('cache-control', 'no-cache, must-revalidate, post-check=0, pre-check=0');
+                xhr.setRequestHeader('cache-control', 'max-age=0');
+                xhr.setRequestHeader('expires', '0');
+                xhr.setRequestHeader('expires', 'Tue, 01 Jan 1980 1:00:00 GMT');
+                xhr.setRequestHeader('pragma', 'no-cache');
+            }
+            
             if (LM.parseJSONLocally && (type === 'json')) {
                 xhr.responseType = 'text';
             } else {
