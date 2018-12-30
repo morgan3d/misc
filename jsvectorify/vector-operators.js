@@ -35,7 +35,7 @@ function _objectAddMutate(a, b) {
 /////////////////////////////////////////////////////////////////////////////
 
 function _neg(a) {
-    return ((typeof a === 'object') && (a !== null)) ? _objectNeg(a, b) : -a;
+    return ((typeof a === 'object') && (a !== null)) ? _objectNeg(a) : -a;
 }
 
 function _objectNeg(a) {
