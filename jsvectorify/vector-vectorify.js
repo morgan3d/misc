@@ -30,7 +30,11 @@ function vectorify(program, options) {
         // that we do not recursively process the same node
         // indefinitely.
         leave: (! options.assignmentReturnsUndefined) ? undefined :
-            function (node) {
+            function (node, parent) {
+                // If the parent is an expression statement (the most common case`)
+                // then this node's value is not being used anyway.
+                if (parent.type === 'ExpressionStatement') { return; }
+                
                 switch (node.type) {
                 case 'UpdateExpression': // ++ or --
                 case 'AssignmentExpression': // +=, -=, *=, etc.
