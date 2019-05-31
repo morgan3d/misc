@@ -1,4 +1,8 @@
-function vectorify(program) {
+function vectorify(program, options) {
+    options = Object.assign({
+        assignmentReturnsUndefined: false
+    }, options || {});
+    
     let src, args;
     if (typeof program === 'string') {
         src = program;
@@ -17,10 +21,25 @@ function vectorify(program) {
     const opTable = Object.freeze({ '+': '_add', '-': '_sub', '*': '_mul', '/': '_div' });
     const create = _recast.types.builders;
 
+    function wrapUndefined(node) {
+        return create.sequenceExpression([node, create.identifier('undefined')]);
+    }
+    
     ast.program = _estraverse.replace(ast.program, {
+        // Wrap mutating operators on traversal *back up* the tree so
+        // that we do not recursively process the same node
+        // indefinitely.
+        leave: (! options.assignmentReturnsUndefined) ? undefined :
+            function (node) {
+                switch (node.type) {
+                case 'UpdateExpression': // ++ or --
+                case 'AssignmentExpression': // +=, -=, *=, etc.
+                    return wrapUndefined(node);
+                }
+            },
+        
         enter: function(node) {
             if ((node.type === 'UnaryExpression') && (node.argument.type !== 'Literal')) {
-                
                 if (node.operator === '-') {
                     // Unary minus
                     return create.callExpression(create.identifier('_neg'), [node.argument]);

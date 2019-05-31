@@ -131,12 +131,29 @@ complexity.
 The `cross` function assumes the vector is of the form `[x, y, z]` or `{x:, y:, z:}`. Other
 routines make no assumptions about length or structure of vectors.
 
+`vectorify` accepts a second argument that is an object specifying
+options. If no second argument is passed, it is the same as using all
+defaults. The current options and defaults are:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{
+   // If true, then =, +=, -=, /=, ++, etc. operators
+   // do not return a value, thus effectively 
+   // preventing the use of mutating operators
+   // within expressions such as a[i++] or
+   // a = b = c. This applies to all operations,
+   // not just vector operations.
+   assignmentReturnsUndefined: false
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 
 Immutable Vectors
 ==========================================
 
-The vector operators follow normal Object variable rules for aliasing and assignment, by
-default. For example:
+The vector operators follow normal Object variable rules for aliasing
+and assignment, by default. For example:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ JavaScript
 function vec3(x, y, z) { return {x:x, y:y, z:z}; }
