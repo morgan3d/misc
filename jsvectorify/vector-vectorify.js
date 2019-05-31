@@ -24,6 +24,16 @@ function vectorify(program, options) {
     function wrapUndefined(node) {
         return create.sequenceExpression([node, create.identifier('undefined')]);
     }
+
+    function allLiteral(node) {
+        if (node.type === 'Literal') {
+            return true;
+        } else if (node.type === 'BinaryExpression') {
+            return allLiteral(node.left) && allLiteral(node.right);
+        }
+            
+        return false;
+    }
     
     ast.program = _estraverse.replace(ast.program, {
         // Wrap mutating operators on traversal *back up* the tree so
@@ -52,8 +62,7 @@ function vectorify(program, options) {
                     return node.argument;
                 }
                 
-            } else if (((node.type === 'BinaryExpression') &&
-                        ((node.left.type !== 'Literal') || (node.right.type !== 'Literal'))) ||
+            } else if (((node.type === 'BinaryExpression') && ! allLiteral(node)) ||
                        (node.type === 'AssignmentExpression')) {
                 
                 let fcnName = opTable[node.operator[0]];

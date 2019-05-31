@@ -6,6 +6,7 @@ function test(src, desired, options) {
 
 let src = `
 let c = 1 * 2;
+c = 1 * 2 * 3;
 let d = - 1;
 let x = 0, a = [{v:0}], y = {b:1}, z=1;
 for (let i = 0; i < 100; ++i) {
