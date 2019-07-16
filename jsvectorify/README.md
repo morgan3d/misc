@@ -143,7 +143,13 @@ defaults. The current options and defaults are:
    // within expressions such as a[i++] or
    // a = b = c. This applies to all operations,
    // not just vector operations.
-   assignmentReturnsUndefined: false
+   assignmentReturnsUndefined: false,
+   
+   // If true, then the function calls ADD, MUL, DIV, SUB, 
+   // and MAD convert *back* into +, *, /, - and `a * b + c`
+   // operators. This is a way of escaping known scalar
+   // operations for peak performance.
+   scalarEscapes: false
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

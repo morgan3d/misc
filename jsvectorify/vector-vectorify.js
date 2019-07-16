@@ -1,6 +1,11 @@
 function vectorify(program, options) {
+
+    // See https://github.com/benjamn/recast for the parsing documentation.
+    // See https://github.com/benjamn/ast-types for the AST documentation.
+    
     options = Object.assign({
-        assignmentReturnsUndefined: false
+        assignmentReturnsUndefined: false,
+        scalarEscapes: false,
     }, options || {});
     
     let src, args;
@@ -16,9 +21,12 @@ function vectorify(program, options) {
         }).replace(/}[ \t\n]*$/, '');
     }
 
-    let ast = _recast.parse(src);
+    const ast = _recast.parse(src);
 
     const opTable = Object.freeze({ '+': '_add', '-': '_sub', '*': '_mul', '/': '_div' });
+
+    // The MAD gets special extra processing to introduce an extra addition operation at the end
+    const escapeTable = {'ADD': '+', 'MUL': '*', 'SUB': '-', 'DIV': '/', 'MAD' : '*'};
     const create = _recast.types.builders;
 
     function wrapUndefined(node) {
@@ -97,7 +105,21 @@ function vectorify(program, options) {
                             create.callExpression(create.identifier(fcnName + 'Mutate'), [node.left, node.right]));
                     }
                 }
-            } // if binary expression
+            } else if (node.type === 'CallExpression') {
+                const op = escapeTable[node.callee.name];
+                if (op) {
+                    // This is a scalar escape function. Create an operator expression
+                    // using the arguments
+                    if (node.callee.name === 'MAD') {                        
+                        // Inject the addition, and convert the rest to MUL for recursive processing
+                        return create.binaryExpression('+',
+                                                       create.callExpression(create.identifier('MUL'), [node.arguments[0], node.arguments[1]]),
+                                                       node.arguments[2]);
+                    } else {
+                        return create.binaryExpression(op, node.arguments[0], node.arguments[1]);
+                    }
+                }
+            } // expression type
         }
     });
     

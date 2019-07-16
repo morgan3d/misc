@@ -20,12 +20,18 @@ for (let i = 0; i < 100; ++i) {
 
 let a = 1;
 x = ++a;
+
+
+let a = 1, b = 2, c = 3; 
+let r = MAD(a, b, c);
 `;
 
-let dst = vectorify(src, {assignmentReturnsUndefined:true});
+let dst = vectorify(src, {assignmentReturnsUndefined:true, scalarEscapes:true});
 
+console.log('SOURCE:');
 console.log(src);
-console.log('------------------------------------------------------');
+console.log('--------------------------------------------------------');
+console.log('RESULT:');
 console.log(dst);
 
 test(`dot({x:1,y:2}, {x:4,y:3})`, 10);
@@ -39,4 +45,6 @@ test(`(function () {let a = 1; return ++a; })()`, undefined, {assignmentReturnsU
 test(`(function () {let a = 1; return ++a; })()`, 2);
 test(`(function () {let a = 1; return a += 1; })()`, 2);
 test(`(function () {let a = 1; return a += 1; })()`, undefined, {assignmentReturnsUndefined:true});
+test(`(function () {let a = 2, b = 3; return MUL(a, b); })()`, 6, {assignmentReturnsUndefined:true, scalarEscapes:true});
+test(`(function () {let a = 1, b = 2, c = a + b; return MAD(a, b, c); })()`, 5, {assignmentReturnsUndefined:true, scalarEscapes:true});
 console.log('Done with tests');
