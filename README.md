@@ -1,6 +1,6 @@
 This repository contains miscellaneous code from throughout my career.
 
-I do not support this code through github--use it at your own risk, and please don't send
+I regularly add to this repo but do not support this code through github--use it at your own risk, and please don't send
 feature requests or ask for help with it. Some of it was written while I was an undergraduate
 and may not compile on modern machines.
 
