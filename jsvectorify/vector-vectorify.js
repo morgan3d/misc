@@ -6,6 +6,7 @@ function vectorify(program, options) {
     options = Object.assign({
         assignmentReturnsUndefined: false,
         scalarEscapes: false,
+        equalsCallback: undefined,
     }, options || {});
     
     let src, args;
@@ -29,6 +30,8 @@ function vectorify(program, options) {
     const escapeTable = {'ADD': '+', 'MUL': '*', 'SUB': '-', 'DIV': '/', 'MAD' : '*'};
     const create = _recast.types.builders;
 
+    // Wraps an expression so that it returns 'undefined', hiding its value.
+    // This could also be implemented using the 'void' operator.
     function wrapUndefined(node) {
         return create.sequenceExpression([node, create.identifier('undefined')]);
     }
@@ -69,6 +72,9 @@ function vectorify(program, options) {
                     // Unary plus, ignore the operator
                     return node.argument;
                 }
+            } else if (options.equalsCallback && (node.type === 'BinaryExpression') && (node.operator === '==')) {
+                
+                return options.equalsCallback(node);
                 
             } else if (((node.type === 'BinaryExpression') && ! allLiteral(node)) ||
                        (node.type === 'AssignmentExpression')) {
@@ -110,7 +116,7 @@ function vectorify(program, options) {
                 if (op) {
                     // This is a scalar escape function. Create an operator expression
                     // using the arguments
-                    if (node.callee.name === 'MAD') {                        
+                    if (node.callee.name === 'MAD') {
                         // Inject the addition, and convert the rest to MUL for recursive processing
                         return create.binaryExpression('+',
                                                        create.callExpression(create.identifier('MUL'), [node.arguments[0], node.arguments[1]]),

@@ -149,7 +149,13 @@ defaults. The current options and defaults are:
    // and MAD convert *back* into +, *, /, - and `a * b + c`
    // operators. This is a way of escaping known scalar
    // operations for peak performance.
-   scalarEscapes: false
+   scalarEscapes: false,
+   
+   // If defined, then call equalsCallback(node) for ==
+   // nodes, to allow the caller to override them to create
+   // an error or create a new node that is a comparison operator.
+   // This intentionally does not happen for pointer equality, ===
+   equalsCallback: undefined
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

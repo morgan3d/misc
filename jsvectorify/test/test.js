@@ -47,4 +47,5 @@ test(`(function () {let a = 1; return a += 1; })()`, 2);
 test(`(function () {let a = 1; return a += 1; })()`, undefined, {assignmentReturnsUndefined:true});
 test(`(function () {let a = 2, b = 3; return MUL(a, b); })()`, 6, {assignmentReturnsUndefined:true, scalarEscapes:true});
 test(`(function () {let a = 1, b = 2, c = a + b; return MAD(a, b, c); })()`, 5, {assignmentReturnsUndefined:true, scalarEscapes:true});
+
 console.log('Done with tests');
