@@ -73,7 +73,7 @@ function vectorify(program, options) {
                     return node.argument;
                 }
             } else if (options.equalsCallback && (node.type === 'BinaryExpression') && (node.operator === '==')) {
-                
+
                 return options.equalsCallback(node);
                 
             } else if (((node.type === 'BinaryExpression') && ! allLiteral(node)) ||
@@ -141,4 +141,26 @@ function vectorify(program, options) {
 
         return Function.constructor.apply(null, args);
     }
+}
+
+// Using '==' to build a '??' operator for browsers that don't support it.
+// This would make a lot more sense using the actual '??' operator, but esprima can't
+// parse that yet, so we re-use the (now deprecated) '==' operator. In the future
+// when esprima is updated, we'll use this to rewrite the nullish operator itself
+// for older browsers.
+//
+// L ?? R -> (function (_L) { return _L !== undefined ? _L : (R); })(L)
+
+vectorify.nullishRewriter = function(node) {
+    const create = _recast.types.builders;
+    
+    // Unique identifier
+    const _L = create.identifier('__gen' + Math.floor(Math.random() * 2e9));
+    const testExpr = create.binaryExpression('!==', _L, create.identifier('undefined'));
+    const bodyExpr =
+          create.blockStatement([
+              create.returnStatement(
+                  create.conditionalExpression(testExpr, _L, node.right))]);
+    const fcn = create.functionExpression(null, [_L], bodyExpr);
+    return create.callExpression(fcn, [node.left]);
 }
