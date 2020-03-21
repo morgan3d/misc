@@ -9,9 +9,11 @@
 
   The routines are:
 
-  - dataManager = new LoadManager()
-  - dataManager.fetch()
-  - dataManager.end()
+  - loadManager = new LoadManager()
+  - loadManager.fetch()
+  - loadManager.end()
+  - LoadManager.fetchOne() to directly run a single fetch _without_ a
+    load manager instance. This does not allow recursive calls, of course.
  
   ----------------------------------------------------
 
@@ -21,8 +23,8 @@
   that uses Promises; it is more elegant in some ways but also more
   complicated because it relies on more language features. Since the
   current implementation is working fine, I don't intend to port to
-  the Fetch API until some critical feature of (such as the explicit
-  headers or credentialing) it is required.
+  the Fetch API until some critical feature of it (such as the explicit
+  headers or credentialing) is required.
 
   ----------------------------------------------------
 
@@ -64,9 +66,11 @@
       callback : function () {...},
       errorCallback : function (why) {...},
 
-      // If true, parse JSON locally so that better error messages
-      // can be provided than via server validation.
-      parseJSONLocally : false,
+      // Options are 'remote', 'local', and 'permissive'
+      //  'remote' parses on the server
+      //  'local' gives better error messages
+      //  'permissive' allows comments, trailing commas, and `backquote multiline strings`
+      jsonParser: 'local',
 
       // If true, append '?' to each URL when fetching to force 
       // it to be reloaded from the server, or at least validated.
@@ -78,6 +82,8 @@
     Invoke \a callback when all fetch() calls have been processed, 
     or \a errorCallback when the first fails.  */
 function LoadManager(options) {
+
+    options = options || {};
 
     // Map from url to:
     // {
@@ -103,8 +109,29 @@ function LoadManager(options) {
     // Invoke when pendingRequests hits zero if status is not 'failure'
     this.callback = options.callback;
     this.errorCallback = options.errorCallback;
-    this.parseJSONLocally = options.parseJSONLocally || false;
+    this.jsonParser = options.jsonParser || 'local';
 }
+
+
+/** Invoked internally when a request is complete, or in rare cases by
+    code that must explicitly manage the request count because of async 
+    processing. */
+LoadManager.prototype.markRequestCompleted = function (url, message, success) {
+    --this.pendingRequests;
+
+    if (success) {
+        if ((this.pendingRequests === 0) && (this.status === 'loading')) {
+            this.status = 'complete';
+            // Throw away all of the data
+            this.resource = null;
+            if (this.callback) { this.callback(); }
+        }
+    } else {
+        this.status = 'failure';
+        this.resource = null;
+        if (this.errorCallback) { this.errorCallback(message + ' for ' + url); }
+    }
+};
 
 
 /**
@@ -121,17 +148,19 @@ function LoadManager(options) {
    \param postProcess(rawData, url) function
    \param callback(data, rawData, url, postProcess)
    \param errorCallback(reason, url) optional. Invoked on failure if some other load has not already failed.
+   \param warningCallback() optional.
+   \param forceReload Boolean, optional. Defaults to LoadManage.forceReload
 
    You will receive a failure if the post process fails.
  */
-LoadManager.prototype.fetch = function (url, type, postProcess, callback, errorCallback) {
+LoadManager.prototype.fetch = function (url, type, postProcess, callback, errorCallback, warningCallback, forceReload) {
     console.assert(typeof type === 'string', 'type must be a string');
     console.assert((typeof postProcess === 'function') || !postProcess,
                    'postProcess must be a function, null, or undefined');
-    
+    if (forceReload === undefined) { forceReload = this.forceReload; }
     if (this.status === 'failure') { return; }
     const LM = this;
-    
+
     console.assert(this.status !== 'complete',
                    'Cannot call LoadManager.fetch() after LoadManager.end()');
 
@@ -153,24 +182,26 @@ LoadManager.prototype.fetch = function (url, type, postProcess, callback, errorC
 
         function onLoadSuccess() {
             if (LM.status === 'failure') { return; }
-            rawEntry.status = 'success';
-            // Run all post processing and callbacks
-            for (let [p, v] of rawEntry.post) {
-                v.value = p ? p(rawEntry.raw, rawEntry.url) : rawEntry.raw;
-                
-                for (let c of v.callbackArray) {
-                    // Note that callbacks may increase LM.pendingRequests
-                    if (c) { c(v.value, rawEntry.raw, rawEntry.url, p); }
-                }
-            }
 
-            --LM.pendingRequests;
-            if ((LM.pendingRequests === 0) && (LM.status === 'loading')) {
-                LM.status = 'complete';
-                // Throw away all of the data
-                LM.resource = null;
-                if (LM.callback) { LM.callback(); }
+            try {
+                // Run all post processing and callbacks
+                for (let [p, v] of rawEntry.post) {
+                    v.value = p ? p(rawEntry.raw, rawEntry.url) : rawEntry.raw;
+                    
+                    for (let c of v.callbackArray) {
+                        // Note that callbacks may trigger their own loads, which
+                        // increase LM.pendingRequests
+                        if (c) { c(v.value, rawEntry.raw, rawEntry.url, p); }
+                    }
+                }
+                rawEntry.status = 'success';
+                LM.markRequestCompleted(rawEntry.url, '', true);
+            } catch (e) {
+                console.dir(e);
+                rawEntry.failureMessage = '' + e;
+                onLoadFailure();
             }
+            
         }
 
         function onLoadFailure() {
@@ -183,9 +214,8 @@ LoadManager.prototype.fetch = function (url, type, postProcess, callback, errorC
                     if (c) { c(rawEntry.failureMessage, rawEntry.url); }
                 }
             }
-            LM.status = 'failure';
-            LM.resource = null;
-            if (LM.errorCallback) { LM.errorCallback(rawEntry.failureMessage + ' for ' + rawEntry.url); }
+
+            LM.markRequestCompleted(rawEntry.url, rawEntry.failureMessage, false);
         }        
         
         // Fire off the asynchronous request
@@ -201,12 +231,12 @@ LoadManager.prototype.fetch = function (url, type, postProcess, callback, errorC
             }
             image.onload = onLoadSuccess;
             image.onerror = onLoadFailure;
-            image.src = url + (LM.forceReload ? ('?refresh=' + Date.now()) : '');
+            image.src = url + (forceReload ? ('?refresh=' + Date.now()) : '');
         } else {
             const xhr = new XMLHttpRequest();
 
             // Force a check for the latest file using a query string
-            xhr.open('GET', url + (LM.forceReload ? ('?refresh=' + Date.now()) : ''), true);
+            xhr.open('GET', url + (forceReload ? ('?refresh=' + Date.now()) : ''), true);
 
             if (LM.forceReload) {
                 // Set headers attempting to force a real refresh;
@@ -220,7 +250,7 @@ LoadManager.prototype.fetch = function (url, type, postProcess, callback, errorC
                 xhr.setRequestHeader('pragma', 'no-cache');
             }
             
-            if (LM.parseJSONLocally && (type === 'json')) {
+            if ((LM.jsonParser !== 'remote') && (type === 'json')) {
                 xhr.responseType = 'text';
             } else {
                 xhr.responseType = type;
@@ -229,14 +259,19 @@ LoadManager.prototype.fetch = function (url, type, postProcess, callback, errorC
             xhr.onload = function() {
                 const status = xhr.status;
                 if (status === 200) {
-                    if (xhr.response) {
-                        if (LM.parseJSONLocally && (type === 'json')) {
-                            // now parse
+                    if (xhr.response !== undefined) {
+                        // now parse
+                        if ((LM.jsonParser !== 'remote') && (type === 'json')) {
                             try {
-                                rawEntry.raw = JSON.parse(xhr.response);
+                                rawEntry.raw = LM.parseJSON(xhr.response, url, warningCallback);
                                 onLoadSuccess();
                             } catch (e) {
-                                rawEntry.failureMessage = "JSON parse error: " + e;
+                                rawEntry.failureMessage = '' + e;
+                                rawEntry.failureMessage = rawEntry.failureMessage.replace(/position (\d*)/, function (match, pos) {
+                                    const chr = parseInt(pos);
+                                    const line = (xhr.response.substring(0, chr).match(/\n/g)||[]).length + 1;
+                                    return 'line ' + line;
+                                });
                                 onLoadFailure();
                             }
                         } else {
@@ -252,7 +287,18 @@ LoadManager.prototype.fetch = function (url, type, postProcess, callback, errorC
                     onLoadFailure();
                 }
             };
-            xhr.send();
+
+            xhr.onerror = function (e) {
+                rawEntry.failureMessage = xhr.statusText;
+                onLoadFailure();
+            };
+            
+            try {
+                xhr.send();
+            } catch (e) {
+                rawEntry.failureMessage = '' + e;
+                onLoadFailure();
+            }
         } // if XMLHttp
     }
 
@@ -290,6 +336,16 @@ LoadManager.prototype.fetch = function (url, type, postProcess, callback, errorC
 }
 
 
+/** The URL is used only for reporting warnings (not errors) */
+LoadManager.prototype.parseJSON = function (text, url, warningCallback) {
+    if (this.jsonParser === 'permissive') {
+        return WorkJSON.parse(text);
+    } else {
+        return JSON.parse(text);
+    }
+}
+
+
 /** 
     Call after the last fetch.
 */
@@ -311,4 +367,10 @@ LoadManager.prototype.end = function () {
     }
 }
 
-
+/** Fetch a single url without a LoadManager instance. */
+LoadManager.fetchOne = function (options, ...args) {
+    console.assert(typeof options === 'object', 'First argument must be an options argument');
+    const manager = new LoadManager(options);
+    manager.fetch(...args);
+    manager.end();
+}
