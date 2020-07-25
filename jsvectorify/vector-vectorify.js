@@ -133,7 +133,7 @@ function vectorify(program, options) {
 
     // Replace any nullish rewriting done. This is exactly tied to the syntax used by the nullish rewriter
     // below.
-    body = body.replace(/\(function\((__nullish_gen\d+)\) {\n([\s\S]+)\1;\s*\}/g, '(function($1){$2$1;}')
+    body = body.replace(/\bfunction\((__nullish_gen\d+)\) {\n([\s\S]+)\1;\s*\}/g, 'function($1){$2$1;}')
     
     if (typeof program === 'string') {
         return body;
