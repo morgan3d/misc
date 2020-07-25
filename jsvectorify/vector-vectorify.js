@@ -128,8 +128,13 @@ function vectorify(program, options) {
             } // expression type
         }
     });
+
+    let body = _recast.print(ast, {wrapColumn:Infinity}).code;
+
+    // Replace any nullish rewriting done. This is exactly tied to the syntax used by the nullish rewriter
+    // below.
+    body = body.replace(/\(function\((__nullish_gen\d+)\) {\n([\s\S]+)\1;\s*\}/g, '(function($1){$2$1;}')
     
-    const body = _recast.print(ast).code;
     if (typeof program === 'string') {
         return body;
     } else {
@@ -149,18 +154,21 @@ function vectorify(program, options) {
 // when esprima is updated, we'll use this to rewrite the nullish operator itself
 // for older browsers.
 //
-// L ?? R -> (function (_L) { return _L !== undefined ? _L : (R); })(L)
-
+// L ?? R -> (function (_L) { return _L === undefined ? (R) : _L; })(L)
+//
+// The exact output pattern is intentionally chosen so that newlines inserted
+// by the prettyprinter can be detected and removed.
 vectorify.nullishRewriter = function(node) {
     const create = _recast.types.builders;
     
     // Unique identifier
-    const _L = create.identifier('__gen' + Math.floor(Math.random() * 2e9));
-    const testExpr = create.binaryExpression('!==', _L, create.identifier('undefined'));
+    const _L = create.identifier('__nullish_gen' + Math.floor(Math.random() * 2e9));
+    const testExpr = create.binaryExpression('===', _L, create.identifier('undefined'));
     const bodyExpr =
           create.blockStatement([
               create.returnStatement(
-                  create.conditionalExpression(testExpr, _L, node.right))]);
+                  create.conditionalExpression(testExpr, node.right, _L)),
+          ]);
     const fcn = create.functionExpression(null, [_L], bodyExpr);
     return create.callExpression(fcn, [node.left]);
 }

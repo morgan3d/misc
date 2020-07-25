@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-bundleops=1;install=1
+# bundleops will build in the overloaded vector operators if set to 1
+#
+# installtools will install the node.js dependencies needed for building if set to 1
+
+bundleops=1;installtools=0
 #bundleops=0;installtools=0
 
 mkdir -p tmp/src
@@ -24,7 +28,7 @@ if [ "$bundleops" != 1 ]
       rm tmp/src/vector-operators.js
 fi
 npx babel tmp/src --presets=@babel/env --out-file tmp/es5/vectorify.js
-uglifyjs --compress --mangle --beautify beautify=false,ascii-only=true -o lib/vectorify.js --preamble "/* vectorify.js by Morgan McGuire from https://casual-effects.com */" tmp/es5/vectorify.js
+uglifyjs --compress --mangle --beautify beautify=false,ascii_only=true -o lib/vectorify.js --preamble "/* vectorify.js by Morgan McGuire from https://casual-effects.com */" tmp/es5/vectorify.js
 # --mangle toplevel,reserved=['window','exports','Math','require','_recast','vectorify','_add','_mul','_div','_sub','dot','floor','round','trunc','ceil','pow','abs','sqrt','min','max','clamp','exp','maxComponent','minComponent','magnitude','direction','cross','cloneVector','copyVector']
 # --mangle-props 1 --keep-fnames 
 ls -al lib/vectorify.js

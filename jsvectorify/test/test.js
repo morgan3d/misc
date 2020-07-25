@@ -34,6 +34,9 @@ console.log('--------------------------------------------------------');
 console.log('RESULT:');
 console.log(dst);
 
+// Test the nullish rewriter to ensure it isn't injecting newlines
+console.log(vectorify('undefined == 3 + 1', {equalsCallback: vectorify.nullishRewriter}));
+
 test(`dot({x:1,y:2}, {x:4,y:3})`, 10);
 test(`({x:1,y:5} + {x:4,y:3}).y`, 8);
 test(`({x:1,y:2} + {x:4,y:3}).y`, 5);
