@@ -1,4 +1,5 @@
-The `vectorify.js` library provides vector math support to JavaScript, so that you can write
+The open source MIT-licensed `vectorify.js` library by Morgan McGuire
+provides vector math support to JavaScript, so that you can write
 expressions such as:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ JavaScript
@@ -155,7 +156,11 @@ defaults. The current options and defaults are:
    // nodes, to allow the caller to override them to create
    // an error or create a new node that is a comparison operator.
    // This intentionally does not happen for pointer equality, ===
-   equalsCallback: undefined
+   equalsCallback: undefined,
+   
+   // String to prepend to generate the operator callback
+   // function name.
+   operatorPrefix: '_'
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

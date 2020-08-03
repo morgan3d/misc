@@ -7,6 +7,7 @@ function vectorify(program, options) {
         assignmentReturnsUndefined: false,
         scalarEscapes: false,
         equalsCallback: undefined,
+        operatorPrefix: '_'
     }, options || {});
     
     let src, args;
@@ -24,7 +25,8 @@ function vectorify(program, options) {
 
     const ast = _recast.parse(src);
 
-    const opTable = Object.freeze({ '+': '_add', '-': '_sub', '*': '_mul', '/': '_div' });
+    const _ = options.operatorPrefix;
+    const opTable = Object.freeze({ '+': _ + 'add', '-': _ + 'sub', '*': _ + 'mul', '/': _ + 'div' });
 
     // The MAD gets special extra processing to introduce an extra addition operation at the end
     const escapeTable = {'ADD': '+', 'MUL': '*', 'SUB': '-', 'DIV': '/', 'MAD' : '*'};
