@@ -69,7 +69,7 @@ function vectorify(program, options) {
             if ((node.type === 'UnaryExpression') && (node.argument.type !== 'Literal')) {
                 if (node.operator === '-') {
                     // Unary minus
-                    return create.callExpression(create.identifier('_neg'), [node.argument]);
+                    return create.callExpression(create.identifier(_ + 'neg'), [node.argument]);
                 } else if (node.operator === '+') {
                     // Unary plus, ignore the operator
                     return node.argument;
@@ -102,7 +102,7 @@ function vectorify(program, options) {
                             // obj.key; convert the identifier into a literal
                             create.literal(lvalue.property.name);
                         
-                        return create.callExpression(create.identifier('_mutate'),
+                        return create.callExpression(create.identifier(_ + 'mutate'),
                                                      [lvalue.object, keyExpr, create.identifier(fcnName + 'Mutate'), rvalue]);
                         
                     } else {
