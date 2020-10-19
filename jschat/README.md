@@ -8,8 +8,6 @@ will launch the host, which provides the guest URL.
 TODO:
 
 - Do not double-add the other side
-- Fix layout of video windows
-- Fix layout of captions
 - Leave button
 - Make an explicit "Join" button so that it doesn't prompt for permissions suddenly on page load
 - Nice visual feedback on URL copy

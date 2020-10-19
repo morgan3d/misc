@@ -32,6 +32,14 @@ body {
     display: inline-block;
     text-align: center;
     background: #fff;
-    border-radius: 4px;
-    padding: 2px;
+    border-radius: 7px;
+    border: 5px solid #fff;
+    width: 45%;
+}
+
+.videoFrame video {
+    border-radius: 5px;
+    width: 100%;
+    margin-top: 2px;
+    margin-bottom: -2px;
 }
