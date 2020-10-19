@@ -45,9 +45,11 @@ function clipboardCopy(text) {
 function startGuest() {
     console.log('startGuest');
     let hostID = window.location.search.substring(1);
-    peer = new Peer();
     document.getElementById('urlbox').innerHTML = `You are a guest of ${hostID}.`;
     
+    peer = new Peer();
+
+    peer.on('open', function (id) {
     startWebCam(function (mediaStream) {
         console.log('web cam started');
         
@@ -67,6 +69,7 @@ function startGuest() {
                 }
                ); //call.on('stream')
     }); // startWebCam
+    }); // peer.on('open')
 }
 
 
