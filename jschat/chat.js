@@ -71,6 +71,7 @@ function startHost() {
     // otherwise we could miss it.
     peer = new Peer();
     peer.on('open', function(id) {
+        console.log('host peer opened with id ' + id);
         const url = 'https://morgan3d.github.io/misc/jschat/?' + id;
         document.getElementById('urlbox').innerHTML =
             `You are the host. Others can join at:<br><span style="white-space:nowrap; cursor: pointer; font-weight: bold" onclick="clipboardCopy('${url}')" title="Copy to Clipboard"><input title="Copy to Clipboard" type="text" value="${url}" id="urlTextBox">&nbsp;<b style="font-size: 125%">⧉</b></span>`;
