@@ -87,32 +87,40 @@ function startHost() {
                     `You are the host. Others can join at:<br><span style="white-space:nowrap; cursor: pointer; font-weight: bold" onclick="clipboardCopy('${url}')" title="Copy to Clipboard"><input title="Copy to Clipboard" type="text" value="${url}" id="urlTextBox">&nbsp;<b style="font-size: 125%">⧉</b></span>`;
 
                 
-    startWebCam(function (mediaStream) {
-        addWebCamView('You', mediaStream, false);
-        
-        peer.on('call',
-                function(call) {
-                    console.log('guest called');
+                startWebCam(function (mediaStream) {
+                    addWebCamView('You', mediaStream, false);
                     
-                    // Answer the call, providing our mediaStream
-                    call.answer(mediaStream);
-                    
-                    // When the client connects, add its stream
-                    call.on('stream',
-                            function (guestStream) {
-                                console.log('guest streamed');
-                                addWebCamView('Guest', guestStream, true);
+                    peer.on('call',
+                            function(call) {
+                                console.log('guest called');
+
+                                // Answer the call, providing our mediaStream
+                                call.answer(mediaStream);
+
+                                let alreadySeenThisCall = false;
+                                
+                                // When the client connects, add its stream
+                                call.on('stream',
+                                        function (guestStream) {
+                                            if (! alreadySeenThisCall) {
+                                                alreadySeenThisCall = true;                                                
+                                                
+                                                console.log('guest streamed');
+                                                addWebCamView('Guest', guestStream, true);
+                                            } else {
+                                                console.log('rejected duplicate stream from guest');
+                                            }
+                                        },
+                                        function (err) {
+                                            console.log('guest stream failed with', err);
+                                        });
                             },
+                            
                             function (err) {
-                                console.log('guest stream failed with', err);
-                            });
-                },
-                
-                function (err) {
-                    console.log('guest call failed with', err);
-                }
-               ); // peer.on('call')
-    }); // startWebCam
+                                console.log('guest call failed with', err);
+                            }
+                           ); // peer.on('call')
+                }); // startWebCam
             },
             function (err) {
                 console.log('host open failed with', err);
