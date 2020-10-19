@@ -57,11 +57,17 @@ function startGuest() {
             
             console.log('call host');
             let call = peer.call(hostID, mediaStream);
-            
+
+            let alreadyAddedThisCall = false;
             call.on('stream',
                     function (hostStream) {
-                        console.log('host answered');
-                        addWebCamView('Host', hostStream, true);
+                        if (! alreadyAddedThisCall) {
+                            alreadyAddedThisCall = true;
+                            console.log('host answered');
+                            addWebCamView('Host', hostStream, true);
+                        } else {
+                            console.log('rejected duplicate call');
+                        }
                     },
                     
                     function (err) {
