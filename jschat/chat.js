@@ -13,7 +13,7 @@ function addWebCamView(caption, mediaStream, playAudio) {
     const videobox = document.getElementById('videobox');
 
     const frame = document.createElement('div');
-    frame.classList.add('videoFrame');
+    frame.classname = 'videoFrame';
     frame.innerHTML = caption + '<br>';
     const video = document.createElement('video');
     video.setAttribute('autoplay', true);
@@ -44,7 +44,7 @@ function startGuest() {
         let call = peer.call(hostID, mediaStream);
         
         call.on('stream', function (hostStream) {
-            addWebCamView('Host', hostStream);
+            addWebCamView('Host', hostStream, true);
         });
     });
 }
@@ -63,8 +63,10 @@ function startHost() {
         peer.on('call', function(call) {
             // Answer the call, providing our mediaStream
             call.answer(mediaStream);
+
+            // When the client connects, add its stream
             call.on('stream', function (guestStream) {
-                addWebCamView('Guest', guestStream);
+                addWebCamView('Guest', guestStream, true);
             });
         });
     });
