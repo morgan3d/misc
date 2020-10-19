@@ -64,7 +64,9 @@ function startGuest() {
                 
                 function (err) {
                     console.log('host stream failed with', err);
-                });
+                }
+               ); //call.on('stream')
+    }); // startWebCam
 }
 
 
@@ -83,7 +85,8 @@ function startHost() {
             },
             function (err) {
                 console.log('host open failed with', err);
-            });
+            }
+           ); // peer.on('open')
     
     startWebCam(function (mediaStream) {
         addWebCamView('You', mediaStream, false);
@@ -108,8 +111,9 @@ function startHost() {
                 
                 function (err) {
                     console.log('guest call failed with', err);
-                });
-    });
+                }
+               ); // peer.on('call')
+    }); // startWebCam
 }
 
 
