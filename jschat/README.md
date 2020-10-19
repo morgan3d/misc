@@ -7,10 +7,10 @@ will launch the host, which provides the guest URL.
 
 TODO:
 
-- Call is not received any more
-- Do not double-add the other side
+- Fix startup sometimes failing. Race condition?
 - Audio mute
 - Video mute
+- Detect drop
 - Leave button
 - Make an explicit "Join" button so that it doesn't prompt for permissions suddenly on page load
 - Nice visual feedback on URL copy
