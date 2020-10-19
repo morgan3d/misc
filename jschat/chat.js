@@ -97,6 +97,9 @@ function startHost() {
                                 // Answer the call, providing our mediaStream
                                 call.answer(mediaStream);
 
+                                // Work around a bug in peer.js where it calls
+                                // twice if the video element is added during the
+                                // callback
                                 let alreadySeenThisCall = false;
                                 
                                 // When the client connects, add its stream
