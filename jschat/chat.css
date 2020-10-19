@@ -1,0 +1,29 @@
+html, body { height: 100% }
+
+body {
+    position: fixed;
+    overflow: hidden;
+    width: 100%;
+    top: 0;
+    margin: 0;
+    background: rgb(255,198,22);
+    background: radial-gradient(circle, rgba(255,198,22,1) 0%, rgba(209,190,118,1) 53%, rgba(137,220,255,1) 100%);
+    font-family: Arial;
+    font-size: 15px;
+}
+
+#urlbox {
+    margin: auto;
+    background: #fff;
+    padding: 5px;
+    border-radius: 2px;
+    text-align: center;
+    line-height: 155%;
+}
+
+#urlTextBox {
+    width: 400px;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+}
