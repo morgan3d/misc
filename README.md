@@ -4,14 +4,14 @@ I regularly add to this repo but do not support this code through github--use it
 feature requests or ask for help with it. Some of it was written while I was an undergraduate
 and may not compile on modern machines.
 
-Some additional open source projects that I _do_ actively support are hosted elsewhere due to
-github's file size and other restrictions. These are:
+Some additional open source projects that I _do_ actively support are:
 
+- [quadplay](https://github.com/morgan3d/quadplay) Javascript web-based fantasy video game console
 - [The G3D Innovation Engine](https://casual-effects.com/g3d) C++ 3D graphics library
-- [codeheart.js](http://casual-effects.com/codeheart) Javascript 2D game library
 - [Markdeep](https://casual-effects.com/markdeep) Document beautification tool
 - [iCompile](https://casual-effects.com/g3d/G3D10/build/manual/icompile-manual.html) Zero-configuration build system
 - [include.js](https://morgan3d.github.io/include.js/) Cross-domain, cross-browser HTML include tag
+- [codeheart.js](http://casual-effects.com/codeheart) Javascript 2D game library
 
 The code in this repository is organized by topic.
 
@@ -49,7 +49,7 @@ JavaScript
 - **jsvectorify** - Vector operations and operator overloading. 2018.
 - **jsmenu** - Lightweight library for dropdown menus. 2018.
 - **jsloadmanager** - Caching and post-processing for recursive resource loading via XMLHttpRequest/fetch. 2018.
-
+- **jschat** - Minimal WebRTC video conference demo
 
 Java
 ==================================================================
