@@ -17,7 +17,6 @@ body {
     margin: auto;
     background: #fff;
     padding: 5px;
-    border-radius: 2px;
     text-align: center;
     line-height: 155%;
 }
@@ -27,4 +26,12 @@ body {
     cursor: pointer;
     border: none;
     font-weight: bold;
+}
+
+.videoFrame {
+    display: inline-block;
+    text-align: center;
+    background: #fff;
+    border-radius: 4px;
+    padding: 2px;
 }
