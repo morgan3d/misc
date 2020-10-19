@@ -45,6 +45,7 @@ function clipboardCopy(text) {
 function startGuest() {
     console.log('startGuest');
     let hostID = window.location.search.substring(1);
+    peer = new Peer();
     document.getElementById('urlbox').innerHTML = `You are a guest of ${hostID}.`;
     
     startWebCam(function (mediaStream) {
@@ -65,6 +66,10 @@ function startGuest() {
 
 function startHost() {
     console.log('startHost');
+
+    // The peer must be created RIGHT before open is registered,
+    // otherwise we could miss it.
+    peer = new Peer();
     peer.on('open', function(id) {
         const url = 'https://morgan3d.github.io/misc/jschat/?' + id;
         document.getElementById('urlbox').innerHTML =
@@ -90,7 +95,7 @@ function startHost() {
 }
 
 
-let peer = new Peer();
+let peer;
 
 function main() {
     if (window.location.search !== '') {
