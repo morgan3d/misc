@@ -67,6 +67,11 @@ function startGuest() {
             console.log('call host');
             let call = peer.call(hostID, mediaStream);
 
+            // Close is not supported on Firefox
+            call.on('close', function () {
+                console.log('host ended the call');
+            });
+
             let alreadyAddedThisCall = false;
             call.on('stream',
                     function (hostStream) {
@@ -115,6 +120,11 @@ function startHost() {
                         
                         // Answer the call, providing our mediaStream
                         call.answer(mediaStream);
+                        
+                        // Close is not supported on Firefox
+                        call.on('close', function () {
+                            console.log('guest left the call');
+                        });                        
                         
                         // Work around a bug in peer.js where it calls
                         // twice if the video element is added during the
