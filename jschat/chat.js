@@ -3,12 +3,15 @@
 
  Created by Morgan McGuire in 2020
  Released into the public domain.
-
- There is no consistent way to detect a closed WebRTC
- connection, so we have to send keepalive messages.
 */
 'use strict';
 
+/*
+ There is no consistent way to detect a closed WebRTC
+ connection, so we have to send keepalive messages. PeerJS
+ has its own parameters for ping rates, but does not appear
+ to use them at present on investigating the code.
+*/
 const KEEP_ALIVE_INTERVAL_MS = 0.25 * 1000;
 const KEEP_ALIVE_MESSAGE = 'KEEP_ALIVE';
 
@@ -78,12 +81,15 @@ function keepAlive(dataConnection, getVideo) {
             getVideo().remove();
             // Ending the chain should allow garbage collection to occur
         } else {
+            console.log('sent KEEP_ALIVE message');
             dataConnection.send(KEEP_ALIVE_MESSAGE);
+
+            // Schedule the next ping
             setTimeout(ping, KEEP_ALIVE_INTERVAL_MS);
         }
     }
 
-    dataConnection.on('open', function () {
+//    dataConnection.on('open', function () {
         console.log('data connection open');
         dataConnection.on('data', function (data) {
             if (data === KEEP_ALIVE_MESSAGE) {
@@ -94,7 +100,7 @@ function keepAlive(dataConnection, getVideo) {
 
         // Start the endless keepAlive process
         ping(dataConnection);
-    });    
+//    });    
 }
 
 
@@ -116,11 +122,10 @@ function startGuest() {
             addWebCamView('You', mediaStream, false);
             
             console.log('call host');
-            let mediaConnection = peer.call(hostID, mediaStream);
-
             let videoElement = undefined;
-
             let alreadyAddedThisCall = false;
+
+            const mediaConnection = peer.call(hostID, mediaStream);
             mediaConnection.on('stream',
                     function (hostStream) {
                         if (! alreadyAddedThisCall) {
@@ -138,10 +143,10 @@ function startGuest() {
                    ); //mediaConnection.on('stream')
 
             console.log('connect data to host');
-            let dataConnection = peer.connect(hostID);
+            const dataConnection = peer.connect(hostID);
             dataConnection.on('open', function () {
-                keepAlive(dataConnection, 
-                    function () { return videoElement; });
+                console.log('data connection to host established');
+                keepAlive(dataConnection, function () { return videoElement; });
             });
 
         }); // startWebCam
@@ -164,7 +169,7 @@ function startHost() {
         console.log('host peer opened with id ' + id);
         const url = 'https://morgan3d.github.io/misc/jschat/?' + id;
         document.getElementById('urlbox').innerHTML =
-            `You are the host. Others can join at:<br><span style="white-space:nowrap; cursor: pointer; font-weight: bold" onclick="clipboardCopy('${url}')" title="Copy to Clipboard"><input title="Copy to Clipboard" type="text" value="${url}" id="urlTextBox">&nbsp;<b style="font-size: 125%">⧉</b></span>`;
+            `You are the host. One guest can join at:<br><span style="white-space:nowrap; cursor: pointer; font-weight: bold" onclick="clipboardCopy('${url}')" title="Copy to Clipboard"><input title="Copy to Clipboard" type="text" value="${url}" id="urlTextBox">&nbsp;<b style="font-size: 125%">⧉</b></span>`;
                 
         startWebCam(function (mediaStream) {
             addWebCamView('You', mediaStream, false);
@@ -172,8 +177,11 @@ function startHost() {
             let videoElement = undefined;
 
             peer.on('connection', function (dataConnection) {
-                keepAlive(dataConnection,
-                    function () { return videoElement; });
+                console.log('data connection to guest established');
+                // The data connection may start before the video connection,
+                // so pass a function that can be evaluated when needed to 
+                // construct the video.
+                keepAlive(dataConnection, function () { return videoElement; });
             });
 
             peer.on('call',
