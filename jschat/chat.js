@@ -49,7 +49,7 @@ function clipboardCopy(text) {
 /* For testing if the stream has failed */
 function debugmMonitorStream(mediaStream) {
     console.log(mediaStream.active);
-    setTimeout(function () { debugmMonitorStream(mediaStream); }, 1000);
+    setTimeout(function () { debugMonitorStream(mediaStream); }, 1000);
 }
 
 function startGuest() {
