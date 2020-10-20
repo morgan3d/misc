@@ -75,12 +75,16 @@ function keepAlive(dataConnection) {
     // Undefined until the first message comes in
     let lastTime = undefined;
 
+    // Save the ID, which may become invalid if the connection fails
+    const peerID = dataConnection.peer;
+
     function ping() {
         const currentTime = now();
+        console.log(dataConnection.peer);
         if (lastTime && (currentTime - lastTime > MISSABLE_INTERVALS * KEEP_ALIVE_INTERVAL_MS)) {
             // The other side seems to have died
             console.log('lost connection. ', (currentTime - lastTime) / 1000, 'seconds without a keepAlive message.');
-            document.getElementById(dataConnection.peer).remove();
+            document.getElementById(peerID).remove();
             // Ending the iterative callback chain should allow garbage collection to occur
             // and destroy all resources
         } else {
@@ -88,7 +92,7 @@ function keepAlive(dataConnection) {
             dataConnection.send(KEEP_ALIVE_MESSAGE);
 
             // Show or hide the connection warning as appropriate
-            document.querySelector("#" + dataConnection.peer + " .warning").style.visiblity = 
+            document.querySelector('#' + peerID + ' .warning').style.visiblity = 
               (lastTime && (currentTime - lastTime > 2 * KEEP_ALIVE_INTERVAL_MS)) ? 'visible' : 'hidden';
 
             // Schedule the next ping
