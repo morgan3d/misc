@@ -8,6 +8,11 @@
 
 function startWebCam(callback) {
     console.log('startWebCam');
+    if (! navigator.mediaDevices) {
+        console.log('No media devices. Probably running without https');
+        return;
+    }
+    
     navigator.mediaDevices.getUserMedia({audio: true, video: {width: 512, height: 512, facingMode: "user"}})
         .then(callback)
         .catch(function(err) {
