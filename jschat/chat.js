@@ -83,8 +83,8 @@ function keepAlive(dataConnection) {
         if (lastTime && (currentTime - lastTime > MISSABLE_INTERVALS * KEEP_ALIVE_INTERVAL_MS)) {
             // The other side seems to have dropped connection
             console.log('lost connection. ', (currentTime - lastTime) / 1000, 'seconds without a keepAlive message.');
-            const element = document.getElementById(elementID);
-            if (element) { element.remove(); }
+            const videoElement = document.getElementById(elementID);
+            if (videoElement) { videoElement.remove(); }
             // Ending the iterative callback chain should allow garbage collection to occur
             // and destroy all resources
         } else {
@@ -93,12 +93,12 @@ function keepAlive(dataConnection) {
 
             // Show or hide the connection warning as appropriate. Note that the element might not exist
             // right at the beginning of the connection.
-            const connectionIsBad = (lastTime && (currentTime - lastTime > 2 * KEEP_ALIVE_INTERVAL_MS));
-            console.log(connectionIsBad);
-            
-            const element = document.querySelector('#' + elementID + ' .warning');
-            if (element) {
-                element.style.visiblity = connectionIsBad ? 'visible' : 'hidden';
+            const connectionIsBad = lastTime && (currentTime - lastTime >= 2 * KEEP_ALIVE_INTERVAL_MS);
+
+            const warningElement = document.querySelector('#' + elementID + ' .warning');
+            if (warningElement) {
+                warningElement.style.visiblity = connectionIsBad ? 'visible' : 'hidden';
+                console.log(warningElement.style.visiblity);
             }
 
             // Schedule the next ping
