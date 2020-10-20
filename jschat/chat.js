@@ -91,9 +91,12 @@ function keepAlive(dataConnection) {
             // console.log('sent KEEP_ALIVE message');
             dataConnection.send(KEEP_ALIVE_MESSAGE);
 
-            // Show or hide the connection warning as appropriate
-            document.querySelector('#' + elementID + ' .warning').style.visiblity = 
-              (lastTime && (currentTime - lastTime > 2 * KEEP_ALIVE_INTERVAL_MS)) ? 'visible' : 'hidden';
+            // Show or hide the connection warning as appropriate. Note that the element might not exist
+            // right at the beginning.
+            const element = document.querySelector('#' + elementID + ' .warning');
+            if (element) {
+                element.style.visiblity = (lastTime && (currentTime - lastTime > 2 * KEEP_ALIVE_INTERVAL_MS)) ? 'visible' : 'hidden';
+            }
 
             // Schedule the next ping
             setTimeout(ping, KEEP_ALIVE_INTERVAL_MS);
