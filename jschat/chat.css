@@ -35,6 +35,7 @@ body {
     border-radius: 7px;
     border: 5px solid #fff;
     width: 45%;
+    margin: 2.5%;
 }
 
 .videoFrame video {
