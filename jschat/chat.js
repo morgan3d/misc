@@ -51,12 +51,6 @@ function clipboardCopy(text) {
     setTimeout(function () { urlTextBox.blur(); });
 }
 
-/* For testing if the stream has failed */
-function debugMonitorStream(mediaConnection) {
-    console.log(mediaConnection.open);
-    setTimeout(function () { debugMonitorStream(mediaConnection); }, 1000);
-}
-
 /* Perpetually send keep alive messages to this dataConnection */
 function keepAlive(dataConnection) {
     function ping() {
@@ -102,7 +96,6 @@ function startGuest() {
                             alreadyAddedThisCall = true;
                             console.log('host answered');
                             addWebCamView('Host', hostStream, true);
-                            debugMonitorStream(mediaConnection);
                         } else {
                             console.log('rejected duplicate call');
                         }
@@ -171,8 +164,6 @@ function startHost() {
                                         
                                         console.log('guest streamed');
                                         addWebCamView('Guest', guestStream, true);
-
-                                        debugMonitorStream(mediaConnection);
                                     } else {
                                         console.log('rejected duplicate stream from guest');
                                     }
