@@ -9,6 +9,8 @@
 */
 'use strict';
 
+const KEEP_ALIVE_INTERVAL_MS = 500;
+
 function startWebCam(callback) {
     console.log('startWebCam');
     if (! navigator.mediaDevices) {
@@ -55,6 +57,24 @@ function debugMonitorStream(mediaConnection) {
     setTimeout(function () { debugMonitorStream(mediaConnection); }, 1000);
 }
 
+/* Perpetually send keep alive messages to this dataConnection */
+function keepAlive(dataConnection) {
+    function ping() {
+        dataConnection.send('keepAlive');
+        setTimeout(ping, KEEP_ALIVE_INTERVAL_MS);
+    }
+
+    dataConnection.on('open', function () {
+        console.log('data connection open');
+        dataConnection.on('data', function (data) {
+            console.log('received data', data);
+        });
+
+        ping(dataConnection);
+    });    
+}
+
+
 function startGuest() {
     console.log('startGuest');
     let hostID = window.location.search.substring(1);
@@ -75,14 +95,6 @@ function startGuest() {
             console.log('call host');
             let mediaConnection = peer.call(hostID, mediaStream);
 
-            console.log('connect data to host');
-            let dataConnection = peer.connect(hostID);
-
-            // Close is not supported on Firefox
-            mediaConnection.on('close', function () {
-                console.log('host ended the call');
-            });
-
             let alreadyAddedThisCall = false;
             mediaConnection.on('stream',
                     function (hostStream) {
@@ -99,7 +111,12 @@ function startGuest() {
                     function (err) {
                         console.log('host stream failed with', err);
                     }
-                   ); //call.on('stream')
+                   ); //mediaConnection.on('stream')
+
+            console.log('connect data to host');
+            let dataConnection = peer.connect(hostID);
+            keepAlive(dataConnection);            
+
         }); // startWebCam
     }); // peer.on('open')
 }
@@ -121,13 +138,16 @@ function startHost() {
         const url = 'https://morgan3d.github.io/misc/jschat/?' + id;
         document.getElementById('urlbox').innerHTML =
             `You are the host. Others can join at:<br><span style="white-space:nowrap; cursor: pointer; font-weight: bold" onclick="clipboardCopy('${url}')" title="Copy to Clipboard"><input title="Copy to Clipboard" type="text" value="${url}" id="urlTextBox">&nbsp;<b style="font-size: 125%">⧉</b></span>`;
-        
-        
+                
         startWebCam(function (mediaStream) {
             addWebCamView('You', mediaStream, false);
             
+            peer.on('connection', function (dataConnection) {
+                keepAlive(dataConnection);
+            });
+
             peer.on('call',
-                    function(mediaConnection) {
+                    function (mediaConnection) {
                         console.log('guest called');
                         
                         // Answer the call, providing our mediaStream
