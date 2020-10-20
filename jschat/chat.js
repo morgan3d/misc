@@ -97,8 +97,7 @@ function keepAlive(dataConnection) {
 
             const warningElement = document.querySelector('#' + elementID + ' .warning');
             if (warningElement) {
-                warningElement.style.visiblity = connectionIsBad ? 'visible' : 'hidden';
-                console.log(warningElement.style.visiblity);
+                warningElement.style.visibility = connectionIsBad ? 'visible' : 'hidden';
             }
 
             // Schedule the next ping
