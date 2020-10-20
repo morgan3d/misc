@@ -47,7 +47,7 @@ function clipboardCopy(text) {
 }
 
 /* For testing if the stream has failed */
-function debugmMonitorStream(mediaStream) {
+function debugMonitorStream(mediaStream) {
     console.log(mediaStream.active);
     setTimeout(function () { debugMonitorStream(mediaStream); }, 1000);
 }
