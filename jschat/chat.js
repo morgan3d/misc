@@ -80,9 +80,8 @@ function keepAlive(dataConnection) {
 
     function ping() {
         const currentTime = now();
-        console.log(dataConnection.peer);
         if (lastTime && (currentTime - lastTime > MISSABLE_INTERVALS * KEEP_ALIVE_INTERVAL_MS)) {
-            // The other side seems to have died
+            // The other side seems to have dropped connection
             console.log('lost connection. ', (currentTime - lastTime) / 1000, 'seconds without a keepAlive message.');
             const element = document.getElementById(elementID);
             if (element) { element.remove(); }
@@ -93,8 +92,9 @@ function keepAlive(dataConnection) {
             dataConnection.send(KEEP_ALIVE_MESSAGE);
 
             // Show or hide the connection warning as appropriate. Note that the element might not exist
-            // right at the beginning.
+            // right at the beginning of the connection.
             const element = document.querySelector('#' + elementID + ' .warning');
+            console.log('#' + elementID + ' .warning', element);
             if (element) {
                 element.style.visiblity = (lastTime && (currentTime - lastTime > 2 * KEEP_ALIVE_INTERVAL_MS)) ? 'visible' : 'hidden';
             }
@@ -108,7 +108,7 @@ function keepAlive(dataConnection) {
     // with initialization and never run.
     dataConnection.on('data', function (data) {
         if (data === KEEP_ALIVE_MESSAGE) { lastTime = now(); }
-        console.log('received data', data);
+        // console.log('received data', data);
     });
 
     // Start the endless keepAlive process
