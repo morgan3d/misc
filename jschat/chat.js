@@ -92,7 +92,7 @@ function keepAlive(dataConnection) {
             dataConnection.send(KEEP_ALIVE_MESSAGE);
 
             // Show or hide the connection warning as appropriate
-            document.querySelector('#' + peerID + ' .warning').style.visiblity = 
+            document.querySelector('#' + elementID + ' .warning').style.visiblity = 
               (lastTime && (currentTime - lastTime > 2 * KEEP_ALIVE_INTERVAL_MS)) ? 'visible' : 'hidden';
 
             // Schedule the next ping
