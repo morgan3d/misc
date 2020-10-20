@@ -8,7 +8,7 @@
 
 function startWebCam(callback) {
     console.log('startWebCam');
-    navigator.mediaDevices.getUserMedia({audio: true, video: {facingMode: "user"}})
+    navigator.mediaDevices.getUserMedia({audio: true, video: {width: 512, height: 512, facingMode: "user"}})
         .then(callback)
         .catch(function(err) {
             console.log(err);
@@ -24,7 +24,7 @@ function addWebCamView(caption, mediaStream, playAudio) {
     frame.innerHTML = `<div style="width: 100%">${caption}</div>`;
     const video = document.createElement('video');
     video.setAttribute('autoplay', true);
-    video.setAttribute('controls', true);
+    // video.setAttribute('controls', true);
     video.srcObject = mediaStream;
     video.muted = ! playAudio;
     frame.appendChild(video);
@@ -49,6 +49,10 @@ function startGuest() {
     
     peer = new Peer();
 
+    peer.on('error', function (err) {
+        console.log('error in guest:', err);
+    });
+    
     peer.on('open', function (id) {
         startWebCam(function (mediaStream) {
             console.log('web cam started');
@@ -85,56 +89,56 @@ function startHost() {
     // The peer must be created RIGHT before open is registered,
     // otherwise we could miss it.
     peer = new Peer();
-    peer.on('open',
-            function(id) {
-                console.log('host peer opened with id ' + id);
-                const url = 'https://morgan3d.github.io/misc/jschat/?' + id;
-                document.getElementById('urlbox').innerHTML =
-                    `You are the host. Others can join at:<br><span style="white-space:nowrap; cursor: pointer; font-weight: bold" onclick="clipboardCopy('${url}')" title="Copy to Clipboard"><input title="Copy to Clipboard" type="text" value="${url}" id="urlTextBox">&nbsp;<b style="font-size: 125%">⧉</b></span>`;
 
-                
-                startWebCam(function (mediaStream) {
-                    addWebCamView('You', mediaStream, false);
+    peer.on('error', function (err) {
+        console.log('error in host:', err);
+    });
+    
+    peer.on('open', function(id) {
+        console.log('host peer opened with id ' + id);
+        const url = 'https://morgan3d.github.io/misc/jschat/?' + id;
+        document.getElementById('urlbox').innerHTML =
+            `You are the host. Others can join at:<br><span style="white-space:nowrap; cursor: pointer; font-weight: bold" onclick="clipboardCopy('${url}')" title="Copy to Clipboard"><input title="Copy to Clipboard" type="text" value="${url}" id="urlTextBox">&nbsp;<b style="font-size: 125%">⧉</b></span>`;
+        
+        
+        startWebCam(function (mediaStream) {
+            addWebCamView('You', mediaStream, false);
+            
+            peer.on('call',
+                    function(call) {
+                        console.log('guest called');
+                        
+                        // Answer the call, providing our mediaStream
+                        call.answer(mediaStream);
+                        
+                        // Work around a bug in peer.js where it calls
+                        // twice if the video element is added during the
+                        // callback
+                        let alreadySeenThisCall = false;
+                        
+                        // When the client connects, add its stream
+                        call.on('stream',
+                                function (guestStream) {
+                                    if (! alreadySeenThisCall) {
+                                        alreadySeenThisCall = true;                                                
+                                        
+                                        console.log('guest streamed');
+                                        addWebCamView('Guest', guestStream, true);
+                                    } else {
+                                        console.log('rejected duplicate stream from guest');
+                                    }
+                                },
+                                function (err) {
+                                    console.log('guest stream failed with', err);
+                                });
+                    },
                     
-                    peer.on('call',
-                            function(call) {
-                                console.log('guest called');
-
-                                // Answer the call, providing our mediaStream
-                                call.answer(mediaStream);
-
-                                // Work around a bug in peer.js where it calls
-                                // twice if the video element is added during the
-                                // callback
-                                let alreadySeenThisCall = false;
-                                
-                                // When the client connects, add its stream
-                                call.on('stream',
-                                        function (guestStream) {
-                                            if (! alreadySeenThisCall) {
-                                                alreadySeenThisCall = true;                                                
-                                                
-                                                console.log('guest streamed');
-                                                addWebCamView('Guest', guestStream, true);
-                                            } else {
-                                                console.log('rejected duplicate stream from guest');
-                                            }
-                                        },
-                                        function (err) {
-                                            console.log('guest stream failed with', err);
-                                        });
-                            },
-                            
-                            function (err) {
-                                console.log('guest call failed with', err);
-                            }
-                           ); // peer.on('call')
-                }); // startWebCam
-            },
-            function (err) {
-                console.log('host open failed with', err);
-            }
-           ); // peer.on('open')
+                    function (err) {
+                        console.log('guest call failed with', err);
+                    }
+                   ); // peer.on('call')
+        }); // startWebCam
+    }); // peer.on('open')
     
 }
 
