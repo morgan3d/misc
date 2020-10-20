@@ -84,7 +84,8 @@ function keepAlive(dataConnection) {
         if (lastTime && (currentTime - lastTime > MISSABLE_INTERVALS * KEEP_ALIVE_INTERVAL_MS)) {
             // The other side seems to have died
             console.log('lost connection. ', (currentTime - lastTime) / 1000, 'seconds without a keepAlive message.');
-            document.getElementById(peerID).remove();
+            const element = document.getElementById(elementID);
+            if (element) { element.remove(); }
             // Ending the iterative callback chain should allow garbage collection to occur
             // and destroy all resources
         } else {
