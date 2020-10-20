@@ -10,6 +10,7 @@
 'use strict';
 
 const KEEP_ALIVE_INTERVAL_MS = 0.25 * 1000;
+const KEEP_ALIVE_MESSAGE = 'KEEP_ALIVE';
 
 // How many intervals can be missed before we drop connection
 const MISSABLE_INTERVALS = 16;
@@ -63,10 +64,13 @@ function clipboardCopy(text) {
     setTimeout(function () { urlTextBox.blur(); });
 }
 
-/* Perpetually send keep alive messages to this dataConnection */
-function keepAlive(dataConnection, getTime, getVideo) {
+/* Perpetually send keep alive messages to this dataConnection, and listen for them
+   coming back. getVideo() is a callback because the video may not be available right
+   when the data connection is. */
+function keepAlive(dataConnection, getVideo) {
+    let lastTime = undefined;
+
     function ping() {
-        let lastTime = getTime();
         const currentTime = now();
         if (lastTime && (currentTime - lastTime > MISSABLE_INTERVALS * KEEP_ALIVE_INTERVAL_MS)) {
             // The other side seems to have died
@@ -74,7 +78,7 @@ function keepAlive(dataConnection, getTime, getVideo) {
             getVideo().remove();
             // Ending the chain should allow garbage collection to occur
         } else {
-            dataConnection.send('keepAlive');
+            dataConnection.send(KEEP_ALIVE_MESSAGE);
             setTimeout(ping, KEEP_ALIVE_INTERVAL_MS);
         }
     }
@@ -82,9 +86,13 @@ function keepAlive(dataConnection, getTime, getVideo) {
     dataConnection.on('open', function () {
         console.log('data connection open');
         dataConnection.on('data', function (data) {
+            if (data === KEEP_ALIVE_MESSAGE) {
+                lastTime = now();
+            }
             console.log('received data', data);
         });
 
+        // Start the endless keepAlive process
         ping(dataConnection);
     });    
 }
@@ -110,7 +118,6 @@ function startGuest() {
             console.log('call host');
             let mediaConnection = peer.call(hostID, mediaStream);
 
-            let lastKeepAliveReceived = undefined;
             let videoElement = undefined;
 
             let alreadyAddedThisCall = false;
@@ -119,7 +126,6 @@ function startGuest() {
                         if (! alreadyAddedThisCall) {
                             alreadyAddedThisCall = true;
                             console.log('host answered');
-                            lastKeepAliveReceived = now();
                             videoElement = addWebCamView('Host', hostStream, true);
                         } else {
                             console.log('rejected duplicate call');
@@ -135,7 +141,6 @@ function startGuest() {
             let dataConnection = peer.connect(hostID);
             dataConnection.on('open', function () {
                 keepAlive(dataConnection, 
-                    function () { return lastKeepAliveReceived; },
                     function () { return videoElement; });
             });
 
@@ -164,12 +169,10 @@ function startHost() {
         startWebCam(function (mediaStream) {
             addWebCamView('You', mediaStream, false);
             
-            let lastKeepAliveReceived = undefined;
             let videoElement = undefined;
 
             peer.on('connection', function (dataConnection) {
                 keepAlive(dataConnection,
-                    function () { return lastKeepAliveReceived; },
                     function () { return videoElement; });
             });
 
@@ -197,7 +200,6 @@ function startHost() {
                                         alreadySeenThisCall = true;                                                
                                         
                                         console.log('guest streamed');
-                                        lastKeepAliveReceived = now();
                                         videoElement = addWebCamView('Guest', guestStream, true);
                                     } else {
                                         console.log('rejected duplicate stream from guest');
