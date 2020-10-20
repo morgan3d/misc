@@ -9,8 +9,7 @@ will launch the host, which provides the guest URL.
 
 TODO:
 
-- Fix startup sometimes failing. Race condition?
-- Detect drop
+- Send keepalive
 - Leave button
 - Make an explicit "Join" button so that it doesn't prompt for permissions suddenly on page load
 - Audio mute button

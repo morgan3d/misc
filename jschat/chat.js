@@ -2,7 +2,10 @@
  From https://github.com/morgan3d/misc/
 
  Created by Morgan McGuire in 2020
- Released into the public domain
+ Released into the public domain.
+
+ There is no consistent way to detect a closed WebRTC
+ connection, so we have to send keepalive messages.
 */
 'use strict';
 
@@ -47,8 +50,8 @@ function clipboardCopy(text) {
 }
 
 /* For testing if the stream has failed */
-function debugMonitorStream(mediaStream) {
-    console.log(mediaStream.active);
+function debugMonitorStream(mediaConnection) {
+    console.log(mediaConnection.open);
     setTimeout(function () { debugMonitorStream(mediaStream); }, 1000);
 }
 
@@ -70,21 +73,24 @@ function startGuest() {
             addWebCamView('You', mediaStream, false);
             
             console.log('call host');
-            let call = peer.call(hostID, mediaStream);
+            let mediaConnection = peer.call(hostID, mediaStream);
+
+            console.log('connect data to host');
+            let dataConnection = peer.connect(hostID);
 
             // Close is not supported on Firefox
-            call.on('close', function () {
+            mediaConnection.on('close', function () {
                 console.log('host ended the call');
             });
 
             let alreadyAddedThisCall = false;
-            call.on('stream',
+            mediaConnection.on('stream',
                     function (hostStream) {
                         if (! alreadyAddedThisCall) {
                             alreadyAddedThisCall = true;
                             console.log('host answered');
                             addWebCamView('Host', hostStream, true);
-                            debugMonitorStream(hostStream);
+                            debugMonitorStream(mediaConnection);
                         } else {
                             console.log('rejected duplicate call');
                         }
@@ -121,14 +127,14 @@ function startHost() {
             addWebCamView('You', mediaStream, false);
             
             peer.on('call',
-                    function(call) {
+                    function(mediaConnection) {
                         console.log('guest called');
                         
                         // Answer the call, providing our mediaStream
-                        call.answer(mediaStream);
+                        mediaConnection.answer(mediaStream);
                         
                         // Close is not supported on Firefox
-                        call.on('close', function () {
+                        mediaConnection.on('close', function () {
                             console.log('guest left the call');
                         });                        
 
@@ -138,7 +144,7 @@ function startHost() {
                         let alreadySeenThisCall = false;
                         
                         // When the client connects, add its stream
-                        call.on('stream',
+                        mediaConnection.on('stream',
                                 function (guestStream) {
                                     if (! alreadySeenThisCall) {
                                         alreadySeenThisCall = true;                                                
@@ -146,7 +152,7 @@ function startHost() {
                                         console.log('guest streamed');
                                         addWebCamView('Guest', guestStream, true);
 
-                                        debugMonitorStream(guestStream);
+                                        debugMonitorStream(mediaConnection);
                                     } else {
                                         console.log('rejected duplicate stream from guest');
                                     }
