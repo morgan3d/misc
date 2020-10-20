@@ -9,10 +9,10 @@
 */
 'use strict';
 
-const KEEP_ALIVE_INTERVAL_MS = 0.5 * 1000;
+const KEEP_ALIVE_INTERVAL_MS = 0.25 * 1000;
 
 // How many intervals can be missed before we drop connection
-const MISSABLE_INTERVALS = 6;
+const MISSABLE_INTERVALS = 8;
 
 /* Milliseconds since epoch in UTC. Used for detecting when the last keepAlive
    was received. */
