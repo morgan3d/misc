@@ -28,14 +28,15 @@ body {
     font-weight: bold;
 }
 
+
 .videoFrame {
     display: inline-block;
     text-align: center;
     background: #fff;
     border-radius: 7px;
     border: 5px solid #fff;
-    width: 45%;
-    margin: 2.5%;
+    width: 44%;
+    margin: 2%;
 }
 
 .videoFrame video {
@@ -43,4 +44,8 @@ body {
     width: 100%;
     margin-top: 2px;
     margin-bottom: -2px;
+}
+
+#videobox {
+    text-align: center;
 }
