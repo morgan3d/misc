@@ -46,6 +46,11 @@ function clipboardCopy(text) {
     setTimeout(function () { urlTextBox.blur(); });
 }
 
+/* For testing if the stream has failed */
+function debugmMonitorStream(mediaStream) {
+    console.log(mediaStream.active);
+    setTimeout(function () { debugmMonitorStream(mediaStream); }, 1000);
+}
 
 function startGuest() {
     console.log('startGuest');
@@ -79,6 +84,7 @@ function startGuest() {
                             alreadyAddedThisCall = true;
                             console.log('host answered');
                             addWebCamView('Host', hostStream, true);
+                            debugMonitorStream(hostStream);
                         } else {
                             console.log('rejected duplicate call');
                         }
@@ -125,7 +131,7 @@ function startHost() {
                         call.on('close', function () {
                             console.log('guest left the call');
                         });                        
-                        
+
                         // Work around a bug in peer.js where it calls
                         // twice if the video element is added during the
                         // callback
@@ -139,6 +145,8 @@ function startHost() {
                                         
                                         console.log('guest streamed');
                                         addWebCamView('Guest', guestStream, true);
+
+                                        debugMonitorStream(guestStream);
                                     } else {
                                         console.log('rejected duplicate stream from guest');
                                     }
