@@ -16,7 +16,7 @@ const KEEP_ALIVE_INTERVAL_MS = 0.25 * 1000;
 const KEEP_ALIVE_MESSAGE = 'KEEP_ALIVE';
 
 // How many intervals can be missed before we drop connection
-const MISSABLE_INTERVALS = 16;
+const MISSABLE_INTERVALS = 10;
 
 /* Milliseconds since epoch in UTC. Used for detecting when the last keepAlive
    was received. */
@@ -40,12 +40,13 @@ function startWebCam(callback) {
 
 
 /* Returns the DOM element that was added */
-function addWebCamView(caption, mediaStream, playAudio) {
+function addWebCamView(caption, mediaStream, playAudio, id) {
     console.log('addWebCamView for ' + caption);
     const videobox = document.getElementById('videobox');
     const frame = document.createElement('div');
     frame.className = 'videoFrame';
-    frame.innerHTML = `<div style="width: 100%">${caption}</div>`;
+    frame.id = id;
+    frame.innerHTML = `<div style="width: 100%">${caption}</div><div class="warning">⚠</div>`;
     const video = document.createElement('video');
     video.setAttribute('autoplay', true);
     // video.setAttribute('controls', true);
@@ -70,7 +71,8 @@ function clipboardCopy(text) {
 /* Perpetually send keep alive messages to this dataConnection, and listen for them
    coming back. getVideo() is a callback because the video may not be available right
    when the data connection is. */
-function keepAlive(dataConnection, getVideo) {
+function keepAlive(dataConnection) {
+    // Undefined until the first message comes in
     let lastTime = undefined;
 
     function ping() {
@@ -78,29 +80,31 @@ function keepAlive(dataConnection, getVideo) {
         if (lastTime && (currentTime - lastTime > MISSABLE_INTERVALS * KEEP_ALIVE_INTERVAL_MS)) {
             // The other side seems to have died
             console.log('lost connection. ', (currentTime - lastTime) / 1000, 'seconds without a keepAlive message.');
-            getVideo().remove();
-            // Ending the chain should allow garbage collection to occur
+            document.getElementById(dataConnection.peer).remove();
+            // Ending the iterative callback chain should allow garbage collection to occur
+            // and destroy all resources
         } else {
-            console.log('sent KEEP_ALIVE message');
+            // console.log('sent KEEP_ALIVE message');
             dataConnection.send(KEEP_ALIVE_MESSAGE);
+
+            // Show or hide the connection warning as appropriate
+            document.querySelector("#" + dataConnection.peer + " .warning").style.visiblity = 
+              (lastTime && (currentTime - lastTime > 2 * KEEP_ALIVE_INTERVAL_MS)) ? 'visible' : 'hidden';
 
             // Schedule the next ping
             setTimeout(ping, KEEP_ALIVE_INTERVAL_MS);
         }
     }
 
-//    dataConnection.on('open', function () {
-        console.log('data connection open');
-        dataConnection.on('data', function (data) {
-            if (data === KEEP_ALIVE_MESSAGE) {
-                lastTime = now();
-            }
-            console.log('received data', data);
-        });
+    // Do not put these in dataConnection.on or they can fail due to a race condition
+    // with initialization and never run.
+    dataConnection.on('data', function (data) {
+        if (data === KEEP_ALIVE_MESSAGE) { lastTime = now(); }
+        console.log('received data', data);
+    });
 
-        // Start the endless keepAlive process
-        ping(dataConnection);
-//    });    
+    // Start the endless keepAlive process
+    ping(dataConnection);
 }
 
 
@@ -119,7 +123,7 @@ function startGuest() {
         startWebCam(function (mediaStream) {
             console.log('web cam started');
             
-            addWebCamView('You', mediaStream, false);
+            addWebCamView('You', mediaStream, false, id);
             
             console.log('call host');
             let videoElement = undefined;
@@ -131,7 +135,7 @@ function startGuest() {
                         if (! alreadyAddedThisCall) {
                             alreadyAddedThisCall = true;
                             console.log('host answered');
-                            videoElement = addWebCamView('Host', hostStream, true);
+                            videoElement = addWebCamView('Host', hostStream, true, mediaConnection.peer);
                         } else {
                             console.log('rejected duplicate call');
                         }
@@ -146,7 +150,7 @@ function startGuest() {
             const dataConnection = peer.connect(hostID);
             dataConnection.on('open', function () {
                 console.log('data connection to host established');
-                keepAlive(dataConnection, function () { return videoElement; });
+                keepAlive(dataConnection);
             });
 
         }); // startWebCam
@@ -172,16 +176,13 @@ function startHost() {
             `You are the host. One guest can join at:<br><span style="white-space:nowrap; cursor: pointer; font-weight: bold" onclick="clipboardCopy('${url}')" title="Copy to Clipboard"><input title="Copy to Clipboard" type="text" value="${url}" id="urlTextBox">&nbsp;<b style="font-size: 125%">⧉</b></span>`;
                 
         startWebCam(function (mediaStream) {
-            addWebCamView('You', mediaStream, false);
+            addWebCamView('You', mediaStream, false, id);
             
             let videoElement = undefined;
 
             peer.on('connection', function (dataConnection) {
                 console.log('data connection to guest established');
-                // The data connection may start before the video connection,
-                // so pass a function that can be evaluated when needed to 
-                // construct the video.
-                keepAlive(dataConnection, function () { return videoElement; });
+                keepAlive(dataConnection);
             });
 
             peer.on('call',
@@ -208,7 +209,7 @@ function startHost() {
                                         alreadySeenThisCall = true;                                                
                                         
                                         console.log('guest streamed');
-                                        videoElement = addWebCamView('Guest', guestStream, true);
+                                        videoElement = addWebCamView('Guest', guestStream, true, mediaConnection.peer);
                                     } else {
                                         console.log('rejected duplicate stream from guest');
                                     }

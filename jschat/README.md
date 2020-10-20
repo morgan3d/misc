@@ -10,12 +10,19 @@ This code sample serves as a reference implementation for using MediaStreams ove
 WebRTC. The application to video chat is just to create a motivating context
 and it is not intended to be a serious demo of browser based video chat.
 
+Features
+-------------------------------------------------
+
+- Audio and video webcam streaming
+- Simple UI, including clipboard
+- Robust connection and handshaking (many PeerJS examples have race conditions!)
+- Connection quality warnings and automatic closing
+
 TODO:
 
-- Fix keepalive
+- Canvas example
 - Leave button
 - Limit to one guest 
-- Allow reconnect
 - Make an explicit "Join" button so that it doesn't prompt for permissions suddenly on page load
 - Audio mute button
 - Video mute button

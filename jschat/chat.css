@@ -31,6 +31,7 @@ body {
 
 .videoFrame {
     display: inline-block;
+    position: relative;
     text-align: center;
     background: #fff;
     border-radius: 7px;
@@ -48,4 +49,13 @@ body {
 
 #videobox {
     text-align: center;
+}
+
+.videoFrame .warning {
+    visibility: hidden;
+    position: absolute;
+    color: #e00;
+    right: 2px;
+    top: -4px;
+    font-weight: bold;
 }
