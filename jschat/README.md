@@ -16,7 +16,8 @@ Features
 - Audio and video webcam streaming
 - Simple UI, including clipboard
 - Robust connection and handshaking (many PeerJS examples have race conditions!)
-- Connection quality warnings and automatic closing
+- Connection quality warnings and automatic closing (WebRTC does not provide this directly)
+- Tested on Safari, Firefox, Chrome, and Edge on Windows and macOS Oct 2020
 
 TODO:
 

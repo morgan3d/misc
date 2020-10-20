@@ -45,7 +45,7 @@ function addWebCamView(caption, mediaStream, playAudio, id) {
     const videobox = document.getElementById('videobox');
     const frame = document.createElement('div');
     frame.className = 'videoFrame';
-    frame.id = id;
+    frame.id = '_' + id;
     frame.innerHTML = `<div style="width: 100%">${caption}</div><div class="warning">⚠</div>`;
     const video = document.createElement('video');
     video.setAttribute('autoplay', true);
@@ -76,7 +76,7 @@ function keepAlive(dataConnection) {
     let lastTime = undefined;
 
     // Save the ID, which may become invalid if the connection fails
-    const peerID = dataConnection.peer;
+    const elementID = '_' + dataConnection.peer;
 
     function ping() {
         const currentTime = now();
