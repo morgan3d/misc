@@ -94,9 +94,10 @@ function keepAlive(dataConnection) {
             // Show or hide the connection warning as appropriate. Note that the element might not exist
             // right at the beginning of the connection.
             const element = document.querySelector('#' + elementID + ' .warning');
-            console.log('#' + elementID + ' .warning', element);
+            const connectionIsBad = (lastTime && (currentTime - lastTime > 2 * KEEP_ALIVE_INTERVAL_MS));
+            console.log(connectionIsBad);
             if (element) {
-                element.style.visiblity = (lastTime && (currentTime - lastTime > 2 * KEEP_ALIVE_INTERVAL_MS)) ? 'visible' : 'hidden';
+                element.style.visiblity = connectionIsBad ? 'visible' : 'hidden';
             }
 
             // Schedule the next ping
