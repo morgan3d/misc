@@ -12,7 +12,7 @@
 const KEEP_ALIVE_INTERVAL_MS = 0.25 * 1000;
 
 // How many intervals can be missed before we drop connection
-const MISSABLE_INTERVALS = 8;
+const MISSABLE_INTERVALS = 16;
 
 /* Milliseconds since epoch in UTC. Used for detecting when the last keepAlive
    was received. */
@@ -66,10 +66,11 @@ function clipboardCopy(text) {
 /* Perpetually send keep alive messages to this dataConnection */
 function keepAlive(dataConnection, getTime, getVideo) {
     function ping() {
-        let time = getTime();
-        if (time && (now() - time > MISSABLE_INTERVALS * KEEP_ALIVE_INTERVAL_MS)) {
+        let lastTime = getTime();
+        const currentTime = now();
+        if (lastTime && (currentTime - lastTime > MISSABLE_INTERVALS * KEEP_ALIVE_INTERVAL_MS)) {
             // The other side seems to have died
-            console.log('lost connection');
+            console.log('lost connection. ', (currentTime - lastTime) / 1000, 'seconds without a keepAlive message.');
             getVideo().remove();
             // Ending the chain should allow garbage collection to occur
         } else {
