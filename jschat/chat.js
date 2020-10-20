@@ -120,7 +120,7 @@ function keepAlive(dataConnection) {
 function startGuest() {
     console.log('startGuest');
     let hostID = window.location.search.substring(1);
-    document.getElementById('urlbox').innerHTML = `You are a guest of ${hostID}.`;
+    document.getElementById('urlbox').innerHTML = `You are the guest in room ${hostID}.`;
     
     peer = new Peer();
 
