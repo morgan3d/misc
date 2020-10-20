@@ -58,4 +58,11 @@ body {
     right: 2px;
     top: -4px;
     font-weight: bold;
+    animation: blinker 0.5s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
 }
