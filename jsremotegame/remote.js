@@ -19,7 +19,9 @@ const KEEP_ALIVE_MESSAGE = 'KEEP_ALIVE';
 // How many intervals can be missed before we drop connection
 const MISSABLE_INTERVALS = 10;
 
-const FRAMERATE_HZ = 120;
+// Going higher than the rendering rate on client or server
+// does not seem to lower latency
+const FRAMERATE_HZ = 60;
 
 const width = 384;
 const height = 224;
@@ -123,7 +125,7 @@ function startHost() {
         alert('canvas.captureStream() requires https, so this demo will not work on this server');
     }
     
-    screenStream = document.getElementById('screen').captureStream(FRAMERATE_HZ);
+    screenStream = document.getElementById('screen').captureStream();//FRAMERATE_HZ);
     
     if (true) {
         // Normally, remove the video on the host
