@@ -14,7 +14,7 @@
       <div id="urlbox"></div>
     </p>
 
-    <canvas id="screen" class="screen" width="384" height="224"></canvas>
-    <video id="video" class="screen" playsinline autoplay></video>
+    <canvas id="screen" class="screen" width="384" height="224" oncontextmenu="event.preventDefault()"></canvas>
+    <video id="video" class="screen" playsinline autoplay oncontextmenu="event.preventDefault()" onmousedown="window.focus()"></video>
   </body>
 </html>

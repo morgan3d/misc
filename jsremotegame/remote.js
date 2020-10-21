@@ -24,6 +24,8 @@ const FRAMERATE_HZ = 10;// TODO 60;
 const width = 384;
 const height = 224;
 
+const peerConfig = {debug: 1};
+
 /* Milliseconds since epoch in UTC. Used for detecting when the last keepAlive
    was received. */
 function now() {
@@ -130,7 +132,7 @@ function startHost() {
     // otherwise we could miss it.
     const id = localStorage.getItem('id') || generateUniqueID();
     localStorage.setItem('id', id);
-    const peer = new Peer(id);
+    const peer = new Peer(id, peerConfig);
 
     peer.on('error', function (err) {
         console.log('error in host:', err);
@@ -203,7 +205,7 @@ function startGuest() {
     const hostID = window.location.search.substring(1);
     document.getElementById('urlbox').innerHTML = `You are the guest in room ${hostID}.`;
     
-    const peer = new Peer(generateUniqueID());
+    const peer = new Peer(generateUniqueID(), peerConfig);
     
     document.getElementById('screen').remove();
 
