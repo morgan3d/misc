@@ -19,13 +19,3 @@ Features
 - Connection quality warnings and automatic closing (WebRTC does not provide this directly)
 - Tested on Safari, Firefox, Chrome, and Edge on Windows and macOS Oct 2020
 
-TODO:
-
-- Canvas example
-- Leave button
-- Limit to one guest 
-- Make an explicit "Join" button so that it doesn't prompt for permissions suddenly on page load
-- Audio mute button
-- Video mute button
-- Nice visual feedback on URL copy
-- Text streaming

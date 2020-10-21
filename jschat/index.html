@@ -7,10 +7,17 @@
   <head>
     <title>Chat</title>
   </head>
-  <body onload="main()">
+  <body>
     <p>
-      <div id="urlbox"> </div>
+      <div id="urlbox"></div>
     </p>
+    <div id="welcome">
+      <div style="width: 200px; height: 120px; background: #fff; border: 1px solid #000; border-radius: 3px; margin: auto; box-shadow: 0px 3px 10px rgba(0, 0, 0, 20%); padding: 10px">
+        WebRTC Video Chat Demo
+        <button onclick="document.getElementById('welcome').remove(); main()" style="margin-top: 30px; margin: 30px auto">Join with WebCam</button>
+        <br><a href="https://casual-effects.com">CasualEffects</a>&nbsp;|&nbsp;<a href="https://github.com/morgan3d/misc/tree/main/jschat">Source Code</a>
+      </div>
+    </div>
 
     <div id="videobox">
     </div>
