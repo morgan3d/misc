@@ -122,6 +122,8 @@ function startHost() {
         video.style.right = '0px';
         video.sourceObj = screenStream;
     }
+
+    // TODO: uncomment
 /*
     
     // The peer must be created RIGHT before open is registered,
@@ -153,7 +155,7 @@ function startHost() {
     }); // peer.on('open')
 */
     // Start the game loop
-//    gameTick();
+    gameTick();
 }
 
 let frame = 0;
