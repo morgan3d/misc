@@ -34,6 +34,7 @@ function now() {
 
 function loadImage(url) {
     const image = new Image();
+    image.crossOrigin = "anonymous";
     image.src = url;
     return image;
 }
@@ -173,7 +174,6 @@ function gameTick() {
      
     try {
         const context = document.getElementById('screen').getContext('2d');
-        
         context.drawImage(backgroundImageArray[0], 0, 0);
         for (let b = 1; b < backgroundImageArray.length; ++b) {
             const backgroundWidth = 272;
