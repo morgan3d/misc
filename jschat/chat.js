@@ -119,10 +119,10 @@ function keepAlive(dataConnection) {
 
 function startGuest() {
     console.log('startGuest');
-    let hostID = window.location.search.substring(1);
+    const hostID = window.location.search.substring(1);
     document.getElementById('urlbox').innerHTML = `You are the guest in room ${hostID}.`;
     
-    peer = new Peer();
+    const peer = new Peer();
 
     peer.on('error', function (err) {
         console.log('error in guest:', err);
@@ -172,7 +172,7 @@ function startHost() {
 
     // The peer must be created RIGHT before open is registered,
     // otherwise we could miss it.
-    peer = new Peer();
+    const peer = new Peer();
 
     peer.on('error', function (err) {
         console.log('error in host:', err);
@@ -234,11 +234,8 @@ function startHost() {
                    ); // peer.on('call')
         }); // startWebCam
     }); // peer.on('open')
-    
 }
 
-
-let peer;
 
 function main() {
     document.getElementById('urlbox').style.visibility = 'visible';                            

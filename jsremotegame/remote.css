@@ -1,0 +1,73 @@
+html, body { height: 100% }
+
+body {
+    position: fixed;
+    overflow: hidden;
+    overscroll-behavior: contain;
+    width: 100%;
+    top: 0;
+    margin: 0;
+    background-color: #4158D0;
+    background-image: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+    font-family: Arial;
+    font-size: 15px;
+    text-align: center;
+}
+
+#urlbox {
+    margin: auto;
+    background: #fff;
+    padding: 5px;
+    text-align: center;
+    line-height: 155%;
+    visibility: hidden;
+}
+
+#urlTextBox {
+    width: 400px;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+}
+
+.screen {
+    width: 768px;
+    height: 448px;
+    background: #000;
+    border: 8px solid #FFF;
+    border-radius: 5px;
+    margin-left: -384px;
+    top: 100px;
+    position: absolute;
+
+    touch-action: none;
+    /* Disable text selection */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+
+    /* Stop iOS from making the entire canvas gray when tapped */
+    -webkit-tap-highlight-color: transparent;
+
+    /* Prevent magnifying glass */
+    -webkit-touch-callout: none;
+
+    cursor: crosshair;
+    /* Force hardware acceleration */
+    transform: scale(1) translateZ(0) !important;
+    
+    image-rendering: optimizeSpeed;
+    image-rendering: -o-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: -moz-crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+
+    /* On Safari, the following works around blurring when resizing images
+       where their PARENT has a transform on it. */
+    transform: scale(1);
+    backface-visibility: hidden;
+}
