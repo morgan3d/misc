@@ -25,8 +25,8 @@ const width = 384;
 const height = 224;
 
 /* Set to true to force the client to try to clean up the image after
-   video decompression */
-const isPixelArt = true;
+   video decompression and disable bilinear interpolation. */
+const isPixelArt = false;//true;
 
 const peerConfig = {debug: 1};
 
