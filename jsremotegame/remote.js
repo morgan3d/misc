@@ -125,7 +125,9 @@ function startHost() {
         alert('canvas.captureStream() requires https, so this demo will not work on this server');
     }
     
-    screenStream = document.getElementById('screen').captureStream();//FRAMERATE_HZ);
+    // Setting the frame rate here increases latency. Instead, specify
+    // when the buffer has changed explicitly in the rendering routines.
+    screenStream = document.getElementById('screen').captureStream();
     
     if (true) {
         // Normally, remove the video on the host
@@ -177,7 +179,7 @@ function gameTick() {
     // display rate, and I want a 60 Hz locked. This is not the
     // optimal way to accomplish that; see the quadplay source for a
     // more precise example.
-    const callback = setTimeout(gameTick, 1000 / FRAMERATE_HZ);
+    const callback = setTimeout(gameTick, Math.floor(1000 / FRAMERATE_HZ));
      
     try {
         const context = document.getElementById('screen').getContext('2d');
