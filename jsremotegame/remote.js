@@ -24,6 +24,10 @@ const FRAMERATE_HZ = 60;
 const width = 384;
 const height = 224;
 
+/* Set to true to force the client to try to clean up the image after
+   video decompression */
+const isPixelArt = true;
+
 const peerConfig = {debug: 1};
 
 /* Milliseconds since epoch in UTC. Used for detecting when the last keepAlive
@@ -208,8 +212,27 @@ function startGuest() {
     document.getElementById('urlbox').innerHTML = `You are the guest in room ${hostID}.`;
     
     const peer = new Peer(generateUniqueID(), peerConfig);
-    
-    document.getElementById('screen').remove();
+
+    if (pixelArt) {
+        const screen = document.getElementById('screen');
+        const context = screen.getContext('2d');
+        const video = document.getElementById('video');
+        video.style.visibility = 'hidden';
+        
+        function drawVideo() {
+            context.drawImage(video, 0, 0, width, height);
+            // Run right before vsync to eliminate latency between the
+            // video update and the. This will overdraw if the monitor
+            // runs at higher than FRAMERATE_HZ, but the client isn't
+            // doing much work anyway.
+            requestAnimationFrame(drawVideo);
+        }
+
+        // Start the callback chain
+        drawVideo();
+    } else {
+        document.getElementById('screen').remove();
+    }
 
     peer.on('error', function (err) {
         console.log('error in guest:', err);
