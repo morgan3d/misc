@@ -120,7 +120,7 @@ function startHost() {
         const video = document.getElementById('video');
         video.style.top = '0px';
         video.style.right = '0px';
-        video.sourceObj = screenStream;
+        video.srcObject = screenStream;
     }
 
     // TODO: uncomment
