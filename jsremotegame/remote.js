@@ -19,7 +19,7 @@ const KEEP_ALIVE_MESSAGE = 'KEEP_ALIVE';
 // How many intervals can be missed before we drop connection
 const MISSABLE_INTERVALS = 10;
 
-const FRAMERATE_HZ = 60;
+const FRAMERATE_HZ = 120;
 
 const width = 384;
 const height = 224;
@@ -27,7 +27,7 @@ const height = 224;
 /* Set to true to force the client to try to clean up the image after
    video decompression and disable bilinear interpolation. This adds
    two frames of latency on Chrome, however. */
-const isPixelArt = false;//true;
+const isPixelArt = true;
 
 const peerConfig = {debug: 1};
 
@@ -125,7 +125,7 @@ function startHost() {
     
     screenStream = document.getElementById('screen').captureStream(FRAMERATE_HZ);
     
-    if (false) {
+    if (true) {
         // Normally, remove the video on the host
         document.getElementById('video').remove();
     } else {
@@ -223,12 +223,13 @@ function startGuest() {
         video.style.visibility = 'hidden';
         
         function drawVideo() {
+            setTimeout(drawVideo, 1000 / FRAMERATE_HZ);
+            //requestAnimationFrame(drawVideo);
             context.drawImage(video, 0, 0, width, height);
             // Run right before vsync to eliminate latency between the
-            // video update and the. This will overdraw if the monitor
+            // video update and the canvas update. This will overdraw if the monitor
             // runs at higher than FRAMERATE_HZ, but the client isn't
-            // doing much work anyway.
-            requestAnimationFrame(drawVideo);
+            // doing much work anyway.         
         }
 
         // Start the callback chain
