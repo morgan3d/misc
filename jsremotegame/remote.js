@@ -125,7 +125,7 @@ function startHost() {
     
     screenStream = document.getElementById('screen').captureStream(FRAMERATE_HZ);
     
-    if (true) {
+    if (false) {
         // Normally, remove the video on the host
         document.getElementById('video').remove();
     } else {
