@@ -112,9 +112,14 @@ let screenStream;
 function startHost() {
     console.log('startHost');
 
+    // The stream will fail silently when running on a non-https server
+    if (location.protocol !== 'https:') {
+        alert('canvas.captureStream() requires https, so this demo will not work on this server');
+    }
+    
     screenStream = document.getElementById('screen').captureStream(FRAMERATE_HZ);
     
-    if (false) {
+    if (true) {
         // Normally, remove the video on the host
         document.getElementById('video').remove();
     } else {
@@ -125,9 +130,6 @@ function startHost() {
         video.srcObject = screenStream;
     }
 
-    // TODO: uncomment
-/*
-    
     // The peer must be created RIGHT before open is registered,
     // otherwise we could miss it.
     const id = localStorage.getItem('id') || generateUniqueID();
@@ -155,7 +157,7 @@ function startHost() {
         });
         
     }); // peer.on('open')
-*/
+
     // Start the game loop
     gameTick();
 }
