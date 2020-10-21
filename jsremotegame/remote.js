@@ -214,6 +214,8 @@ function startGuest() {
     const peer = new Peer(generateUniqueID(), peerConfig);
 
     if (pixelArt) {
+        // Instead of showing the video directly, render it to the canvas
+        // and then clean up the bits and render back to the canvas.
         const screen = document.getElementById('screen');
         const context = screen.getContext('2d');
         const video = document.getElementById('video');
