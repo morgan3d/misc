@@ -213,7 +213,7 @@ function startGuest() {
     
     const peer = new Peer(generateUniqueID(), peerConfig);
 
-    if (pixelArt) {
+    if (isPixelArt) {
         // Instead of showing the video directly, render it to the canvas
         // and then clean up the bits and render back to the canvas.
         const screen = document.getElementById('screen');
