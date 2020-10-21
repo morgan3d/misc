@@ -19,7 +19,7 @@ const KEEP_ALIVE_MESSAGE = 'KEEP_ALIVE';
 // How many intervals can be missed before we drop connection
 const MISSABLE_INTERVALS = 10;
 
-const FRAMERATE_HZ = 10;// TODO 60;
+const FRAMERATE_HZ = 60;
 
 const width = 384;
 const height = 224;
