@@ -121,8 +121,8 @@ function startHost() {
     console.log('startHost');
 
     // The stream will fail silently when running on a non-https server
-    if (location.protocol !== 'https:') {
-        alert('canvas.captureStream() requires https, so this demo will not work on this server');
+    if (location.protocol === 'file:') {
+        alert('canvas.captureStream() requires http/https to avoid CORS violations, so this demo will not work on this server');
     }
     
     // Setting the frame rate here increases latency. Instead, specify

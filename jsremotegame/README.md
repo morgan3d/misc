@@ -9,6 +9,5 @@ Background sprites are based on public domain images by Luis Zuno [(@ansimuz)](h
 TODO:
 
 - Enable keepalive
-- Try using hardware acceleration to remove the pixelArt processing
-  latency
+- Enable events to move characters
 - Test latency on separate machines
