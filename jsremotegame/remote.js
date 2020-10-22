@@ -179,7 +179,7 @@ function gameTick() {
     // display rate, and I want a 60 Hz locked. This is not the
     // optimal way to accomplish that; see the quadplay source for a
     // more precise example.
-    const callback = setTimeout(gameTick, Math.floor(0.5 * 1000 / FRAMERATE_HZ));
+    const callback = setTimeout(gameTick, Math.floor(1000 / FRAMERATE_HZ));
      
     try {
         const context = document.getElementById('screen').getContext('2d');
@@ -227,13 +227,13 @@ function startGuest() {
         video.style.visibility = 'hidden';
         
         function drawVideo() {
-            setTimeout(drawVideo, 1000 / FRAMERATE_HZ);
-            //requestAnimationFrame(drawVideo);
+            //setTimeout(drawVideo, 1000 / FRAMERATE_HZ);
+            requestAnimationFrame(drawVideo);
             context.drawImage(video, 0, 0, width, height);
             // Run right before vsync to eliminate latency between the
             // video update and the canvas update. This will overdraw if the monitor
             // runs at higher than FRAMERATE_HZ, but the client isn't
-            // doing much work anyway.         
+            // doing much work anyway. 
         }
 
         // Start the callback chain
