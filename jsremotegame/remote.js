@@ -179,7 +179,7 @@ function gameTick() {
     // display rate, and I want a 60 Hz locked. This is not the
     // optimal way to accomplish that; see the quadplay source for a
     // more precise example.
-    const callback = setTimeout(gameTick, Math.floor(1000 / FRAMERATE_HZ));
+    const callback = setTimeout(gameTick, Math.floor(0.5 * 1000 / FRAMERATE_HZ));
      
     try {
         const context = document.getElementById('screen').getContext('2d');
