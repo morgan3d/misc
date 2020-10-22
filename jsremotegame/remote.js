@@ -27,9 +27,9 @@ const width = 384;
 const height = 224;
 
 /* Set to true to force the client to try to clean up the image after
-   video decompression and disable bilinear interpolation. This adds
-   two frames of latency on Chrome, however. */
-const isPixelArt = false;
+   video decompression and disable bilinear interpolation. In the current 
+   implementation this adds no latency. */
+const isPixelArt = true;
 
 const peerConfig = {debug: 1};
 
