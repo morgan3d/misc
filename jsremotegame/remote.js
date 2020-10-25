@@ -29,6 +29,8 @@ const height = 224;
 const isUIWebView = ! /chrome|firefox|safari|edge/i.test(navigator.userAgent) && /applewebkit/i.test(navigator.userAgent);  
 const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || isUIWebView;
 
+// polyfill for Safari
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 /* Set to true to force the client to try to clean up the image after
    video decompression and disable bilinear interpolation. In the current 
@@ -180,8 +182,8 @@ function startHost() {
     const peer = new Peer(id, peerConfig);
 
     peer.on('error', function (err) {
-        let msg = error + '.';
-        if (err.indexOf('concurrent user limit')) {
+        let msg = err + '.';
+        if (msg.indexOf('concurrent user limit')) {
             msg += ' The PeerJS Cloud is too popular right now. Try again in a little while.';
         }
         document.getElementById('urlbox').innerHTML = `Sorry. <span style="color:red">${msg}</span>`;
@@ -301,8 +303,8 @@ function startGuest() {
     }
 
     peer.on('error', function (err) {
-        let msg = error + '.';
-        if (err.indexOf('concurrent user limit')) {
+        let msg = err + '.';
+        if (msg.indexof('concurrent user limit')) {
             msg += ' The PeerJS Cloud is too popular right now. Try again in a little while.';
         }
         document.getElementById('urlbox').innerHTML = `Sorry. <span style="color:red">${msg}</span>`;
