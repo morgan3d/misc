@@ -19,3 +19,17 @@ Features
 - Connection quality warnings and automatic closing (WebRTC does not provide this directly)
 - Tested on Safari, Firefox, Chrome, and Edge on Windows and macOS Oct 2020
 
+
+Notes
+-------------------------------------------------
+
+The application is artificially limited to two people in the chat
+to simplify the UI and network setup. You can support multiple users
+by extending the host code to tell other peers about each other
+and then letting them connect individually into a fully-connected
+P2P network.
+
+Screensharing can be implemented in a browser via
+`navigator.mediaDevices.getDisplayMedia()`.  See
+https://github.com/peers/peerjs/issues/736 for examples of replacing
+the webcam with a screen track.

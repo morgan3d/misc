@@ -187,32 +187,35 @@ function peerErrorHandler(err) {
 
 function startHost() {
     console.log('startHost');
-
-    // polyfill for Safari
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    audioContext.resume();
-    getAudioBuffer('sound0.mp3').then(function (buffer) {
-        soundEffect = buffer;
-        console.log('loaded audio');
-    });
-    
     // The stream will fail silently due to cross-origin tainting on a
     // local file server.
     if (location.protocol === 'file:') {
         alert('canvas.captureStream() requires http/https to avoid CORS violations, so this demo will not work on this server');
     }
 
+    // Construct the audio, with a polyfill for Safari
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    // This should work because we're in an interactive event handler when called
+    audioContext.resume();
+    getAudioBuffer('sound0.mp3').then(function (buffer) {
+        soundEffect = buffer;
+        console.log('loaded audio');
+    });
+    
     // Create the video stream. Setting the frame rate here increases latency. Instead, specify
     // when the buffer has changed explicitly in the rendering routines.
     screenStream = document.getElementById('screen').captureStream();
 
     // Add the audio
+    
     // Mozilla example (didn't work on Firefox hosts many years ago; breaks Safari guests today):
     //screenStream.addTrack(audioContext.createMediaStreamDestination().stream.getAudioTracks()[0]);
 
     // Alternative example constructing a new stream from the tracks of the originals.
     // This breaks Safari guests and doesn't stream the audio for others.
-    //screenStream = new MediaStream([screenStream.getVideoTracks()[0], audioContext.createMediaStreamDestination().stream.getAudioTracks()[0]]);
+    //screenStream = new MediaStream([screenStream.getVideoTracks()[0],
+    //                                audioContext.createMediaStreamDestination().stream.getAudioTracks()[0]]);
     
     if (true) {
         // Normally, remove the video on the host
@@ -406,7 +409,7 @@ function startGuest() {
 }
 
 
-
+// Run from the first click, to avoid autoplay blocking
 function main() {
     document.getElementById('urlbox').style.visibility = 'visible';
     if (window.location.search !== '') {
