@@ -33,10 +33,10 @@ const isPixelArt = true;
 
 const peerConfig = {
     debug: 1,
-    /*host: "peer.???.org",
+    host: "peer.???.org",
     port: 9001,
     path: '/remoteplay',
-    key: 'remoteplay'*/
+    key: 'remoteplay'
 };
 
 const isUIWebView = ! /chrome|firefox|safari|edge/i.test(navigator.userAgent) && /applewebkit/i.test(navigator.userAgent);  
@@ -209,12 +209,22 @@ function startHost() {
 
     // Add the audio
     // Mozilla example (didn't work on Firefox hosts many years ago; breaks Safari guests today):
-    // screenStream.addTrack(audioContext.createMediaStreamDestination().stream.getAudioTracks()[0]);
+    //screenStream.addTrack(audioContext.createMediaStreamDestination().stream.getAudioTracks()[0].clone());
 
     // Alternative example constructing a new stream from the tracks of the originals.
     // This breaks Safari guests and doesn't stream the audio for others.
-    // screenStream = new MediaStream([screenStream.getVideoTracks()[0],
-    //                                audioContext.createMediaStreamDestination().stream.getAudioTracks()[0]]);
+    //screenStream = new MediaStream([screenStream.getVideoTracks()[0].clone(),
+    //                                audioContext.createMediaStreamDestination().stream.getAudioTracks()[0].clone()]);
+
+    // Another alternative, based on nes.party
+    /*
+    {
+        const audioDestination = audioContext.createMediaStreamDestination();
+        window.screenStream = screenStream; // prevent GC
+        window.audioDestination = audioDestination; // prevent GC
+        screenStream = new MediaStream(screenStream.getTracks().concat(audioDestination.stream.getTracks()));
+    }
+*/
     
     if (true) {
         // Normally, remove the video on the host
