@@ -35,7 +35,15 @@ const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || i
    implementation this adds no latency. */
 const isPixelArt = true;
 
-const peerConfig = {debug: 1};
+const peerConfig = {
+    debug: 1,
+    /*
+    host: "...",
+    port: 9001,
+    path: '/remoteplay',
+    key: 'remoteplay'
+    */
+};
 
 /* Milliseconds since epoch in UTC. Used for detecting when the last keepAlive
    was received. */
@@ -172,6 +180,11 @@ function startHost() {
     const peer = new Peer(id, peerConfig);
 
     peer.on('error', function (err) {
+        let msg = error + '.';
+        if (err.indexOf('concurrent user limit')) {
+            msg += ' The PeerJS Cloud is too popular right now. Try again in a little while.';
+        }
+        document.getElementById('urlbox').innerHTML = `Sorry. <span style="color:red">${msg}</span>`;
         console.log('error in host:', err);
     });
     
@@ -259,14 +272,17 @@ function startGuest() {
     
     const peer = new Peer(generateUniqueID(), peerConfig);
 
-    // On Safari, video will not update unless it is in a video element
-    if (isPixelArt && ! isSafari) {
+    if (isPixelArt) {
         // Instead of showing the video directly, render it to the canvas
         // and then clean up the bits and render back to the canvas.
         const screen = document.getElementById('screen');
         const context = screen.getContext('2d');
         const video = document.getElementById('video');
-        video.style.visibility = 'hidden';
+
+        // On Safari, video will not update unless the video element is in the
+        // DOM and visible, so we hide it behind the canvas instead of hiding
+        // it completely (which is friendlier to the browser compositor).
+        if (! isSafari) { video.style.visibility = 'hidden'; }
         
         function drawVideo() {
             //setTimeout(drawVideo, 1000 / FRAMERATE_HZ);
@@ -285,6 +301,11 @@ function startGuest() {
     }
 
     peer.on('error', function (err) {
+        let msg = error + '.';
+        if (err.indexOf('concurrent user limit')) {
+            msg += ' The PeerJS Cloud is too popular right now. Try again in a little while.';
+        }
+        document.getElementById('urlbox').innerHTML = `Sorry. <span style="color:red">${msg}</span>`;
         console.log('error in guest:', err);
     });
     
