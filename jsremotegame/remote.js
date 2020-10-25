@@ -26,12 +26,6 @@ const FRAMERATE_HZ = 60;
 const width = 384;
 const height = 224;
 
-const isUIWebView = ! /chrome|firefox|safari|edge/i.test(navigator.userAgent) && /applewebkit/i.test(navigator.userAgent);  
-const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || isUIWebView;
-
-// polyfill for Safari
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
 /* Set to true to force the client to try to clean up the image after
    video decompression and disable bilinear interpolation. In the current 
    implementation this adds no latency. */
@@ -46,6 +40,22 @@ const peerConfig = {
     key: 'remoteplay'
     */
 };
+
+const isUIWebView = ! /chrome|firefox|safari|edge/i.test(navigator.userAgent) && /applewebkit/i.test(navigator.userAgent);  
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || isUIWebView;
+
+/////////////////////////////////////////////////////////////////////////
+
+async function getAudioBuffer(url) {
+  const response = await fetch(url);
+  const arrayBuffer = await response.arrayBuffer();
+  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+  return audioBuffer;
+}    
+
+let audioContext;
+let soundEffect;
+
 
 /* Milliseconds since epoch in UTC. Used for detecting when the last keepAlive
    was received. */
@@ -134,7 +144,7 @@ function clipboardCopy(text) {
 // Only defined on the host
 let screenStream;
 
-const INSTRUCTIONS = 'Use the <b>←</b>, <b>→</b>, <b>A</b>, and <b>D</b> keys to move your character';
+const INSTRUCTIONS = 'Use the <b>←</b>, <b>→</b>, <b>A</b>, and <b>D</b> keys to move your character, <b>Spacebar</b> for sound.';
 
 let playerState = [{lt: false, rt: false, x: 134/2}, {lt: false, rt: false, x: width - 134/2}];
 
@@ -148,13 +158,44 @@ function processKeyEvent(player, type, keyCode) {
     case 37: case 65: // Left
         state.lt = type === 'keydown';
         break;
+
+    case 32: // Spacebar
+        if (type === 'keydown') {
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            if (soundEffect) {
+                const trackSource = audioContext.createBufferSource();
+                trackSource.buffer = soundEffect;
+                trackSource.connect(audioContext.destination);
+                trackSource.start();
+            } else {
+                console.log('audio not loaded yet');
+            }
+        }
+        break;
     }
+}
+
+function peerErrorHandler(err) {
+    let msg = err + '.';
+    if (msg.indexOf('concurrent user limit')) {
+        msg += ' The PeerJS Cloud is too popular right now. Try again in a little while.';
+    }
+    document.getElementById('urlbox').innerHTML = `Sorry. <span style="color:red">${msg}</span>`;
 }
 
 
 function startHost() {
     console.log('startHost');
 
+    // polyfill for Safari
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    getAudioBuffer('sound0.mp3').then(function (buffer) {
+        soundEffect = buffer;
+        console.log('loaded audio');
+    });
+    
     // The stream will fail silently when running on a non-https server
     if (location.protocol === 'file:') {
         alert('canvas.captureStream() requires http/https to avoid CORS violations, so this demo will not work on this server');
@@ -181,14 +222,7 @@ function startHost() {
     localStorage.setItem('id', id);
     const peer = new Peer(id, peerConfig);
 
-    peer.on('error', function (err) {
-        let msg = err + '.';
-        if (msg.indexOf('concurrent user limit')) {
-            msg += ' The PeerJS Cloud is too popular right now. Try again in a little while.';
-        }
-        document.getElementById('urlbox').innerHTML = `Sorry. <span style="color:red">${msg}</span>`;
-        console.log('error in host:', err);
-    });
+    peer.on('error', peerErrorHandler);
     
     peer.on('open', function(id) {
         console.log('host peer opened with id ' + id);
@@ -302,14 +336,7 @@ function startGuest() {
         document.getElementById('screen').remove();
     }
 
-    peer.on('error', function (err) {
-        let msg = err + '.';
-        if (msg.indexof('concurrent user limit')) {
-            msg += ' The PeerJS Cloud is too popular right now. Try again in a little while.';
-        }
-        document.getElementById('urlbox').innerHTML = `Sorry. <span style="color:red">${msg}</span>`;
-        console.log('error in guest:', err);
-    });
+    peer.on('error', peerErrorHandler);
     
     peer.on('open', function (id) {
         let alreadyAddedThisCall = false;
