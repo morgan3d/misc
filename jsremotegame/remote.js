@@ -26,6 +26,10 @@ const FRAMERATE_HZ = 60;
 const width = 384;
 const height = 224;
 
+const isUIWebView = ! /chrome|firefox|safari|edge/i.test(navigator.userAgent) && /applewebkit/i.test(navigator.userAgent);  
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || isUIWebView;
+
+
 /* Set to true to force the client to try to clean up the image after
    video decompression and disable bilinear interpolation. In the current 
    implementation this adds no latency. */
@@ -59,10 +63,18 @@ function generateUniqueID() {
     return prefix + number.toFixed(length).substring(2);
 }
 
+
 /* Perpetually send keep alive messages to this dataConnection, and listen for them
    coming back. getVideo() is a callback because the video may not be available right
    when the data connection is. */
-function keepAlive(dataConnection) {
+function keepAlive(dataConnection, setWarning, drop) {
+    dataConnection.messageHandlerArray = [];
+    dataConnection.on('data', function (message) {
+        for (let i = 0; i < dataConnection.messageHandlerArray.length; ++i) {
+            if (dataConnection.messageHandlerArray[i](message)) { return; }
+        }
+    });
+
     // Undefined until the first message comes in
     let lastTime = undefined;
 
@@ -76,6 +88,7 @@ function keepAlive(dataConnection) {
             console.log('lost connection. ', (currentTime - lastTime) / 1000, 'seconds without a keepAlive message.');
             // Ending the iterative callback chain should allow garbage collection to occur
             // and destroy all resources
+            drop && drop(dataConnection.peer);
         } else {
             // console.log('sent KEEP_ALIVE message');
             dataConnection.send(KEEP_ALIVE_MESSAGE);
@@ -83,21 +96,15 @@ function keepAlive(dataConnection) {
             // Show or hide the connection warning as appropriate. Note that the element might not exist
             // right at the beginning of the connection.
             const connectionIsBad = lastTime && (currentTime - lastTime >= 2 * KEEP_ALIVE_INTERVAL_MS);
-            /*
-            const warningElement = document.querySelector('#' + elementID + ' .warning');
-            if (warningElement) {
-                warningElement.style.visibility = connectionIsBad ? 'visible' : 'hidden';
-            }*/
+            setWarning && setWarning(dataConnection.peer, connectionIsBad);
 
             // Schedule the next ping
             setTimeout(ping, KEEP_ALIVE_INTERVAL_MS);
         }
     }
 
-    // Do not put these in dataConnection.on or they can fail due to a race condition
-    // with initialization and never run.
-    dataConnection.on('data', function (data) {
-        if (data === KEEP_ALIVE_MESSAGE) { lastTime = now(); }
+    dataConnection.messageHandlerArray.push(function (data) {
+        if (data === KEEP_ALIVE_MESSAGE) { lastTime = now(); return true; }
         // console.log('received data', data);
     });
 
@@ -116,6 +123,8 @@ function clipboardCopy(text) {
 
 // Only defined on the host
 let screenStream;
+
+let start = undefined;
 
 function startHost() {
     console.log('startHost');
@@ -161,9 +170,8 @@ function startHost() {
 
             console.log('calling the guest back with the stream');
             const mediaConnection = peer.call(dataConnection.peer, screenStream);
-            
-            // TODO
-            // keepAlive(dataConnection);
+
+            keepAlive(dataConnection);
         });
         
     }); // peer.on('open')
@@ -218,7 +226,8 @@ function startGuest() {
     
     const peer = new Peer(generateUniqueID(), peerConfig);
 
-    if (isPixelArt) {
+    // On Safari, video will not update unless it is in a video element
+    if (isPixelArt && ! isSafari) {
         // Instead of showing the video directly, render it to the canvas
         // and then clean up the bits and render back to the canvas.
         const screen = document.getElementById('screen');
@@ -284,11 +293,18 @@ function startGuest() {
         
         console.log('connect data to host');
         // This will trigger the host to call back with a mediaconnection as well
-        const dataConnection = peer.connect(hostID);
+        const dataConnection = peer.connect(hostID, {reliable: true, serialization: 'json'});
         dataConnection.on('open', function () {
             console.log('data connection to host established');
-            // TODO
-            //keepAlive(dataConnection);
+            keepAlive(dataConnection);
+
+            document.addEventListener('keydown', function (event) {
+                dataConnection.send({type: 'keydown'});
+            });
+            
+            document.addEventListener('keyup', function (event) {
+                dataConnection.send({type: 'keyup'});
+            });
         });
         
 
