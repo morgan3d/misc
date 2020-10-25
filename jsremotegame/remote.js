@@ -33,8 +33,7 @@ const isPixelArt = true;
 
 const peerConfig = {
     debug: 1,
-    /*
-    host: "peer.???.org",
+    /*host: "peer.???.org",
     port: 9001,
     path: '/remoteplay',
     key: 'remoteplay'*/
@@ -210,11 +209,11 @@ function startHost() {
 
     // Add the audio
     // Mozilla example (didn't work on Firefox hosts many years ago; breaks Safari guests today):
-    screenStream.addTrack(audioContext.createMediaStreamDestination().stream.getAudioTracks()[0]);
+    // screenStream.addTrack(audioContext.createMediaStreamDestination().stream.getAudioTracks()[0]);
 
     // Alternative example constructing a new stream from the tracks of the originals.
     // This breaks Safari guests and doesn't stream the audio for others.
-    //screenStream = new MediaStream([screenStream.getVideoTracks()[0],
+    // screenStream = new MediaStream([screenStream.getVideoTracks()[0],
     //                                audioContext.createMediaStreamDestination().stream.getAudioTracks()[0]]);
     
     if (true) {
