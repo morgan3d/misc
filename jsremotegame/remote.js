@@ -210,7 +210,7 @@ function startHost() {
 
     // Add the audio
     // Mozilla example (didn't work on Firefox hosts many years ago; breaks Safari guests today):
-    //screenStream.addTrack(audioContext.createMediaStreamDestination().stream.getAudioTracks()[0]);
+    screenStream.addTrack(audioContext.createMediaStreamDestination().stream.getAudioTracks()[0]);
 
     // Alternative example constructing a new stream from the tracks of the originals.
     // This breaks Safari guests and doesn't stream the audio for others.
@@ -377,6 +377,7 @@ function startGuest() {
                             alreadyAddedThisCall = true;
                             console.log('host answered');
                             document.getElementById('video').srcObject = hostStream;
+                            document.getElementById('audio').srcObject = hostStream;
                         } else {
                             console.log('rejected duplicate call');
                         }
