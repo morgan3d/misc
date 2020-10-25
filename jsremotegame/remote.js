@@ -33,7 +33,8 @@ const isPixelArt = true;
 
 const peerConfig = {
     debug: 1,
-    /*host: "peer.???.org",
+    /*
+    host: "peer.???.org",
     port: 9001,
     path: '/remoteplay',
     key: 'remoteplay'*/
@@ -208,7 +209,6 @@ function startHost() {
     screenStream = document.getElementById('screen').captureStream();
 
     // Add the audio
-    
     // Mozilla example (didn't work on Firefox hosts many years ago; breaks Safari guests today):
     //screenStream.addTrack(audioContext.createMediaStreamDestination().stream.getAudioTracks()[0]);
 
@@ -303,7 +303,8 @@ function gameTick() {
         context.font = "12px Arial";
         context.fillText("Frame " + frame, 10, 20);
 
-        screenStream.getVideoTracks()[0].requestFrame();
+        const videoTrack = screenStream.getVideoTracks()[0];
+        if (videoTrack) { videoTrack.requestFrame(); }
         ++frame;
     } catch (err) {
         // If anything goes wrong, stop the game
