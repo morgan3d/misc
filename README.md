@@ -49,7 +49,8 @@ JavaScript
 - **jsvectorify** - Vector operations and operator overloading. 2018.
 - **jsmenu** - Lightweight library for dropdown menus. 2018.
 - **jsloadmanager** - Caching and post-processing for recursive resource loading via XMLHttpRequest/fetch. 2018.
-- **jschat** - Minimal WebRTC video conference demo
+- **jschat** - Minimal WebRTC video conference reference code
+- **jsremotegame** - Minimal WebRTC Canvas + Audio + Input streaming reference code
 
 Java
 ==================================================================
