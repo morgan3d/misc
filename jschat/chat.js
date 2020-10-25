@@ -18,6 +18,21 @@ const KEEP_ALIVE_MESSAGE = 'KEEP_ALIVE';
 // How many intervals can be missed before we drop connection
 const MISSABLE_INTERVALS = 10;
 
+const peerConfig = {
+    debug: 1,/*
+    host: "peer.???.org",
+    port: 9001,
+    path: '/remoteplay',
+    key: 'remoteplay'*/
+};
+
+function generateUniqueID() {
+    const length = 8;
+    const prefix = 'xc';
+    const number = (Math.random() + (performance.now() % 1000) / 1000) % 1;
+    return prefix + number.toFixed(length).substring(2);
+}
+
 /* Milliseconds since epoch in UTC. Used for detecting when the last keepAlive
    was received. */
 function now() {
@@ -122,7 +137,7 @@ function startGuest() {
     const hostID = window.location.search.substring(1);
     document.getElementById('urlbox').innerHTML = `You are the guest in room ${hostID}.`;
     
-    const peer = new Peer();
+    const peer = new Peer(generateUniqueID(), peerConfig);
 
     peer.on('error', function (err) {
         console.log('error in guest:', err);
@@ -172,8 +187,10 @@ function startHost() {
 
     // The peer must be created RIGHT before open is registered,
     // otherwise we could miss it.
-    const peer = new Peer();
-
+    const id = localStorage.getItem('id') || generateUniqueID();
+    localStorage.setItem('id', id);
+    const peer = new Peer(id, peerConfig);
+    
     peer.on('error', function (err) {
         console.log('error in host:', err);
     });
