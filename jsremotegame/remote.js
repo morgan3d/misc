@@ -377,7 +377,6 @@ function startGuest() {
                             alreadyAddedThisCall = true;
                             console.log('host answered');
                             document.getElementById('video').srcObject = hostStream;
-                            document.getElementById('audio').srcObject = hostStream;
                         } else {
                             console.log('rejected duplicate call');
                         }
