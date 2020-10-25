@@ -32,11 +32,11 @@ const height = 224;
 const isPixelArt = true;
 
 const peerConfig = {
-    debug: 1,
+    debug: 1,/*
     host: "peer.???.org",
     port: 9001,
     path: '/remoteplay',
-    key: 'remoteplay'
+    key: 'remoteplay'*/
 };
 
 const isUIWebView = ! /chrome|firefox|safari|edge/i.test(navigator.userAgent) && /applewebkit/i.test(navigator.userAgent);  
