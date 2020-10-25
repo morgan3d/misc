@@ -33,12 +33,10 @@ const isPixelArt = true;
 
 const peerConfig = {
     debug: 1,
-    /*
-    host: "...",
+    /*host: "peer.???.org",
     port: 9001,
     path: '/remoteplay',
-    key: 'remoteplay'
-    */
+    key: 'remoteplay'*/
 };
 
 const isUIWebView = ! /chrome|firefox|safari|edge/i.test(navigator.userAgent) && /applewebkit/i.test(navigator.userAgent);  
@@ -178,8 +176,9 @@ function processKeyEvent(player, type, keyCode) {
 }
 
 function peerErrorHandler(err) {
-    let msg = err + '.';
-    if (msg.indexOf('concurrent user limit')) {
+    let msg = err + '';
+    if (! msg.endsWith('.')) { msg += '.'; }
+    if (msg.indexOf('concurrent user limit') !== -1) {
         msg += ' The PeerJS Cloud is too popular right now. Try again in a little while.';
     }
     document.getElementById('urlbox').innerHTML = `Sorry. <span style="color:red">${msg}</span>`;
@@ -191,20 +190,29 @@ function startHost() {
 
     // polyfill for Safari
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    audioContext.resume();
     getAudioBuffer('sound0.mp3').then(function (buffer) {
         soundEffect = buffer;
         console.log('loaded audio');
     });
     
-    // The stream will fail silently when running on a non-https server
+    // The stream will fail silently due to cross-origin tainting on a
+    // local file server.
     if (location.protocol === 'file:') {
         alert('canvas.captureStream() requires http/https to avoid CORS violations, so this demo will not work on this server');
     }
-    
-    // Setting the frame rate here increases latency. Instead, specify
+
+    // Create the video stream. Setting the frame rate here increases latency. Instead, specify
     // when the buffer has changed explicitly in the rendering routines.
     screenStream = document.getElementById('screen').captureStream();
-    screenStream.addTrack(audioContext.createMediaStreamDestination().stream.getAudioTracks()[0]);
+
+    // Add the audio
+    // Mozilla example (didn't work on Firefox hosts many years ago; breaks Safari guests today):
+    //screenStream.addTrack(audioContext.createMediaStreamDestination().stream.getAudioTracks()[0]);
+
+    // Alternative example constructing a new stream from the tracks of the originals.
+    // This breaks Safari guests and doesn't stream the audio for others.
+    //screenStream = new MediaStream([screenStream.getVideoTracks()[0], audioContext.createMediaStreamDestination().stream.getAudioTracks()[0]]);
     
     if (true) {
         // Normally, remove the video on the host
@@ -319,7 +327,9 @@ function startGuest() {
         // On Safari, video will not update unless the video element is in the
         // DOM and visible, so we hide it behind the canvas instead of hiding
         // it completely (which is friendlier to the browser compositor).
-        if (! isSafari) { video.style.visibility = 'hidden'; }
+        if (! isSafari) {
+            video.style.visibility = 'hidden';
+        }        
         
         function drawVideo() {
             //setTimeout(drawVideo, 1000 / FRAMERATE_HZ);

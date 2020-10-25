@@ -8,4 +8,4 @@ I haven't tested on Linux yet.
 
 TODO:
 
-- Audio reference code via https://stackoverflow.com/questions/39302814/mediastream-capture-canvas-and-audio-simultaneously
+- Fix audio not playing on the guest
