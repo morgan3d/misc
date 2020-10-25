@@ -124,7 +124,23 @@ function clipboardCopy(text) {
 // Only defined on the host
 let screenStream;
 
-let start = undefined;
+const INSTRUCTIONS = 'Use the <b>←</b>, <b>→</b>, <b>A</b>, and <b>D</b> keys to move your character';
+
+let playerState = [{lt: false, rt: false, x: 134/2}, {lt: false, rt: false, x: width - 134/2}];
+
+function processKeyEvent(player, type, keyCode) {
+    const state = playerState[player];
+    switch (keyCode) {
+    case 39: case 68: // Right
+        state.rt = type === 'keydown';
+        break;
+        
+    case 37: case 65: // Left
+        state.lt = type === 'keydown';
+        break;
+    }
+}
+
 
 function startHost() {
     console.log('startHost');
@@ -163,7 +179,7 @@ function startHost() {
         console.log('host peer opened with id ' + id);
         const url = location.href + '?' + id;
         document.getElementById('urlbox').innerHTML =
-            `You are the host. One guest can join at:<br><span style="white-space:nowrap; cursor: pointer; font-weight: bold" onclick="clipboardCopy('${url}')" title="Copy to Clipboard"><input title="Copy to Clipboard" type="text" value="${url}" id="urlTextBox">&nbsp;<b style="font-size: 125%">⧉</b></span>`;
+            `You are the host. One guest can join at:<br><span style="white-space:nowrap; cursor: pointer; font-weight: bold" onclick="clipboardCopy('${url}')" title="Copy to Clipboard"><input title="Copy to Clipboard" type="text" value="${url}" id="urlTextBox">&nbsp;<b style="font-size: 125%">⧉</b></span><br>${INSTRUCTIONS}`;
 
         peer.on('connection', function (dataConnection) {
             console.log('data connection to guest established');
@@ -172,12 +188,21 @@ function startHost() {
             const mediaConnection = peer.call(dataConnection.peer, screenStream);
 
             keepAlive(dataConnection);
+            dataConnection.messageHandlerArray.push(function (message) {
+                if (message && message.type && message.type.startsWith('key')) {
+                    processKeyEvent(1, message.type, message.keyCode);
+                }
+            });
         });
         
     }); // peer.on('open')
 
     // Start the game loop
     gameTick();
+
+    function handleEvent(event) { processKeyEvent(0, event.type, event.keyCode); }
+    document.addEventListener('keydown', handleEvent);
+    document.addEventListener('keyup', handleEvent);
 }
 
 let frame = 0;
@@ -201,9 +226,17 @@ function gameTick() {
         }
         context.fillStyle = '#333';
         context.fillRect(0, 200, 384, 24);
-    
-        context.drawImage(characterImageArray[0], 16 + 16 * Math.cos(frame * 0.02), height - 134);
-        context.drawImage(characterImageArray[1], width - 134 - (16 + 16 * Math.cos(frame * 0.03 + 1)), height - 134);
+
+        for (let p = 0; p < 2; ++p) {
+            const state = playerState[p];
+            if (state.lt && ! state.rt) {
+                state.x -= 3;
+            } else if (state.rt && ! state.lt) {
+                state.x += 3;
+            }
+            state.x = (state.x + width) % width;
+            context.drawImage(characterImageArray[p], state.x - 134 / 2, height - 134);
+        }
 
         context.fillStyle = '#dc0';
         context.font = "12px Arial";
@@ -222,7 +255,7 @@ function gameTick() {
 function startGuest() {
     console.log('startGuest');
     const hostID = window.location.search.substring(1);
-    document.getElementById('urlbox').innerHTML = `You are the guest in room ${hostID}.`;
+    document.getElementById('urlbox').innerHTML = `You are the guest in room ${hostID}.<br>${INSTRUCTIONS}`;
     
     const peer = new Peer(generateUniqueID(), peerConfig);
 
@@ -299,11 +332,11 @@ function startGuest() {
             keepAlive(dataConnection);
 
             document.addEventListener('keydown', function (event) {
-                dataConnection.send({type: 'keydown'});
+                dataConnection.send({type: 'keydown', keyCode: event.keyCode});
             });
             
             document.addEventListener('keyup', function (event) {
-                dataConnection.send({type: 'keyup'});
+                dataConnection.send({type: 'keyup', keyCode: event.keyCode});
             });
         });
         

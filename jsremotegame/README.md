@@ -7,7 +7,3 @@ Background sprites are based on public domain images by Luis Zuno [(@ansimuz)](h
 
 Image quality on the remote is substantially lower on Safari than on other browsers.
 
-
-TODO:
-
-- Enable events to move characters
