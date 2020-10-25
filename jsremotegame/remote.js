@@ -204,6 +204,7 @@ function startHost() {
     // Setting the frame rate here increases latency. Instead, specify
     // when the buffer has changed explicitly in the rendering routines.
     screenStream = document.getElementById('screen').captureStream();
+    screenStream.addTrack(audioContext.createMediaStreamDestination().stream.getAudioTracks()[0]);
     
     if (true) {
         // Normally, remove the video on the host
