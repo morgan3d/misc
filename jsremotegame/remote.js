@@ -1,5 +1,4 @@
 'use strict';
-
 /*
  From https://github.com/morgan3d/misc/
 
@@ -31,12 +30,12 @@ const height = 224;
    implementation this adds no latency. */
 const isPixelArt = true;
 
-const peerConfig = {
-    debug: 1,/*
+const peerConfig = true ? {} : {
+    debug: 1,
     host: "peer.???.org",
     port: 9001,
     path: '/remoteplay',
-    key: 'remoteplay'*/
+    key: 'remoteplay'
 };
 
 const isUIWebView = ! /chrome|firefox|safari|edge/i.test(navigator.userAgent) && /applewebkit/i.test(navigator.userAgent);  
@@ -165,7 +164,7 @@ function processKeyEvent(player, type, keyCode) {
             if (soundEffect) {
                 const trackSource = audioContext.createBufferSource();
                 trackSource.buffer = soundEffect;
-                trackSource.connect(audioContext.destination);
+                trackSource.connect(audioContext.gainNode);
                 trackSource.start();
             } else {
                 console.log('audio not loaded yet');
@@ -196,6 +195,11 @@ function startHost() {
     // Construct the audio, with a polyfill for Safari
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
+    audioContext.gainNode = audioContext.createGain();
+    // audioContext.gainNode.gain.value = 1;
+    audioContext.gainNode.connect(audioContext.destination);
+
+
     // This should work because we're in an interactive event handler when called
     audioContext.resume();
     getAudioBuffer('sound0.mp3').then(function (buffer) {
@@ -204,27 +208,15 @@ function startHost() {
     });
     
     // Create the video stream. Setting the frame rate here increases latency. Instead, specify
-    // when the buffer has changed explicitly in the rendering routines.
-    screenStream = document.getElementById('screen').captureStream();
+    // when the buffer has changed explicitly in the rendering routines. Setting the rate explicitly
+    // to 0 seems to improve Safari.
+    screenStream = document.getElementById('screen').captureStream(0);
 
-    // Add the audio
-    // Mozilla example (didn't work on Firefox hosts many years ago; breaks Safari guests today):
-    //screenStream.addTrack(audioContext.createMediaStreamDestination().stream.getAudioTracks()[0].clone());
-
-    // Alternative example constructing a new stream from the tracks of the originals.
-    // This breaks Safari guests and doesn't stream the audio for others.
-    //screenStream = new MediaStream([screenStream.getVideoTracks()[0].clone(),
-    //                                audioContext.createMediaStreamDestination().stream.getAudioTracks()[0].clone()]);
-
-    // Another alternative, based on nes.party
-    /*
     {
         const audioDestination = audioContext.createMediaStreamDestination();
-        window.screenStream = screenStream; // prevent GC
-        window.audioDestination = audioDestination; // prevent GC
+        audioContext.gainNode.connect(audioDestination);
         screenStream = new MediaStream(screenStream.getTracks().concat(audioDestination.stream.getTracks()));
     }
-*/
     
     if (true) {
         // Normally, remove the video on the host
@@ -386,6 +378,7 @@ function startGuest() {
                             alreadyAddedThisCall = true;
                             console.log('host answered');
                             document.getElementById('video').srcObject = hostStream;
+                            console.log(hostStream.getTracks());
                         } else {
                             console.log('rejected duplicate call');
                         }
@@ -428,3 +421,4 @@ function main() {
         startHost();
     }
 }
+
