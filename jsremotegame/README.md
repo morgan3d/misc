@@ -13,4 +13,8 @@ I haven't tested on Linux yet.
 
 TODO:
 
-- Fix streaming to a Safari guest
+- Safari doesn't work as a guest. It just gets that first frame and
+  then stops receiving (the incoming image appears to be transparent
+  black).
+- Video, but no audio, when using Safari as the host (to some other
+  browser as a guest.)
