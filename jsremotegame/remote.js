@@ -40,6 +40,7 @@ const peerConfig = true ? {} : {
 
 const isUIWebView = ! /chrome|firefox|safari|edge/i.test(navigator.userAgent) && /applewebkit/i.test(navigator.userAgent);  
 const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || isUIWebView;
+const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
 /////////////////////////////////////////////////////////////////////////
 
@@ -139,7 +140,7 @@ function clipboardCopy(text) {
 }
 
 // Only defined on the host
-let screenStream;
+let videoTrack;
 
 const INSTRUCTIONS = 'Use the <b>←</b>, <b>→</b>, <b>A</b>, and <b>D</b> keys to move your character, <b>Spacebar</b> for sound.';
 
@@ -209,13 +210,16 @@ function startHost() {
     
     // Create the video stream. Setting the frame rate here increases latency. Instead, specify
     // when the buffer has changed explicitly in the rendering routines. Setting the rate explicitly
-    // to 0 seems to improve Safari.
-    screenStream = document.getElementById('screen').captureStream(0);
+    // to 0 seems to improve Safari guests. On Firefox, requestFrame() doesn't work on the host
+    // so we have to allow auto streaming.
+    let screenStream = document.getElementById('screen').captureStream(isFirefox ? undefined : 0);
+    videoTrack = screenStream.getVideoTracks()[0];
 
-    {
+    if (true) {
         const audioDestination = audioContext.createMediaStreamDestination();
         audioContext.gainNode.connect(audioDestination);
-        screenStream = new MediaStream(screenStream.getTracks().concat(audioDestination.stream.getTracks()));
+        const audioTrack = audioDestination.stream.getAudioTracks()[0];
+        screenStream = new MediaStream([videoTrack, audioTrack]);
     }
     
     if (true) {
@@ -304,8 +308,7 @@ function gameTick() {
         context.font = "12px Arial";
         context.fillText("Frame " + frame, 10, 20);
 
-        const videoTrack = screenStream.getVideoTracks()[0];
-        if (videoTrack) { videoTrack.requestFrame(); }
+        if (videoTrack && videoTrack.requestFrame) { videoTrack.requestFrame(); }
         ++frame;
     } catch (err) {
         // If anything goes wrong, stop the game
@@ -328,6 +331,11 @@ function startGuest() {
         const screen = document.getElementById('screen');
         const context = screen.getContext('2d');
         const video = document.getElementById('video');
+
+        /*
+        video.style.left = '0px';
+        screen.style.right = '0px';
+        */
 
         // On Safari, video will not update unless the video element is in the
         // DOM and visible, so we hide it behind the canvas instead of hiding
@@ -422,3 +430,25 @@ function main() {
     }
 }
 
+
+function onLoad() {
+    if (window.location.search === '') {
+        // Start drawing on the host immediately based on this voodoo
+        // https://github.com/peers/peerjs/issues/594
+        const context = document.getElementById('screen').getContext('2d');
+        let count = 3;
+        
+        function prepare() {
+            if (--count > 0) {
+                setTimeout(prepare());
+            }
+            context.fillStyle = '#333';
+            for (let i = 0; i < 40; ++i) {
+                context.fillRect(Math.random() * width, Math.random() * height, 32, 32);
+                context.clearRect(0, 0, width, height);
+                context.fillRect(0, 0, 0, 0);
+            }
+        }
+        prepare();
+    }
+}

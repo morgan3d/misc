@@ -11,3 +11,6 @@ WebRTC, MediaStream, AudioContext, and PeerJS are very finicky. It took a lot of
 careful ordering of operations to make the code robust.
 I haven't tested on Linux yet.
 
+TODO:
+
+- Fix streaming to a Safari guest
