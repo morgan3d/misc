@@ -45,10 +45,18 @@ const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 /////////////////////////////////////////////////////////////////////////
 
 async function getAudioBuffer(url) {
-  const response = await fetch(url);
-  const arrayBuffer = await response.arrayBuffer();
-  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-  return audioBuffer;
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+    if (isSafari) {
+        // Work around "Unhandled Promise Rejection: TypeError: Not enough arguments"
+        return await new Promise(function (resolve, reject) {
+            audioContext.decodeAudioData(arrayBuffer, function (buffer) {
+                resolve(buffer);
+            });
+        });
+    } else {
+        return await audioContext.decodeAudioData(arrayBuffer);
+    }
 }    
 
 let audioContext;
@@ -195,6 +203,9 @@ function startHost() {
 
     // Construct the audio, with a polyfill for Safari
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (! audioContext.start) {
+        audioContext.start = audioContext.noteOn;
+    }
 
     audioContext.gainNode = audioContext.createGain();
     // audioContext.gainNode.gain.value = 1;
