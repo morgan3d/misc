@@ -11,8 +11,3 @@ WebRTC, MediaStream, AudioContext, and PeerJS are very finicky. It took a lot of
 careful ordering of operations to make the code robust.
 I haven't tested on Linux yet.
 
-TODO:
-
-- Safari doesn't work as a guest. It just gets that first frame and
-  then stops receiving (the incoming image appears to be transparent
-  black).

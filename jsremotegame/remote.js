@@ -208,9 +208,7 @@ function startHost() {
     }
 
     audioContext.gainNode = audioContext.createGain();
-    // audioContext.gainNode.gain.value = 1;
     audioContext.gainNode.connect(audioContext.destination);
-
 
     // This should work because we're in an interactive event handler when called
     audioContext.resume();
@@ -330,6 +328,11 @@ function gameTick() {
 
 
 function startGuest() {
+    const videoElement = document.getElementById('video');
+    if (isSafari) {
+        // Safari requires this, and it must be called from an event handler
+        videoElement.play();
+    }
     console.log('startGuest');
     const hostID = window.location.search.substring(1);
     document.getElementById('urlbox').innerHTML = `You are the guest in room ${hostID}.<br>${INSTRUCTIONS}`;
@@ -343,10 +346,8 @@ function startGuest() {
         const context = screen.getContext('2d');
         const video = document.getElementById('video');
 
-        /*
-        video.style.left = '0px';
-        screen.style.right = '0px';
-        */
+        // For debugging, look at the video itself
+        // video.style.left = '0px'; screen.style.right = '0px';
 
         // On Safari, video will not update unless the video element is in the
         // DOM and visible, so we hide it behind the canvas instead of hiding
@@ -396,8 +397,7 @@ function startGuest() {
                         if (! alreadyAddedThisCall) {
                             alreadyAddedThisCall = true;
                             console.log('host answered');
-                            document.getElementById('video').srcObject = hostStream;
-                            console.log(hostStream.getTracks());
+                            videoElement.srcObject = hostStream;
                         } else {
                             console.log('rejected duplicate call');
                         }
