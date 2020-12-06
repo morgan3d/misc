@@ -24,6 +24,10 @@ x = ++a;
 
 let a = 1, b = 2, c = 3; 
 let r = MAD(a, b, c);
+
+// Tests for new features:
+//const x = a ?? 1;
+//{...{a:1}}
 `;
 
 let dst = vectorify(src, {assignmentReturnsUndefined:true, scalarEscapes:true});

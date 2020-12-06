@@ -36,6 +36,13 @@ const peerConfig = true ? {} : {
     port: 9001,
     path: '/remoteplay',
     key: 'remoteplay'
+/*
+    debug: 1,
+    host: "???",
+    port: 3000,
+    path: '/quadplay',
+    key: 'peerjs'
+*/
 };
 
 const isUIWebView = ! /chrome|firefox|safari|edge/i.test(navigator.userAgent) && /applewebkit/i.test(navigator.userAgent);  
@@ -397,7 +404,16 @@ function startGuest() {
                         if (! alreadyAddedThisCall) {
                             alreadyAddedThisCall = true;
                             console.log('host answered');
+
+                            hostStream.addEventListener('addtrack', function (event) {
+                                if (event.track.kind !== 'video') { return; }
+                                const settings = hostStream.getVideoTracks()[0].getSettings();
+                                console.dir(hostStream);
+                                console.log(`incoming video is ${settings.width} x ${settings.height}`);
+                            });
+                            
                             videoElement.srcObject = hostStream;
+
                         } else {
                             console.log('rejected duplicate call');
                         }
