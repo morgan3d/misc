@@ -5,7 +5,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css?family=Play');
     body { font-family: 'Play', sans-serif; width: 800px; line-height: 120%; margin-left: auto; margin-right: auto; margin-top: 20px; color: #444; font-size: 14px}
-    input.slider { position:relative; top: 2px; width: 72px }
+    input.slider { position:relative; top: 2px; width: 56px }
     #display { font-family: 'Lucida Console', monospace; line-height:85%; letter-spacing: -0.75px; transform-origin: 0 0; color: #000; font-size: 14px }
     button  { font-family: 'Play', sans-serif; font-size: 0.9em; height: 26px }
   </style>
@@ -15,15 +15,16 @@
     <br>[<a href="maze.js">source code</a>]
   </center>
   <p>
-    The maze is always solvable. Every spot is reachable in the maze. With Shortcuts at minimum, there is a unique path. With Fill at maximum,
-    that path touches every cell.
+    The maze is always solvable. Every spot is reachable in the maze. With Shortcuts at minimum, there is a unique path. With Coverage at maximum,
+    that path touches every 2x2 block. When generated, the maze contains 2x2 blocks with the top-left corner always solid. It is then expanded
+    by the Hall and Wall size to alter the appearance.
   </p>
   <button onclick="regenerate()">Regen</button>
   <input style="margin-left:13px" type="checkbox" id="wrap" autocomplete="off" onchange="regenerate()"><label for="wrap">Tile</label>
   <span style="padding-left:16px">Shortcuts</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="imperfection">
-  <span style="padding-left:16px">Hall</span> <input class="slider" type="range" min="1" max="5" value="3" autocomplete="off" onchange="regenerate()" id="hallWidth">
-  <span style="padding-left:16px">Wall</span> <input class="slider" type="range" min="1" max="8" value="1" autocomplete="off" onchange="regenerate()" id="wallWidth">
-  <span style="padding-left:16px">Fill</span> <input class="slider" type="range" min="0" max="100" value="100" autocomplete="off" onchange="regenerate()" id="fill">
+  <span style="padding-left:16px">Hall&nbsp;Size</span> <input class="slider" type="range" min="1" max="5" value="3" autocomplete="off" onchange="regenerate()" id="hallWidth">
+  <span style="padding-left:16px">Wall&nbsp;Size</span> <input class="slider" type="range" min="1" max="8" value="1" autocomplete="off" onchange="regenerate()" id="wallWidth">
+  <span style="padding-left:16px">Coverage</span> <input class="slider" type="range" min="0" max="100" value="100" autocomplete="off" onchange="regenerate()" id="fill">
   <span style="padding-left:16px">Rooms</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="rooms">
 
   <div style="display: inline-block">
