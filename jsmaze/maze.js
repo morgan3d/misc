@@ -1,5 +1,5 @@
 /** Creates a w x h maze with corridors of 0 and walls of 255 expressed
-    as an array of arrays using floodfill.
+    as an array of arrays using flood filling (breadth first search).
 
     If wrap is true, then the maze is on a torus. Otherwise it is on a rectangle.
 
@@ -7,7 +7,8 @@
     is zero. The maximum is 1.
 
     Fill is how much of the space (very roughly) the maze should fill. 1.0 fills the entire
-    space. 0.0 gives a very thin and stringy result.
+    space. 0.0 gives a very thin and stringy result. 
+    Straightness is a measure of how much to favor straight corridors from 0.0 to 1.0.
 
     The deadEndArray will have the coordinates of all dead ends appended. These are good
     locations to generate rooms when fill is very low. If imperfect > 0 then there is a small
@@ -19,7 +20,7 @@
 
     BSD License
 */
-function makeMaze(w, h, wrap, imperfect, fill, deadEndArray) {
+function makeMaze(w, h, straightness, wrap, imperfect, fill, deadEndArray) {
     const SOLID = 255, RESERVED = 127, EMPTY = 0;
     let random = Math.random, floor = Math.floor;
 
@@ -87,6 +88,20 @@ function makeMaze(w, h, wrap, imperfect, fill, deadEndArray) {
 
             // Fisher-Yates shuffle directions
             shuffle(directions);
+
+            // Prioritize a straight line. Note that cur.step is a
+            // pointer to one of the directions, so we can use pointer
+            // equality to find it.
+            if (random() < straightness) {
+                for (let i = 0; i < 4; ++i) {
+                    if (directions[i] === cur.step) {
+                        // Swap with the last
+                        directions[i] = directions[3];
+                        directions[3] = cur.step;
+                        break;
+                    }
+                }
+            }
             
             // Push neighbors if not visited
             let deadEnd = true;

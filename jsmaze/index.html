@@ -4,10 +4,11 @@
   <script src="maze.js?"></script>
   <style>
     @import url('https://fonts.googleapis.com/css?family=Play');
-    body { font-family: 'Play', sans-serif; width: 800px; line-height: 120%; margin-left: auto; margin-right: auto; margin-top: 20px; color: #444; font-size: 14px}
-    input.slider { position:relative; top: 2px; width: 56px }
+    body { font-family: 'Play', sans-serif; width: 850px; line-height: 120%; margin-left: auto; margin-right: auto; margin-top: 20px; color: #444; font-size: 14px}
+    input.slider { position:relative; top: 4px; width: 50px }
     #display { font-family: 'Lucida Console', monospace; line-height:85%; letter-spacing: -0.75px; transform-origin: 0 0; color: #000; font-size: 14px }
     button  { font-family: 'Play', sans-serif; font-size: 0.9em; height: 26px }
+    #preset button { width: 80px }
   </style>
   
   <center>
@@ -19,9 +20,22 @@
     that path touches every 2x2 block. When generated, the maze contains 2x2 blocks with the top-left corner always solid. It is then expanded
     by the Hall and Wall size to alter the appearance.
   </p>
-  <button onclick="regenerate()">Regen</button>
-  <input style="margin-left:13px" type="checkbox" id="wrap" autocomplete="off" onchange="regenerate()"><label for="wrap">Tile</label>
+  <div id="preset">
+  Presets:
+  <button onclick="preset(false, 0.00, 0.00, 3, 1, 1.00, 0.00)">Labyrinth</button>
+  <button onclick="preset(false, 0.00, 0.00, 1, 4, 0.20, 1.00)">Catacombs</button>
+  <button onclick="preset(false, 0.00, 0.00, 1, 2, 1.00, 0.15)">Hedge</button>
+  <button onclick="preset(false, 0.25, 0.00, 6, 1, 0.10, 0.50)">Palace</button>
+  <button onclick="preset(false, 0.75, 0.50, 1, 1, 0.15, 1.00)">Fortress</button>
+  <button onclick="preset(false, 0.05, 0.90, 1, 4, 0.20, 1.00)">Suburb</button>
+  <button onclick="preset(false, 1.00, 0.00, 1, 3, 0.50, 1.00)">City</button>
+  <button onclick="preset(true,  0.25, 0.80, 6, 1, 1.00, 0.00)">PAC-MAN</button>
+  </div>
+  <hr noshade>
+  <button onclick="regenerate()"><div style="transform: rotate(45deg); font-weight: bold; font-size: 120%">↻</div></button>
+  <input type="checkbox" id="wrap" autocomplete="off" onchange="regenerate()" style="margin-right:2px"><label style="margin-right:-8px" for="wrap">Tile</label>
   <span style="padding-left:16px">Shortcuts</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="imperfection">
+  <span style="padding-left:16px">Straight</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="straightness">
   <span style="padding-left:16px">Hall&nbsp;Size</span> <input class="slider" type="range" min="1" max="5" value="3" autocomplete="off" onchange="regenerate()" id="hallWidth">
   <span style="padding-left:16px">Wall&nbsp;Size</span> <input class="slider" type="range" min="1" max="8" value="1" autocomplete="off" onchange="regenerate()" id="wallWidth">
   <span style="padding-left:16px">Coverage</span> <input class="slider" type="range" min="0" max="100" value="100" autocomplete="off" onchange="regenerate()" id="fill">
@@ -32,7 +46,18 @@
   </div>
   
   <script>
-      function regenerate() {
+    function preset(tile, shortcuts, straightness, hall, wall, coverage, rooms) {
+        document.getElementById("wrap").checked = tile;
+        document.getElementById("imperfection").value = shortcuts * 100;
+        document.getElementById("hallWidth").value = hall;
+        document.getElementById("wallWidth").value = wall;
+        document.getElementById("fill").value = coverage * 100;
+        document.getElementById("rooms").value = rooms * 100;
+        document.getElementById("straightness").value = straightness * 100;
+        regenerate();
+    }
+    
+    function regenerate() {
          let wrap = document.getElementById("wrap").checked !== false;
          let imperfection = parseInt(document.getElementById("imperfection").value) / 100;
          let fill = parseInt(document.getElementById("fill").value) / 100;
@@ -40,9 +65,10 @@
          let hallWidth = parseInt(document.getElementById("hallWidth").value);
          let wallWidth = parseInt(document.getElementById("wallWidth").value);
          let rooms = parseInt(document.getElementById("rooms").value) / 100;
+         let straightness = parseInt(document.getElementById("straightness").value) / 100;
 
          let deadEndArray = [];
-         let maze = makeMaze(104, 60, wrap, imperfection, fill, deadEndArray);
+         let maze = makeMaze(112, 60, straightness, wrap, imperfection, fill, deadEndArray);
          let map = mazeToMap(maze, hallWidth, wallWidth);
 
          if (rooms > 0) {
