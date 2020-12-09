@@ -5,7 +5,9 @@
   <style>
     @import url('https://fonts.googleapis.com/css?family=Play');
     body { font-family: 'Play', sans-serif; width: 850px; line-height: 120%; margin-left: auto; margin-right: auto; margin-top: 20px; color: #444; font-size: 14px}
-    input.slider { position:relative; top: 4px; width: 50px }
+    label {margin-left: 4px; margin-right: 20px; position: relative; top: -2px}
+    input.checkbox { margin-left: -5px } 
+    input.slider { position:relative; top: 4px; width: 55px }
     #display { font-family: 'Lucida Console', monospace; line-height:85%; letter-spacing: -0.75px; transform-origin: 0 0; color: #000; font-size: 14px }
     button  { font-family: 'Play', sans-serif; font-size: 0.9em; height: 26px }
     #preset button { width: 90px }
@@ -22,32 +24,37 @@
   </p>
   <div id="preset">
   Presets:
-  <button onclick="preset(false, 0.00, 0.00, 3, 1, 1.00, 0.00)">Labyrinth</button>
-  <button onclick="preset(false, 0.00, 0.00, 1, 4, 0.20, 1.00)">Catacombs</button>
-  <button onclick="preset(false, 0.00, 0.00, 1, 2, 1.00, 0.15)">Hedge</button>
-  <button onclick="preset(false, 0.25, 0.00, 6, 1, 0.10, 0.50)">Palace</button>
-  <button onclick="preset(false, 0.75, 0.50, 1, 1, 0.15, 1.00)">Fortress</button>
-  <button onclick="preset(false, 0.05, 0.90, 1, 4, 0.20, 1.00)">Suburb</button>
-  <button onclick="preset(false, 1.00, 0.00, 1, 3, 0.50, 1.00)">City</button>
-  <button onclick="preset(true,  0.25, 0.80, 6, 1, 1.00, 0.00)">PAC-MAN</button>
+  <button onclick="preset(false, false, false, 0.00, 0.00, 3, 1, 1.00, 0.00)">Labyrinth</button>
+  <button onclick="preset(false, false, false, 0.00, 0.00, 1, 4, 0.20, 1.00)">Catacombs</button>
+  <button onclick="preset(false, false, false, 0.00, 0.00, 1, 2, 1.00, 0.15)">Hedge</button>
+  <button onclick="preset(false, false, false, 0.25, 0.00, 6, 1, 0.10, 0.50)">Palace</button>
+  <button onclick="preset(false, false, false, 0.75, 0.50, 1, 1, 0.15, 1.00)">Fortress</button>
+  <button onclick="preset(false, false, false, 0.05, 0.90, 1, 4, 0.20, 1.00)">Suburb</button>
+  <button onclick="preset(true,  false, false, 1.00, 0.00, 1, 3, 0.50, 1.00)">City</button>
+  <button onclick="preset(true,  true, false, 0.25, 0.80, 6, 1, 1.00, 0.00)">PAC-MAN</button>
   </div>
   <hr noshade>
-  <button onclick="regenerate()"><div style="transform: rotate(45deg); font-weight: bold; font-size: 120%">↻</div></button>
-  <input type="checkbox" id="wrap" autocomplete="off" onchange="regenerate()" style="margin-right:2px"><label style="margin-right:-8px" for="wrap">Tile</label>
-  <span style="padding-left:16px">Shortcuts</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="imperfection">
+  <button onclick="regenerate()" style="height:40px; width: 40px; margin-right: 10px"><div style="transform: rotate(45deg); font-size: 200%">↻</div></button>
+  <div style="display:inline-block; position: relative; top: 5px">
+  <input type="checkbox" id="wrap" autocomplete="off" onchange="regenerate()"><label for="wrap">Tile</label>
+  <input type="checkbox" id="hsymmetry" autocomplete="off" onchange="regenerate()"><label for="hsymmetry">Mirror Horizontally</label>
+  <input type="checkbox" id="vsymmetry" autocomplete="off" onchange="regenerate()"><label for="vsymmetry">Mirror Vertically</label>
+  <br><span>Shortcuts</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="imperfection">
   <span style="padding-left:16px">Straight</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="straightness">
   <span style="padding-left:16px">Hall&nbsp;Size</span> <input class="slider" type="range" min="1" max="5" value="3" autocomplete="off" onchange="regenerate()" id="hallWidth">
   <span style="padding-left:16px">Wall&nbsp;Size</span> <input class="slider" type="range" min="1" max="8" value="1" autocomplete="off" onchange="regenerate()" id="wallWidth">
   <span style="padding-left:16px">Coverage</span> <input class="slider" type="range" min="0" max="100" value="100" autocomplete="off" onchange="regenerate()" id="fill">
   <span style="padding-left:16px">Rooms</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="rooms">
-
+  </div>
   <div style="display: inline-block">
     <pre id="display"></pre>
   </div>
   
   <script>
-    function preset(tile, shortcuts, straightness, hall, wall, coverage, rooms) {
+    function preset(tile, hsymmetry, vsymmetry, shortcuts, straightness, hall, wall, coverage, rooms) {
         document.getElementById("wrap").checked = tile;
+        document.getElementById("hsymmetry").checked = hsymmetry;
+        document.getElementById("vsymmetry").checked = vsymmetry;
         document.getElementById("imperfection").value = shortcuts * 100;
         document.getElementById("hallWidth").value = hall;
         document.getElementById("wallWidth").value = wall;
@@ -59,6 +66,8 @@
     
     function regenerate() {
          let wrap = document.getElementById("wrap").checked !== false;
+         let hSymmetry = document.getElementById("hsymmetry").checked !== false;
+         let vSymmetry = document.getElementById("vsymmetry").checked !== false;
          let imperfection = parseInt(document.getElementById("imperfection").value) / 100;
          let fill = parseInt(document.getElementById("fill").value) / 100;
 
@@ -68,7 +77,7 @@
          let straightness = parseInt(document.getElementById("straightness").value) / 100;
 
          let deadEndArray = [];
-         let maze = makeMaze(112, 60, straightness, wrap, imperfection, fill, deadEndArray);
+         let maze = makeMaze(112, 60, straightness, wrap, imperfection, fill, hSymmetry, vSymmetry, deadEndArray);
          let map = mazeToMap(maze, hallWidth, wallWidth);
 
          if (rooms > 0) {
@@ -80,8 +89,8 @@
          display.style.transform = "scale(" + scale + "," + (scale * 0.7) + ")";
          display.style.textShadow = "" + (1.5 / scale) + "px " + (2 / scale) + "px " + (5 / scale) + "px rgba(0,0,0,0.35)";
 
-         let hsl = "" + (Math.random() * 360) + ",40%,70%";
-         display.style.background = "linear-gradient(to bottom, hsla(" + hsl + ",0.1) 0%, hsla(" + hsl + ",1) 100%)";
+         let hsl = "" + (Math.random() * 360) + ",70%,70%";
+         display.style.background = "linear-gradient(to bottom, hsla(" + hsl + ",0.1) 0%, hsla(" + hsl + ",0.25) 45%, hsla(" + hsl + ",1) 100%)";
          display.innerHTML = mapToString(map);
       }
       regenerate();
