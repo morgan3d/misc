@@ -20,7 +20,7 @@
 
     BSD License
 */
-function makeMaze(w, h, straightness, wrap, imperfect, fill, hSymmetry, vSymmetry, deadEndArray) {
+function makeMaze(w, h, straightness, wrap, imperfect, fill, deadEndArray) {
     const SOLID = 255, RESERVED = 127, EMPTY = 0;
     let random = Math.random, floor = Math.floor;
 
@@ -37,15 +37,12 @@ function makeMaze(w, h, straightness, wrap, imperfect, fill, hSymmetry, vSymmetr
     if (fill === undefined) { fill = 1; }
     let reserveProb = (1 - Math.min(Math.max(0, fill * 0.9 + 0.1), 1))**1.6;
 
-    // Used for symmetry
-    let pad = 0;
     if (wrap) {
         // Ensure even size
         w += w & 1; h += h & 1;
     } else {
         // Ensure odd size
         w += ~(w & 1); h += ~(h & 1);
-        pad = 1;
     }
 
     // Allocate and initialize to solid
@@ -82,29 +79,11 @@ function makeMaze(w, h, straightness, wrap, imperfect, fill, hSymmetry, vSymmetr
         // Unvisited?
         if (unexplored(cur.x, cur.y)) {
 
-            {
-                // Mark visited
-                let x = cur.x, y = cur.y;
-
-                for (let i = 0; i < 2; ++i) {
-                    maze[x][y] = EMPTY;
-                    
-                    if (hSymmetry) {
-                        maze[w - pad - x][y] = EMPTY;
-                        if (vSymmetry) {
-                            maze[w - pad - x][h - pad - y] = EMPTY;
-                        }
-                    }
-                    
-                    if (vSymmetry) {
-                        maze[x][h - pad - y] = EMPTY;
-                    }
-                    
-                    // Carve the wall back towards the source
-                    x = (cur.x - cur.step.x + w) % w;
-                    y = (cur.y - cur.step.y + h) % h;
-                }
-            }
+            // Mark visited
+            maze[cur.x][cur.y] = EMPTY;
+            
+            // Carve the wall back towards the source
+            maze[(cur.x - cur.step.x + w) % w][(cur.y - cur.step.y + h) % h] = EMPTY;
             --ignoreReserved;
 
             // Fisher-Yates shuffle directions

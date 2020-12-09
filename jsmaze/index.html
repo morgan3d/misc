@@ -20,7 +20,7 @@
   <p>
     The maze is always solvable. Every spot is reachable in the maze. With Shortcuts at minimum, there is a unique path. With Coverage at maximum,
     that path touches every 2x2 block. When generated, the maze contains 2x2 blocks with the top-left corner always solid. It is then expanded
-    by the Hall and Wall size to alter the appearance.
+    by the Hall and Wall size to alter the appearance. Mirroring breaks most of these guarantees.
   </p>
   <div id="preset">
   Presets:
@@ -77,11 +77,29 @@
          let straightness = parseInt(document.getElementById("straightness").value) / 100;
 
          let deadEndArray = [];
-         let maze = makeMaze(112, 60, straightness, wrap, imperfection, fill, hSymmetry, vSymmetry, deadEndArray);
+         let maze = makeMaze(112, 60, straightness, wrap, imperfection, fill, deadEndArray);
          let map = mazeToMap(maze, hallWidth, wallWidth);
 
          if (rooms > 0) {
             addMapRooms(map, deadEndArray, rooms, hallWidth, wallWidth);
+         }
+
+         const offset = wrap ? 2 : 1;
+         const w = map.length;
+         const h = map[0].length;
+         if (hSymmetry) {
+             for (let y = 0; y < h; ++y) {
+                 for (let x = 0; x < w / 2; ++x) {
+                     map[w - offset - x][y] = map[x][y];
+                 }
+             }
+         }
+         if (vSymmetry) {
+             for (let x = 0; x < w; ++x) {
+                 for (let y = 0; y < h / 2; ++y) {
+                     map[x][h - offset - y] = map[x][y];
+                 }
+             }
          }
       
          let display = document.getElementById("display");
