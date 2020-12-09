@@ -10,7 +10,7 @@
     input.slider { position:relative; top: 4px; width: 55px }
     #display { font-family: 'Lucida Console', monospace; line-height:85%; letter-spacing: -0.75px; transform-origin: 0 0; color: #000; font-size: 14px }
     button  { font-family: 'Play', sans-serif; font-size: 0.9em; height: 26px }
-    #preset button { width: 75px }
+    #preset button { width: 74px }
   </style>
   
   <center>
@@ -22,8 +22,7 @@
     that path touches every 2x2 block. When generated, the maze contains 2x2 blocks with the top-left corner always solid. It is then expanded
     by the Hall and Wall size to alter the appearance. Mirroring breaks most of these guarantees.
   </p>
-  <div id="preset">
-  Presets:
+  <center id="preset">
   <button onclick="preset(false, false, false, 0.00, 0.00, 3, 1, 1.00, 0.00)">Labyrinth</button>
   <button onclick="preset(false, false, false, 0.00, 0.00, 1, 4, 0.20, 1.00)">Catacombs</button>
   <button onclick="preset(false, false, false, 0.00, 0.00, 1, 2, 1.00, 0.15)">Hedge</button>
@@ -34,7 +33,8 @@
   <button onclick="preset(true,  true,  false, 0.25, 0.80, 6, 1, 1.00, 0.00)">PAC-MAN</button>
   <button onclick="preset(true,  true,  false, 0.90, 0.10, 3, 1, 0.12, 1.00)">Starship</button>
   <button onclick="preset(true,  true,  true,  1.00, 0.95, 1, 1, 0.60, 1.00)">Garden</button>
-  </div>
+  <button onclick="preset(false, true,  false, 0.20, 1.00, 2, 1, 0.50, 0.10)">Forbidden</button>
+  </center>
   <hr noshade>
   <button onclick="regenerate()" style="height:40px; width: 40px; margin-right: 10px"><div style="transform: rotate(45deg); font-size: 200%">↻</div></button>
   <div style="display:inline-block; position: relative; top: 5px">
