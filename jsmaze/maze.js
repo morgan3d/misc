@@ -20,7 +20,7 @@
 
     BSD License
 */
-function makeMaze(w, h, straightness, wrap, imperfect, fill, deadEndArray) {
+function makeMaze(w, h, straightness, wrap, hSymmetry, vSymmetry, imperfect, fill, deadEndArray) {
     const SOLID = 255, RESERVED = 127, EMPTY = 0;
     let random = Math.random, floor = Math.floor;
 
@@ -73,6 +73,7 @@ function makeMaze(w, h, straightness, wrap, imperfect, fill, deadEndArray) {
         return (c === SOLID) || ((c === RESERVED) && (ignoreReserved > 0));
     }
 
+    const borderOffset = wrap ? 0 : 1;
     while (stack.length) {
         let cur = stack.pop();
 
@@ -80,10 +81,29 @@ function makeMaze(w, h, straightness, wrap, imperfect, fill, deadEndArray) {
         if (unexplored(cur.x, cur.y)) {
 
             // Mark visited
-            maze[cur.x][cur.y] = EMPTY;
+            let x = cur.x, y = cur.y;
+
+            // When generating, apply symmetry. We'll later mirror for
+            // rooms and scattered shortcuts, but doing it here as well ensures that
+            // the primary corridors cross the centerline well.
+            for (let repeat = 0; repeat < 2; ++repeat) {
+                maze[x][y] = EMPTY;
+                if (hSymmetry) {
+                    maze[w - x - borderOffset][y] = EMPTY;
+                    if (vSymmetry) {
+                        maze[w - x - borderOffset][h - y - borderOffset] = EMPTY;
+                    }
+                }
+                if (vSymmetry) {
+                    maze[x][h - y - borderOffset] = EMPTY;
+                }                
             
-            // Carve the wall back towards the source
-            maze[(cur.x - cur.step.x + w) % w][(cur.y - cur.step.y + h) % h] = EMPTY;
+                // Carve the wall back towards the source
+                // for the 2nd iteration
+                x = (cur.x - cur.step.x + w) % w;
+                y = (cur.y - cur.step.y + h) % h;
+            }
+            
             --ignoreReserved;
 
             // Fisher-Yates shuffle directions
