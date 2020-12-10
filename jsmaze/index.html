@@ -96,8 +96,8 @@ function regenerate() {
   <style>
     @import url('https://fonts.googleapis.com/css?family=Play');
     body { font-family: 'Play', sans-serif; width: 850px; line-height: 120%; margin-left: auto; margin-right: auto; margin-top: 20px; color: #444; font-size: 14px}
-    label {margin-left: 4px; margin-right: 20px; position: relative; top: -2px}
-    input.checkbox { margin-left: -5px } 
+    label {margin-right: 15px}
+    input[type=checkbox] { position: relative; top: 2px} 
     input.slider { position:relative; top: 4px; width: 55px }
     #display { font-family: 'Lucida Console', monospace; line-height:85%; letter-spacing: -0.75px; transform-origin: 0 0; color: #000; font-size: 14px }
     button  { font-family: 'Play', sans-serif; font-size: 0.9em; height: 26px }
@@ -129,10 +129,11 @@ function regenerate() {
   <hr noshade>
   <button onclick="regenerate()" style="height:40px; width: 40px; margin-right: 10px"><div style="transform: rotate(45deg); font-size: 200%">↻</div></button>
   <div style="display:inline-block; position: relative; top: 5px">
-    <input type="checkbox" id="hwrap" autocomplete="off" onchange="regenerate()"><label for="hwrap">Horizontal Tile</label>
-    <input type="checkbox" id="hsymmetry" autocomplete="off" onchange="regenerate()"><label for="hsymmetry">Mirror Horizontally</label>
-    <input type="checkbox" id="vwrap" autocomplete="off" onchange="regenerate()"><label for="vwrap">Vertical Tile</label>
-    <input type="checkbox" id="vsymmetry" autocomplete="off" onchange="regenerate()"><label for="vsymmetry">Mirror Vertically</label>
+    Horizontal: <input type="checkbox" id="hwrap" autocomplete="off" onchange="regenerate()"><label for="hwrap">Tile</label>
+    <input type="checkbox" id="hsymmetry" autocomplete="off" onchange="regenerate()"><label for="hsymmetry">Mirror</label>
+    &nbsp;&nbsp;&nbsp;&nbsp; Vertical:
+    <input type="checkbox" id="vwrap" autocomplete="off" onchange="regenerate()"><label for="vwrap">Tile</label>
+    <input type="checkbox" id="vsymmetry" autocomplete="off" onchange="regenerate()"><label for="vsymmetry">Mirror</label>
   <br><span>Shortcuts</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="imperfection">
   <span style="padding-left:16px">Straight</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="straightness">
   <span style="padding-left:16px">Hall&nbsp;Size</span> <input class="slider" type="range" min="1" max="5" value="3" autocomplete="off" onchange="regenerate()" id="hallWidth">
