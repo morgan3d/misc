@@ -1,18 +1,22 @@
-/** Creates a w x h maze with corridors of 0 and walls of 255 expressed
-    as an array of arrays using flood filling (breadth first search).
+/** Creates a w x h maze with corridors of value 0 and walls of 255,
+    expressed as an array of arrays. The primary underlying algorithm
+    is flood filling (breadth first search).
 
-    If wrap is true, then the maze is on a torus. Otherwise it is on a rectangle.
+    If wrap is true, then the maze is on a torus. Otherwise it is on a
+    rectangle.
 
-    Imperfect is the maximum fraction of additional connections (creating loops). The default
-    is zero. The maximum is 1.
+    Imperfect is the maximum fraction of additional connections
+    (creating loops). The default is zero. The maximum is 1.
 
-    Fill is how much of the space (very roughly) the maze should fill. 1.0 fills the entire
-    space. 0.0 gives a very thin and stringy result. 
-    Straightness is a measure of how much to favor straight corridors from 0.0 to 1.0.
+    Fill is how much of the space (very roughly) the maze should
+    fill. 1.0 fills the entire space. 0.0 gives a very thin and
+    stringy result.  Straightness is a measure of how much to favor
+    straight corridors from 0.0 to 1.0.
 
-    The deadEndArray will have the coordinates of all dead ends appended. These are good
-    locations to generate rooms when fill is very low. If imperfect > 0 then there is a small
-    chance that some of these will not actually be dead ends.
+    The deadEndArray will have the coordinates of all dead ends
+    appended. These are good locations to generate rooms when fill is
+    very low. If imperfect > 0 then there is a small chance that some
+    of these will not actually be dead ends.
 
     Morgan McGuire
     @CasualEffects
@@ -24,6 +28,9 @@ function makeMaze(w, h, straightness, wrap, hSymmetry, vSymmetry, imperfect, fil
     const SOLID = 255, RESERVED = 127, EMPTY = 0;
     let random = Math.random, floor = Math.floor;
 
+    const hWrap = wrap;
+    const vWrap = wrap;
+          
     function randomInt(x) { return floor(random() * x); }
 
     // Knuth-Fisher-Yates shuffle of an Array
@@ -37,7 +44,7 @@ function makeMaze(w, h, straightness, wrap, hSymmetry, vSymmetry, imperfect, fil
     if (fill === undefined) { fill = 1; }
     let reserveProb = (1 - Math.min(Math.max(0, fill * 0.9 + 0.1), 1))**1.6;
 
-    if (wrap) {
+    if (hWrap) {
         if (hSymmetry) {
             // Must be a multiple of 4 offset by 2
             // for mirror symmetry
@@ -46,7 +53,12 @@ function makeMaze(w, h, straightness, wrap, hSymmetry, vSymmetry, imperfect, fil
             // Ensure even size
             w += w & 1; 
         }
+    } else {
+        // Ensure odd size
+        w += ~(w & 1);
+    }
 
+    if (vWrap) {
         if (vSymmetry) {
             h = Math.round((h - 2) / 4) * 4 + 2;
         } else {
@@ -54,8 +66,7 @@ function makeMaze(w, h, straightness, wrap, hSymmetry, vSymmetry, imperfect, fil
         }
 
     } else {
-        // Ensure odd size
-        w += ~(w & 1); h += ~(h & 1);
+        h += ~(h & 1);
     }
 
     // Allocate and initialize to solid
@@ -86,7 +97,8 @@ function makeMaze(w, h, straightness, wrap, hSymmetry, vSymmetry, imperfect, fil
         return (c === SOLID) || ((c === RESERVED) && (ignoreReserved > 0));
     }
 
-    const borderOffset = wrap ? 0 : 1;
+    const hBorderOffset = hWrap ? 0 : 1;
+    const vBorderOffset = vWrap ? 0 : 1;
     while (stack.length) {
         let cur = stack.pop();
 
@@ -102,13 +114,13 @@ function makeMaze(w, h, straightness, wrap, hSymmetry, vSymmetry, imperfect, fil
             for (let repeat = 0; repeat < 2; ++repeat) {
                 maze[x][y] = EMPTY;
                 if (hSymmetry) {
-                    maze[w - x - borderOffset][y] = EMPTY;
+                    maze[w - x - hBorderOffset][y] = EMPTY;
                     if (vSymmetry) {
-                        maze[w - x - borderOffset][h - y - borderOffset] = EMPTY;
+                        maze[w - x - hBorderOffset][h - y - vBorderOffset] = EMPTY;
                     }
                 }
                 if (vSymmetry) {
-                    maze[x][h - y - borderOffset] = EMPTY;
+                    maze[x][h - y - vBorderOffset] = EMPTY;
                 }                
             
                 // Carve the wall back towards the source
@@ -143,10 +155,8 @@ function makeMaze(w, h, straightness, wrap, hSymmetry, vSymmetry, imperfect, fil
                 let x = cur.x + step.x * 2;
                 let y = cur.y + step.y * 2;
                 
-                if (wrap) {
-                    x = (x + w) % w;
-                    y = (y + h) % h;
-                }
+                if (hWrap) { x = (x + w) % w; }
+                if (vWrap) { y = (y + h) % h; }
                 
                 if ((x >= 0) && (y >= 0) && (x < w) && (y < h) && unexplored(x, y)) {
                     // In bounds and not visited
@@ -162,7 +172,8 @@ function makeMaze(w, h, straightness, wrap, hSymmetry, vSymmetry, imperfect, fil
     
     if (imperfect > 0) {
         // Boundary
-        const bdry = wrap ? 0 : 1;
+        const hBdry = hWrap ? 0 : 1;
+        const vBdry = vWrap ? 0 : 1;
 
         // Removes if not  attached to some passage
         function remove(x, y) {
@@ -175,8 +186,8 @@ function makeMaze(w, h, straightness, wrap, hSymmetry, vSymmetry, imperfect, fil
         
         // Remove some random walls, preserving the edges if not wrapping.
         for (let i = Math.ceil(imperfect * w * h / 3); i > 0; --i) {
-            remove(randomInt(w * 0.5 - bdry * 2) * 2 + 1, randomInt(h * 0.5 - bdry * 2) * 2 + bdry * 2);
-            remove(randomInt(w * 0.5 - bdry * 2) * 2 + bdry * 2, randomInt(h * 0.5 - bdry * 2) * 2 + 1);
+            remove(randomInt(w * 0.5 - hBdry * 2) * 2 + 1, randomInt(h * 0.5 - vBdry * 2) * 2 + vBdry * 2);
+            remove(randomInt(w * 0.5 - hBdry * 2) * 2 + hBdry * 2, randomInt(h * 0.5 - vBdry * 2) * 2 + 1);
         }
         
         // Reconnect single-wall islands
@@ -202,6 +213,8 @@ function makeMaze(w, h, straightness, wrap, hSymmetry, vSymmetry, imperfect, fil
             } // y
         } // x
     } // reserveProb
+
+    // TODO: Strip 
 
     return maze;
 }
