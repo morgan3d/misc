@@ -18,8 +18,9 @@
 
     The deadEndArray will have the coordinates of all dead ends
     appended. These are good locations to generate rooms when fill is
-    very low. If imperfect > 0 then there is a small chance that some
+    very low. If imperfect > 0 then some
     of these will not actually be dead ends.
+    The dead ends are not correctly represented in maps with mirroring.
 
     Morgan McGuire
     @CasualEffects
@@ -380,7 +381,12 @@ function makeMaze(w, h, horizontal, vertical, straightness, imperfect, fill, dea
             } // i
         } // x
         
-        // TODO: Adjust deadEndArray
+        // Adjust deadEndArray
+        for (let i = 0; i < deadEndArray.length; ++i) {
+            const c = deadEndArray[i];
+            c.x = (c.x >> 1) * (wallWidth + hallWidth) + (1 - xPhase) * wallWidth + hallWidth / 2;
+            c.y = (c.y >> 1) * (wallWidth + hallWidth) + (1 - yPhase) * wallWidth + hallWidth / 2;
+        }
     }
 
     if (horizontal.border > 1) {
@@ -409,44 +415,41 @@ function makeMaze(w, h, horizontal, vertical, straightness, imperfect, fill, dea
         }
     }
 
+    // Visualize dead ends
+    if (false) {
+        for (let i = 0; i < deadEndArray.length; ++i) {
+            const c = deadEndArray[i];
+            maze[c.x | 0][c.y | 0] = 'X';
+        }        
+    }
+    
     return maze;
 }
 
 
-// TODO: No longer need to account for deadEndArray thickening
 /** 
     Carve empty rooms into map, which was expanded using parameters
     hallWidth, wallWidth from a maze that had the mazeDeadEndArray
     dead ends.
  */
 function addMapRooms(map, hallWidth, wallWidth, horizontal, vertical, mazeDeadEndArray, roomsFraction) {
-    const hWrap     = horizontal.loop;
-    const hSymmetry = horizontal.symmetry;
-    const hBorder   = horizontal.border;
-    
-    const vWrap     = vertical.loop;
-    const vSymmetry = vertical.symmetry;
-    const vBorder   = vertical.border;
-
     const EMPTY = 0;
     const w = map.length, h = map[0].length, floor = Math.floor, min = Math.min, max = Math.max, ceil = Math.ceil;
 
     roomsFraction = max(0, min(1, roomsFraction));
-    // Scale maze coordinates by this value
-    const s = (hallWidth + wallWidth) / 2;
     
     // Dimensions of the room
-    let a = ceil(1.2 * s / max(roomsFraction, 0.4));
-    let b = a;
+    const a = ceil(0.6 * (hallWidth + wallWidth) / max(roomsFraction, 0.4));
+    const b = a;
     
     // Outermost rooms are usually at the end of the array
     const last = floor((mazeDeadEndArray.length - 1) * roomsFraction);
     for (let i = last; i >= 0; --i) {
-        let c = mazeDeadEndArray[i];
+        const c = mazeDeadEndArray[i];
 
-        // Upper-left corner of the hallway
-        let u = floor((c.x - 0.5) * s + wallWidth - a / 2);
-        let v = floor((c.y - 0.5) * s + wallWidth - b / 2);
+        // Upper-left corner
+        const u = floor(c.x - a / 2);
+        const v = floor(c.y - b / 2);
 
         for (let x = max(wallWidth, u - a); x <= min(w - wallWidth - 1, u + a); ++x) {
             map[x].fill(EMPTY, max(wallWidth, v - b), min(h - wallWidth, v + b + 1));
@@ -458,8 +461,8 @@ function addMapRooms(map, hallWidth, wallWidth, horizontal, vertical, mazeDeadEn
     {
         const w = map.length;
         const h = map[0].length;
-        if (hSymmetry) {
-            const offset = hWrap ? hallWidth + 1 : 1;
+        if (horizontal.symmetry) {
+            const offset = horizontal.loop ? hallWidth + 1 : 1;
             for (let y = 0; y < h; ++y) {
                 for (let x = 0; x <= w / 2; ++x) {
                     map[w - offset - x][y] = map[x][y];
@@ -467,8 +470,8 @@ function addMapRooms(map, hallWidth, wallWidth, horizontal, vertical, mazeDeadEn
             }
         } // horiz
         
-        if (vSymmetry) {
-            const offset = vWrap ? hallWidth + 1 : 1;
+        if (vertical.symmetry) {
+            const offset = vertical.loop ? hallWidth + 1 : 1;
             for (let x = 0; x < w; ++x) {
                 for (let y = 0; y <= h / 2; ++y) {
                     map[x][h - offset - y] = map[x][y];
