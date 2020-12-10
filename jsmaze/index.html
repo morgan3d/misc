@@ -35,7 +35,7 @@ function regenerate() {
     const map = mazeToMap(maze, hallWidth, wallWidth);
     
     if (rooms > 0) {
-        addMapRooms(map, deadEndArray, rooms, hallWidth, wallWidth);
+        addMapRooms(map, hWrap, vWrap, hSymmetry, vSymmetry, deadEndArray, rooms, hallWidth, wallWidth);
     }
 
     {

@@ -292,7 +292,7 @@ function mazeToMap(maze, hallWidth, wallWidth) {
     Carve empty rooms into map, which was expanded using parameters hallWidth, wallWidth from a
     maze that had the mazeDeadEndArray dead ends.
  */
-function addMapRooms(map, mazeDeadEndArray, roomsFraction, hallWidth, wallWidth) {
+function addMapRooms(map, hWrap, vWrap, hSymmetry, vSymmetry, mazeDeadEndArray, roomsFraction, hallWidth, wallWidth) {
     const EMPTY = 0;
     const w = map.length, h = map[0].length, floor = Math.floor, min = Math.min, max = Math.max, ceil = Math.ceil;
 
