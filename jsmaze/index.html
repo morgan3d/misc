@@ -1,8 +1,10 @@
 <!doctype html><!-- -*- javascript -*- --><script>
     
-function preset(htile, vtile, hsymmetry, vsymmetry, shortcuts, straightness, hall, wall, coverage, rooms) {
-    document.getElementById("hwrap").checked = htile;
-    document.getElementById("vwrap").checked = vtile;
+function preset(hloop, vloop, hborder, vborder, hsymmetry, vsymmetry, shortcuts, straightness, hall, wall, coverage, rooms) {
+    document.getElementById("hloop").checked = hloop;
+    document.getElementById("vloop").checked = vloop;
+    document.getElementById("hborder").checked = hborder;
+    document.getElementById("vborder").checked = vborder;
     document.getElementById("hsymmetry").checked = hsymmetry;
     document.getElementById("vsymmetry").checked = vsymmetry;
     document.getElementById("imperfection").value = shortcuts * 100;
@@ -15,36 +17,52 @@ function preset(htile, vtile, hsymmetry, vsymmetry, shortcuts, straightness, hal
 }
 
 function regenerate() {
-    const hWrap = document.getElementById("hwrap").checked !== false;
-    const vWrap = document.getElementById("vwrap").checked !== false;
-    const hSymmetry = document.getElementById("hsymmetry").checked !== false;
-    const vSymmetry = document.getElementById("vsymmetry").checked !== false;
-    const imperfection = parseInt(document.getElementById("imperfection").value) / 100;
-    const fill = parseInt(document.getElementById("fill").value) / 100;
+    function get(id) {
+        const element = document.getElementById(id);
+        if (element.type === 'checkbox') {
+            return element.checked !== false;
+        } else if (element.type === 'range') {
+            return parseInt(element.value);
+        }
+    }
     
-    const hallWidth = parseInt(document.getElementById("hallWidth").value);
-    const wallWidth = parseInt(document.getElementById("wallWidth").value);
-    const rooms = parseInt(document.getElementById("rooms").value) / 100;
-    const straightness = parseInt(document.getElementById("straightness").value) / 100;
+    const horizontal = {
+        loop:     get('hloop'),
+        symmetry: get('hsymmetry'),
+        border:   get('hborder')
+    };
+    
+    const vertical = {
+        loop:     get('vloop'),
+        symmetry: get('vsymmetry'),
+        border:   get('vborder')
+    };
+    
+    const hallWidth    = get('hallWidth');
+    const wallWidth    = get('wallWidth');
+    const imperfection = get('imperfection') / 100;
+    const coverage     = get('fill') / 100;
+    const rooms        = get('rooms') / 100;
+    const straightness = get('straightness') / 100;
     
     const deadEndArray = [];
     const w = 112, h = 60;
-    const maze = makeMaze(w, h, straightness, hWrap, vWrap, hSymmetry, vSymmetry, imperfection, fill, deadEndArray);
+    const maze = makeMaze(w, h, horizontal, vertical, straightness, imperfection, coverage, deadEndArray);
     
     // Expand hall and wall width
-    const map = mazeToMap(maze, hallWidth, wallWidth);
+    const map = mazeToMap(maze, hallWidth, wallWidth, horizontal, vertical);
     
     if (rooms > 0) {
-        addMapRooms(map, hWrap, vWrap, hSymmetry, vSymmetry, deadEndArray, rooms, hallWidth, wallWidth);
+        addMapRooms(map, hallWidth, wallWidth, horizontal, vertical, deadEndArray, rooms);
     }
     
-    const display = document.getElementById("display");
+    const display = document.getElementById('display');
     const scale = 2 / (hallWidth + wallWidth);
-    display.style.transform = "scale(" + scale + "," + (scale * 0.7) + ")";
-    display.style.textShadow = "" + (1.5 / scale) + "px " + (2 / scale) + "px " + (5 / scale) + "px rgba(0,0,0,0.35)";
+    display.style.transform = `scale(${scale}, ${scale * 0.7})`;
+    display.style.textShadow = `${1.5 / scale}px ${2 / scale}px ${5 / scale}px rgba(0,0,0,0.35)`;
     
-    const hsl = "" + (Math.random() * 360) + ",70%,70%";
-    display.style.background = "linear-gradient(to bottom, hsla(" + hsl + ",0.1) 0%, hsla(" + hsl + ",0.25) 45%, hsla(" + hsl + ",1) 100%)";
+    const hsl = `${Math.random() * 360},70%,70%`;
+    display.style.background = `linear-gradient(to bottom, hsla(${hsl},0.1) 0%, hsla(${hsl},0.25) 45%, hsla(${hsl},1) 100%)`;
     display.innerHTML = mapToString(map);
 }
 </script>
@@ -61,36 +79,39 @@ function regenerate() {
     button  { font-family: 'Play', sans-serif; font-size: 0.9em; height: 26px }
     #preset button { width: 74px }
   </style>
-  <body onload="regenerate()">
+  <body onload="document.getElementById('labyrinth').click()">
   <center>
     <b style="font-size: 120%; color:#DDAF08">Dungeon Maze Generator by <a style="color:#DDAF08" href="https://casual-effects.com">Casual Effects</a></b>
     <br>[<a href="maze.js">source code</a>]
   </center>
-  <p>
+  <p style="text-align: justified">
     The maze is always solvable. Every spot is reachable in the maze. With Shortcuts at minimum, there is a unique path. With Coverage at maximum,
     that path touches every 2x2 block. When generated, the maze contains 2x2 blocks with the top-left corner always solid. It is then expanded
     by the Hall and Wall size to alter the appearance. Mirroring breaks most of these guarantees.
   </p>
   <center id="preset">
-  <button onclick="preset(false, false, false, false, 0.00, 0.00, 3, 1, 1.00, 0.00)">Labyrinth</button>
-  <button onclick="preset(false, false, false, false, 0.00, 0.00, 1, 4, 0.20, 1.00)">Catacombs</button>
-  <button onclick="preset(false, false, false, false, 0.00, 0.00, 1, 2, 1.00, 0.15)">Hedge</button>
-  <button onclick="preset(false, false, false, false, 0.25, 0.00, 6, 1, 0.10, 0.50)">Palace</button>
-  <button onclick="preset(false, false, false, false, 0.75, 0.50, 1, 1, 0.15, 1.00)">Fortress</button>
-  <button onclick="preset(false, false, false, false, 0.05, 0.90, 1, 4, 0.20, 1.00)">Suburb</button>
-  <button onclick="preset(true,  true,  false, false, 0.60, 0.00, 1, 3, 1.00, 1.00)">City</button>
-  <button onclick="preset(true,  false, true,  false, 0.25, 0.80, 6, 1, 1.00, 0.00)">PAC-MAN</button>
-  <button onclick="preset(false, false, true,  false, 0.90, 0.10, 3, 1, 0.12, 1.00)">Starship</button>
-  <button onclick="preset(true,  true,  true,  true,  1.00, 0.95, 1, 1, 0.50, 1.00)">Garden</button>
-  <button onclick="preset(false, false, true,  false, 0.20, 1.00, 2, 1, 0.50, 0.10)">Forbidden</button>
+  <button onclick="preset(false, false, true,  true,  false, false, 0.00, 0.00, 3, 1, 1.00, 0.00)" id="labyrinth">Labyrinth</button>
+  <button onclick="preset(false, false, true,  true,  false, false, 0.00, 0.00, 1, 4, 0.20, 1.00)">Catacombs</button>
+  <button onclick="preset(false, false, false, false, false, false, 0.00, 0.00, 1, 2, 1.00, 0.15)">Hedge</button>
+  <button onclick="preset(false, false, true,  true,  false, false, 0.25, 0.00, 6, 1, 0.10, 0.50)">Palace</button>
+  <button onclick="preset(false, false, true,  true,  false, false, 0.75, 0.50, 1, 1, 0.15, 1.00)">Fortress</button>
+  <button onclick="preset(false, false, true,  true,  false, false, 0.05, 0.90, 1, 4, 0.20, 1.00)">Suburb</button>
+  <button onclick="preset(true,  true,  true,  true,  false, false, 0.60, 0.00, 1, 3, 1.00, 1.00)">City</button>
+  <button onclick="preset(true,  false, true,  true,  true,  false, 0.25, 0.80, 6, 1, 1.00, 0.00)">PAC-MAN</button>
+  <button onclick="preset(false, false, true,  true,  true,  false, 0.90, 0.10, 3, 1, 0.12, 1.00)">Starship</button>
+  <button onclick="preset(false, false, true,  true,  true,  true,  1.00, 0.95, 2, 1, 0.50, 1.00)">Garden</button>
+  <button onclick="preset(false, false, true,  true,  true,  false, 0.20, 1.00, 2, 1, 0.50, 0.10)">Forbidden</button>
   </center>
   <hr noshade>
   <button onclick="regenerate()" style="height:40px; width: 40px; margin-right: 10px"><div style="transform: rotate(45deg); font-size: 200%">↻</div></button>
   <div style="display:inline-block; position: relative; top: 5px">
-    Horizontal: <input type="checkbox" id="hwrap" autocomplete="off" onchange="regenerate()"><label for="hwrap">Tile</label>
+    Horizontal:
+    <input type="checkbox" id="hloop" autocomplete="off" onchange="regenerate()"><label for="hwrap">Loop</label>
+    <input type="checkbox" id="hborder" autocomplete="off" onchange="regenerate()"><label for="hborder">Border</label>
     <input type="checkbox" id="hsymmetry" autocomplete="off" onchange="regenerate()"><label for="hsymmetry">Mirror</label>
-    &nbsp;&nbsp;&nbsp;&nbsp; Vertical:
-    <input type="checkbox" id="vwrap" autocomplete="off" onchange="regenerate()"><label for="vwrap">Tile</label>
+    <span style="margin-left: 150px">Vertical:</span>
+    <input type="checkbox" id="vloop" autocomplete="off" onchange="regenerate()"><label for="vwrap">Loop</label>
+    <input type="checkbox" id="vborder" autocomplete="off" onchange="regenerate()"><label for="vborder">Border</label>
     <input type="checkbox" id="vsymmetry" autocomplete="off" onchange="regenerate()"><label for="vsymmetry">Mirror</label>
   <br><span>Shortcuts</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="imperfection">
   <span style="padding-left:16px">Straight</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="straightness">
