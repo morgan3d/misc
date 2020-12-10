@@ -96,6 +96,28 @@ function makeMaze(w, h, straightness, hWrap, vWrap, hSymmetry, vSymmetry, imperf
 
     const hBorderOffset = hWrap ? 0 : 1;
     const vBorderOffset = vWrap ? 0 : 1;
+
+    function set(x, y, value) {
+        x = (x + w) % w;
+        y = (y + h) % h;
+
+        maze[x][y] = value;
+        
+        const u = w - x - hBorderOffset;
+        const v = h - y - vBorderOffset
+        if (hSymmetry) {
+            if (u < w) {
+                maze[u][y] = value;
+                if (vSymmetry) {
+                    maze[u][v] = value;
+                }
+            }
+        }
+        if (vSymmetry && v < h) {
+            maze[x][v] = value;
+        }                
+    }
+    
     while (stack.length) {
         let cur = stack.pop();
 
@@ -103,28 +125,10 @@ function makeMaze(w, h, straightness, hWrap, vWrap, hSymmetry, vSymmetry, imperf
         if (unexplored(cur.x, cur.y)) {
 
             // Mark visited
-            let x = cur.x, y = cur.y;
+            set(cur.x, cur.y, EMPTY);
 
-            // When generating, apply symmetry. We'll later mirror for
-            // rooms and scattered shortcuts, but doing it here as well ensures that
-            // the primary corridors cross the centerline well.
-            for (let repeat = 0; repeat < 2; ++repeat) {
-                maze[x][y] = EMPTY;
-                if (hSymmetry) {
-                    maze[w - x - hBorderOffset][y] = EMPTY;
-                    if (vSymmetry) {
-                        maze[w - x - hBorderOffset][h - y - vBorderOffset] = EMPTY;
-                    }
-                }
-                if (vSymmetry) {
-                    maze[x][h - y - vBorderOffset] = EMPTY;
-                }                
-            
-                // Carve the wall back towards the source
-                // for the 2nd iteration
-                x = (cur.x - cur.step.x + w) % w;
-                y = (cur.y - cur.step.y + h) % h;
-            }
+            // Carve the wall back towards the source
+            set(cur.x - cur.step.x, cur.y - cur.step.y, EMPTY);
             
             --ignoreReserved;
 
@@ -177,13 +181,13 @@ function makeMaze(w, h, straightness, hWrap, vWrap, hSymmetry, vSymmetry, imperf
             let a = maze[x][(y + 1) % h], b = maze[x][(y - 1 + h) % h],
                 c = maze[(x + 1) % w][y], d = maze[(x - 1 + w) % w][y];
             if (Math.min(a, b, c, d) === EMPTY) {
-                maze[x][y] = EMPTY;
+                set(x, y, EMPTY);
             }
         }
         
         // Remove some random walls, preserving the edges if not wrapping.
         for (let i = Math.ceil(imperfect * w * h / 3); i > 0; --i) {
-            remove(randomInt(w * 0.5 - hBdry * 2) * 2 + 1, randomInt(h * 0.5 - vBdry * 2) * 2 + vBdry * 2);
+            remove(randomInt(w * 0.5 - hBdry * 2) * 2 + 1,         randomInt(h * 0.5 - vBdry * 2) * 2 + vBdry * 2);
             remove(randomInt(w * 0.5 - hBdry * 2) * 2 + hBdry * 2, randomInt(h * 0.5 - vBdry * 2) * 2 + 1);
         }
         
@@ -196,7 +200,7 @@ function makeMaze(w, h, straightness, hWrap, vWrap, hSymmetry, vSymmetry, imperf
                 if (a === EMPTY && b === EMPTY && c === EMPTY && d === EMPTY) {
                     // This is an island. Restore one adjacent wall at random
                     let dir = directions[randomInt(4)];
-                    maze[(x + w + dir.x) % w][(y + h + dir.y) % h] = SOLID;
+                    set(x + dir.x, y + dir.y, SOLID);
                 }
             } // x
         } // y
@@ -211,7 +215,11 @@ function makeMaze(w, h, straightness, hWrap, vWrap, hSymmetry, vSymmetry, imperf
         } // x
     } // reserveProb
 
-    // TODO: Strip 
+    // TODO: Strip rows/cols
+    if (hSymmetry && hWrap) {
+    }
+
+    // TODO: renumber dead ends
 
     return maze;
 }
