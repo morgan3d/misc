@@ -25,13 +25,16 @@
     BSD License
 */
 function makeMaze(w, h, horizontal, vertical, straightness, imperfect, fill, deadEndArray, random) {
-    const hWrap     = horizontal.loop;
     const hSymmetry = horizontal.symmetry;
     const hBorder   = horizontal.border;
+    // Ignore wrapping unless the border and symmetry are also set; in
+    // that case, generate without wrapping and poke holes in the
+    // border
+    const hWrap     = horizontal.loop && !(hSymmetry && hBorder);
     
-    const vWrap     = vertical.loop;
     const vSymmetry = vertical.symmetry;
     const vBorder   = vertical.border;
+    const vWrap     = vertical.loop && !(vSymmetry && vBorder);
     
     const SOLID = 255, RESERVED = 127, EMPTY = 0;
     random = random || Math.random;
@@ -198,7 +201,8 @@ function makeMaze(w, h, horizontal, vertical, straightness, imperfect, fill, dea
         const hBdry = hWrap ? 0 : 1;
         const vBdry = vWrap ? 0 : 1;
 
-        // Removes if not  attached to some passage
+        // Removes the wall at (x, y) if at least one neighbor is also
+        // empty
         function remove(x, y) {
             let a = maze[x][(y + 1) % h], b = maze[x][(y - 1 + h) % h],
                 c = maze[(x + 1) % w][y], d = maze[(x - 1 + w) % w][y];
@@ -237,7 +241,38 @@ function makeMaze(w, h, horizontal, vertical, straightness, imperfect, fill, dea
         } // x
     } // reserveProb
 
+    if (horizontal.loop && horizontal.border && horizontal.symmetry) {
+        // Poke some holes in the border. The regular generator
+        // doesn't handle this case elegantly
+        // Decrease probability with straightness, increase with
+        // imperfection
+        const prob = 0.025 + 0.25 * (1 - straightness**2 * (1 - imperfect)) + 0.5 * imperfect;
+        for (let y = 1; y < maze[0].length; y += 2) {
 
+            // Do not create a passage into a wall or immediately below another
+            if ((maze[1][y] === EMPTY) &&
+                (maze[0][y - 2] !== EMPTY) && 
+                (random() < prob)) {
+                maze[0][y] = EMPTY;
+                maze[maze.length - 1][y] = EMPTY;
+            }
+        }
+    }
+
+    if (vertical.loop && vertical.border && vertical.symmetry) {
+        const prob = 0.05 + 0.15 * (1 - straightness * (1 - imperfect)) + 0.5 * imperfect;
+        for (let x = 1; x < maze.length; x += 2) {
+
+            // Do not create a passage into a wall or immediately beside another
+            if ((maze[x][1] === EMPTY) &&
+                (x < 2 || maze[x - 2][0] !== EMPTY) && 
+                (random() < prob)) {
+                maze[x][0] = EMPTY;
+                maze[x][maze[0].length - 1] = EMPTY;
+            }
+        }
+    }
+    
     // Horizontal borders
     if (! hWrap && ! hBorder) {
         // Remove border
@@ -259,8 +294,6 @@ function makeMaze(w, h, horizontal, vertical, straightness, imperfect, fill, dea
             }
         }
     } else if (hSymmetry && hWrap) {
-        // TODO: hBorder = true case
-        
         // Remove the left wall and hall columns; the wall will
         // be a solid edge and the hall is the same as
         // the rightmost one
@@ -299,8 +332,6 @@ function makeMaze(w, h, horizontal, vertical, straightness, imperfect, fill, dea
             --deadEndArray[i].y;
         }
     } else if (vSymmetry && vWrap) {
-        // TODO: hBorder = true case
-        
         // Remove the top wall and top columns; the wall will
         // be a solid edge and the hall is the same as
         // the bottom one
