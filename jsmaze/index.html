@@ -47,13 +47,10 @@ function regenerate() {
     
     const deadEndArray = [];
     const w = 112, h = 60;
-    const maze = makeMaze(w, h, horizontal, vertical, straightness, imperfection, coverage, deadEndArray);
-    
-    // Expand hall and wall width
-    const map = mazeToMap(maze, hallWidth, wallWidth, horizontal, vertical);
+    const maze = makeMaze(w, h, horizontal, vertical, straightness, imperfection, coverage, deadEndArray, hallWidth, wallWidth);
     
     if (rooms > 0) {
-        addMapRooms(map, hallWidth, wallWidth, horizontal, vertical, deadEndArray, rooms);
+        addMapRooms(maze, hallWidth, wallWidth, horizontal, vertical, deadEndArray, rooms);
     }
     
     const display = document.getElementById('display');
@@ -63,7 +60,7 @@ function regenerate() {
     
     const hsl = `${Math.random() * 360},70%,70%`;
     display.style.background = `linear-gradient(to bottom, hsla(${hsl},0.1) 0%, hsla(${hsl},0.25) 45%, hsla(${hsl},1) 100%)`;
-    display.innerHTML = mapToString(map);
+    display.innerHTML = mazeToString(maze);
 }
 </script>
 
@@ -99,7 +96,7 @@ function regenerate() {
   <button onclick="preset(false, false, 1, 1, false, false, 0.75, 0.50, 1, 1, 0.15, 1.00)">Fortress</button>
   <button onclick="preset(false, false, 1, 1, false, false, 0.05, 0.90, 1, 4, 0.20, 1.00)">Suburb</button>
   <button onclick="preset(true,  true,  1, 1, false, false, 0.60, 0.00, 1, 3, 1.00, 1.00)">City</button>
-  <button onclick="preset(true,  false, 1, 1, true,  false, 0.25, 0.80, 6, 1, 1.00, 0.00)">PAC-MAN</button>
+  <button onclick="preset(true,  false, 3, 3, true,  false, 0.25, 0.80, 6, 1, 1.00, 0.00)">PAC-MAN</button>
   <button onclick="preset(false, false, 1, 1, true,  false, 0.90, 0.10, 3, 1, 0.12, 1.00)">Starship</button>
   <button onclick="preset(false, false, 1, 1, true,  true,  1.00, 0.95, 2, 1, 0.50, 1.00)">Garden</button>
   <button onclick="preset(false, false, 1, 1, true,  false, 0.20, 1.00, 2, 1, 0.50, 0.10)">Forbidden</button>
@@ -110,11 +107,11 @@ function regenerate() {
     Horizontal:
     <input type="checkbox" id="hloop" autocomplete="off" onchange="regenerate()"><label for="hwrap">Loop</label>
     <input type="checkbox" id="hsymmetry" autocomplete="off" onchange="regenerate()"><label for="hsymmetry">Mirror</label>
-    <span style="padding-left:16px">Border</span> <input class="slider" type="range" min="0" max="2" value="1" autocomplete="off" onchange="regenerate()" id="hborder">
+    <span style="padding-left:16px">Border</span> <input class="slider" type="range" min="0" max="3" value="1" autocomplete="off" onchange="regenerate()" id="hborder">
     <span style="margin-left: 131px">Vertical:</span>
     <input type="checkbox" id="vloop" autocomplete="off" onchange="regenerate()"><label for="vwrap">Loop</label>
     <input type="checkbox" id="vsymmetry" autocomplete="off" onchange="regenerate()"><label for="vsymmetry">Mirror</label>
-    <span style="padding-left:16px">Border</span> <input class="slider" type="range" min="0" max="2" value="1" autocomplete="off" onchange="regenerate()" id="vborder">
+    <span style="padding-left:16px">Border</span> <input class="slider" type="range" min="0" max="3" value="1" autocomplete="off" onchange="regenerate()" id="vborder">
   <br><span>Shortcuts</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="imperfection">
   <span style="padding-left:16px">Straight</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="straightness">
   <span style="padding-left:16px">Hall&nbsp;Size</span> <input class="slider" type="range" min="1" max="5" value="3" autocomplete="off" onchange="regenerate()" id="hallWidth">
