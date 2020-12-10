@@ -113,13 +113,14 @@ function makeMaze(w, h, straightness, hWrap, vWrap, hSymmetry, vSymmetry, imperf
                 }
             }
         }
+        
         if (vSymmetry && v < h) {
             maze[x][v] = value;
         }                
     }
     
     while (stack.length) {
-        let cur = stack.pop();
+        const cur = stack.pop();
 
         // Unvisited?
         if (unexplored(cur.x, cur.y)) {
@@ -152,7 +153,7 @@ function makeMaze(w, h, straightness, hWrap, vWrap, hSymmetry, vSymmetry, imperf
             // Push neighbors if not visited
             let deadEnd = true;
             for (let i = 0; i < 4; ++i) {
-                let step = directions[i];
+                const step = directions[i];
                 let x = cur.x + step.x * 2;
                 let y = cur.y + step.y * 2;
                 
@@ -215,11 +216,45 @@ function makeMaze(w, h, straightness, hWrap, vWrap, hSymmetry, vSymmetry, imperf
         } // x
     } // reserveProb
 
-    // TODO: Strip rows/cols
+
     if (hSymmetry && hWrap) {
+        // Remove the left wall and hall columns; the wall will
+        // be a solid edge and the hall is the same as
+        // the rightmost one
+        maze.shift();
+        maze.shift();
+
+        // Correct the dead ends for the new coordinates
+        for (let i = 0; i < deadEndArray.length; ++i) {
+            deadEndArray[i].x -= 2;
+            if (deadEndArray[i].x < 0) {
+                deadEndArray[i] = deadEndArray[deadEndArray.length - 1];
+                deadEndArray.pop();
+                --i;
+            }
+        }
     }
 
-    // TODO: renumber dead ends
+
+    if (vSymmetry && vWrap) {
+        // Remove the top wall and top columns; the wall will
+        // be a solid edge and the hall is the same as
+        // the bottom one
+        for (let x = 0; x < maze.length; ++x) {
+            maze[x].shift();
+            maze[x].shift();
+        }
+
+        // Correct the dead ends for the new coordinates
+        for (let i = 0; i < deadEndArray.length; ++i) {
+            deadEndArray[i].y -= 2;
+            if (deadEndArray[i].y < 0) {
+                deadEndArray[i] = deadEndArray[deadEndArray.length - 1];
+                deadEndArray.pop();
+                --i;
+            }
+        }
+    }
 
     return maze;
 }
