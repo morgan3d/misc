@@ -66,6 +66,8 @@ function regenerate() {
     display.innerHTML = mapToString(map);
 }
 </script>
+
+
 <html>
   <title>Dungeon Maze Generator</title>
   <script src="maze.js?"></script>
@@ -84,8 +86,8 @@ function regenerate() {
     <b style="font-size: 120%; color:#DDAF08">Dungeon Maze Generator by <a style="color:#DDAF08" href="https://casual-effects.com">Casual Effects</a></b>
     <br>[<a href="maze.js">source code</a>]
   </center>
-  <p style="text-align: justified">
-    The maze is always solvable. Every spot is reachable in the maze. With Shortcuts at minimum, there is a unique path. With Coverage at maximum,
+  <p style="text-align: justify">
+    The maze is always solvable when mirroring is off. Every spot is reachable in the maze. With Shortcuts at minimum, there is a unique path. With Coverage at maximum,
     that path touches every 2x2 block. When generated, the maze contains 2x2 blocks with the top-left corner always solid. It is then expanded
     by the Hall and Wall size to alter the appearance. Mirroring breaks most of these guarantees.
   </p>

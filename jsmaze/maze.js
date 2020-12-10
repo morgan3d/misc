@@ -48,8 +48,15 @@ function makeMaze(w, h, horizontal, vertical, straightness, imperfect, fill, dea
     h = floor(h || w);
 
     // Account for edges that will later be stripped
-    if (! hBorder && ! hWrap) { w += 2; }
-    if (! vBorder && ! vWrap) { h += 2; }
+    if (! hBorder) {
+        ++w;
+        if (! hWrap) { ++w; }
+    }
+    
+    if (! vBorder) {
+        ++h;
+        if (! vWrap) { ++h; }
+    }
     
     imperfect = Math.min(1, Math.max(0, imperfect || 0));
     if (fill === undefined) { fill = 1; }
