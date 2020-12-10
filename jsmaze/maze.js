@@ -38,8 +38,21 @@ function makeMaze(w, h, straightness, wrap, hSymmetry, vSymmetry, imperfect, fil
     let reserveProb = (1 - Math.min(Math.max(0, fill * 0.9 + 0.1), 1))**1.6;
 
     if (wrap) {
-        // Ensure even size
-        w += w & 1; h += h & 1;
+        if (hSymmetry) {
+            // Must be a multiple of 4 offset by 2
+            // for mirror symmetry
+            w = Math.round((w - 2) / 4) * 4 + 2;
+        } else {
+            // Ensure even size
+            w += w & 1; 
+        }
+
+        if (vSymmetry) {
+            h = Math.round((h - 2) / 4) * 4 + 2;
+        } else {
+            h += h & 1;
+        }
+
     } else {
         // Ensure odd size
         w += ~(w & 1); h += ~(h & 1);
@@ -60,8 +73,8 @@ function makeMaze(w, h, straightness, wrap, hSymmetry, vSymmetry, imperfect, fil
         } // x
     }
 
-    // Carve hallways recursively
-    let stack = [{x:floor(w / 4) * 2 - 3, y:floor(h / 4) * 2 - 3, step:{x:0, y:0}}];
+    // Carve hallways recursively, starting at the center
+    let stack = [{x: floor(w / 4) * 2 - 1, y: floor(h / 4) * 2 - 1, step: {x: 0, y: 0}}];
     deadEndArray.push(stack[0]);
     let directions = [{x:-1, y:0}, {x:1, y:0}, {x:0, y:1}, {x:0, y:-1}];
 

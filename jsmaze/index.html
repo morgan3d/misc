@@ -1,4 +1,94 @@
-<!doctype html>
+<!doctype html><!-- -*- javascript -*- --><script>
+    
+function preset(tile, hsymmetry, vsymmetry, shortcuts, straightness, hall, wall, coverage, rooms) {
+    document.getElementById("wrap").checked = tile;
+    document.getElementById("hsymmetry").checked = hsymmetry;
+    document.getElementById("vsymmetry").checked = vsymmetry;
+    document.getElementById("imperfection").value = shortcuts * 100;
+    document.getElementById("hallWidth").value = hall;
+    document.getElementById("wallWidth").value = wall;
+    document.getElementById("fill").value = coverage * 100;
+    document.getElementById("rooms").value = rooms * 100;
+    document.getElementById("straightness").value = straightness * 100;
+    regenerate();
+}
+
+function regenerate() {
+    const wrap = document.getElementById("wrap").checked !== false;
+    const hSymmetry = document.getElementById("hsymmetry").checked !== false;
+    const vSymmetry = document.getElementById("vsymmetry").checked !== false;
+    const imperfection = parseInt(document.getElementById("imperfection").value) / 100;
+    const fill = parseInt(document.getElementById("fill").value) / 100;
+    
+    const hallWidth = parseInt(document.getElementById("hallWidth").value);
+    const wallWidth = parseInt(document.getElementById("wallWidth").value);
+    const rooms = parseInt(document.getElementById("rooms").value) / 100;
+    const straightness = parseInt(document.getElementById("straightness").value) / 100;
+    
+    const deadEndArray = [];
+    const w = 112// - ((hSymmetry && wrap) ? 2 : 0);
+    const h = 60// - ((vSymmetry && wrap) ? 1 : 0);
+    const maze = makeMaze(w, h, straightness, wrap, hSymmetry, vSymmetry, imperfection, fill, deadEndArray);
+    
+    // Expand hall and wall width
+    const map = mazeToMap(maze, hallWidth, wallWidth);
+    
+    if (rooms > 0) {
+        addMapRooms(map, deadEndArray, rooms, hallWidth, wallWidth);
+    }
+
+    {
+        let w = map.length;
+        let h = map[0].length;
+        if (hSymmetry) {
+            let offset = 1;
+            if (wrap) {
+                // Remove the left wall and hall columns; the wall will
+                // be a solid edge and the hall is the same as
+                // the rightmost one
+                for (let i = 0; i < hallWidth + wallWidth; ++i) {
+                    map.shift();
+                }
+                w = map.length
+                offset += hallWidth;
+            }
+            for (let y = 0; y < h; ++y) {
+                for (let x = 0; x <= w / 2; ++x) {
+                    map[w - offset - x][y] = map[x][y];
+                }
+            }
+        } // horiz
+        
+        if (vSymmetry) {
+            let offset = 1;
+            if (wrap) {
+                // Remove the top wall and hall from each column
+                for (let x = 0; x < w; ++x) {
+                    for (let i = 0; i < hallWidth + wallWidth; ++i) {
+                        map[x].shift();
+                    }
+                }
+                h = map[0].length;
+                offset += hallWidth;
+            }
+            for (let x = 0; x < w; ++x) {
+                for (let y = 0; y <= h / 2; ++y) {
+                    map[x][h - offset - y] = map[x][y];
+                }
+            }
+        } // vert
+    } // scope
+    
+    const display = document.getElementById("display");
+    const scale = 2 / (hallWidth + wallWidth);
+    display.style.transform = "scale(" + scale + "," + (scale * 0.7) + ")";
+    display.style.textShadow = "" + (1.5 / scale) + "px " + (2 / scale) + "px " + (5 / scale) + "px rgba(0,0,0,0.35)";
+    
+    const hsl = "" + (Math.random() * 360) + ",70%,70%";
+    display.style.background = "linear-gradient(to bottom, hsla(" + hsl + ",0.1) 0%, hsla(" + hsl + ",0.25) 45%, hsla(" + hsl + ",1) 100%)";
+    display.innerHTML = mapToString(map);
+}
+</script>
 <html>
   <title>Dungeon Maze Generator</title>
   <script src="maze.js?"></script>
@@ -12,7 +102,7 @@
     button  { font-family: 'Play', sans-serif; font-size: 0.9em; height: 26px }
     #preset button { width: 74px }
   </style>
-  
+  <body onload="regenerate()">
   <center>
     <b style="font-size: 120%; color:#DDAF08">Dungeon Maze Generator by <a style="color:#DDAF08" href="https://casual-effects.com">Casual Effects</a></b>
     <br>[<a href="maze.js">source code</a>]
@@ -32,7 +122,7 @@
   <button onclick="preset(true,  false, false, 0.60, 0.00, 1, 3, 1.00, 1.00)">City</button>
   <button onclick="preset(true,  true,  false, 0.25, 0.80, 6, 1, 1.00, 0.00)">PAC-MAN</button>
   <button onclick="preset(false, true,  false, 0.90, 0.10, 3, 1, 0.12, 1.00)">Starship</button>
-  <button onclick="preset(true,  true,  true,  1.00, 0.95, 1, 1, 0.60, 1.00)">Garden</button>
+  <button onclick="preset(true,  true,  true,  1.00, 0.95, 1, 1, 0.50, 1.00)">Garden</button>
   <button onclick="preset(false, true,  false, 0.20, 1.00, 2, 1, 0.50, 0.10)">Forbidden</button>
   </center>
   <hr noshade>
@@ -50,75 +140,6 @@
   </div>
   <div style="display: inline-block">
     <pre id="display"></pre>
-  </div>
-  
-  <script>
-    function preset(tile, hsymmetry, vsymmetry, shortcuts, straightness, hall, wall, coverage, rooms) {
-        document.getElementById("wrap").checked = tile;
-        document.getElementById("hsymmetry").checked = hsymmetry;
-        document.getElementById("vsymmetry").checked = vsymmetry;
-        document.getElementById("imperfection").value = shortcuts * 100;
-        document.getElementById("hallWidth").value = hall;
-        document.getElementById("wallWidth").value = wall;
-        document.getElementById("fill").value = coverage * 100;
-        document.getElementById("rooms").value = rooms * 100;
-        document.getElementById("straightness").value = straightness * 100;
-        regenerate();
-    }
-    
-    function regenerate() {
-         let wrap = document.getElementById("wrap").checked !== false;
-         let hSymmetry = document.getElementById("hsymmetry").checked !== false;
-         let vSymmetry = document.getElementById("vsymmetry").checked !== false;
-         let imperfection = parseInt(document.getElementById("imperfection").value) / 100;
-         let fill = parseInt(document.getElementById("fill").value) / 100;
-
-         let hallWidth = parseInt(document.getElementById("hallWidth").value);
-         let wallWidth = parseInt(document.getElementById("wallWidth").value);
-         let rooms = parseInt(document.getElementById("rooms").value) / 100;
-         let straightness = parseInt(document.getElementById("straightness").value) / 100;
-
-         let deadEndArray = [];
-         const w = 112 - ((hSymmetry && wrap) ? 2 : 0);
-         const h = 60 - ((vSymmetry && wrap) ? 1 : 0);
-         let maze = makeMaze(w, h, straightness, wrap, hSymmetry, vSymmetry, imperfection, fill, deadEndArray);
-         let map = mazeToMap(maze, hallWidth, wallWidth);
-
-         if (rooms > 0) {
-            addMapRooms(map, deadEndArray, rooms, hallWidth, wallWidth);
-         }
-
-         // Grow by wall expansion to map
-         {
-             const w = map.length;
-             const h = map[0].length;
-             if (hSymmetry) {
-                 for (let y = 0; y < h; ++y) {
-                     for (let x = 0; x <= w / 2; ++x) {
-                         map[w - 1 - x][y] = map[x][y];
-                     }
-                 }
-             } // horiz
-             
-             if (vSymmetry) {
-                 for (let x = 0; x < w; ++x) {
-                     for (let y = 0; y <= h / 2; ++y) {
-                         map[x][h - 1 - y] = map[x][y];
-                     }
-                 }
-             } // vert
-         } // scope
-      
-         let display = document.getElementById("display");
-         let scale = 2 / (hallWidth + wallWidth);
-         display.style.transform = "scale(" + scale + "," + (scale * 0.7) + ")";
-         display.style.textShadow = "" + (1.5 / scale) + "px " + (2 / scale) + "px " + (5 / scale) + "px rgba(0,0,0,0.35)";
-
-         let hsl = "" + (Math.random() * 360) + ",70%,70%";
-         display.style.background = "linear-gradient(to bottom, hsla(" + hsl + ",0.1) 0%, hsla(" + hsl + ",0.25) 45%, hsla(" + hsl + ",1) 100%)";
-         display.innerHTML = mapToString(map);
-      }
-      regenerate();
-  </script>
-
+  </div>  
+</body>
 </html>
