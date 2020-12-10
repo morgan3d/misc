@@ -24,12 +24,9 @@
 
     BSD License
 */
-function makeMaze(w, h, straightness, wrap, hSymmetry, vSymmetry, imperfect, fill, deadEndArray) {
+function makeMaze(w, h, straightness, hWrap, vWrap, hSymmetry, vSymmetry, imperfect, fill, deadEndArray) {
     const SOLID = 255, RESERVED = 127, EMPTY = 0;
     let random = Math.random, floor = Math.floor;
-
-    const hWrap = wrap;
-    const vWrap = wrap;
           
     function randomInt(x) { return floor(random() * x); }
 
