@@ -37,28 +37,6 @@ function regenerate() {
     if (rooms > 0) {
         addMapRooms(map, hWrap, vWrap, hSymmetry, vSymmetry, deadEndArray, rooms, hallWidth, wallWidth);
     }
-
-    {
-        const w = map.length;
-        const h = map[0].length;
-        if (hSymmetry) {
-            const offset = hWrap ? hallWidth + 1 : 1;
-            for (let y = 0; y < h; ++y) {
-                for (let x = 0; x <= w / 2; ++x) {
-                    map[w - offset - x][y] = map[x][y];
-                }
-            }
-        } // horiz
-        
-        if (vSymmetry) {
-            const offset = vWrap ? hallWidth + 1 : 1;
-            for (let x = 0; x < w; ++x) {
-                for (let y = 0; y <= h / 2; ++y) {
-                    map[x][h - offset - y] = map[x][y];
-                }
-            }
-        } // vert
-    } // scope
     
     const display = document.getElementById("display");
     const scale = 2 / (hallWidth + wallWidth);

@@ -289,8 +289,9 @@ function mazeToMap(maze, hallWidth, wallWidth) {
 
 
 /** 
-    Carve empty rooms into map, which was expanded using parameters hallWidth, wallWidth from a
-    maze that had the mazeDeadEndArray dead ends.
+    Carve empty rooms into map, which was expanded using parameters
+    hallWidth, wallWidth from a maze that had the mazeDeadEndArray
+    dead ends.
  */
 function addMapRooms(map, hWrap, vWrap, hSymmetry, vSymmetry, mazeDeadEndArray, roomsFraction, hallWidth, wallWidth) {
     const EMPTY = 0;
@@ -317,6 +318,31 @@ function addMapRooms(map, hWrap, vWrap, hSymmetry, vSymmetry, mazeDeadEndArray, 
             map[x].fill(EMPTY, max(wallWidth, v - b), min(h - wallWidth, v + b + 1));
         } // x
     } // i
+
+
+    // Restore symmetry
+    {
+        const w = map.length;
+        const h = map[0].length;
+        if (hSymmetry) {
+            const offset = hWrap ? hallWidth + 1 : 1;
+            for (let y = 0; y < h; ++y) {
+                for (let x = 0; x <= w / 2; ++x) {
+                    map[w - offset - x][y] = map[x][y];
+                }
+            }
+        } // horiz
+        
+        if (vSymmetry) {
+            const offset = vWrap ? hallWidth + 1 : 1;
+            for (let x = 0; x < w; ++x) {
+                for (let y = 0; y <= h / 2; ++y) {
+                    map[x][h - offset - y] = map[x][y];
+                }
+            }
+        } // vert
+    } // scope
+
 }
 
 
