@@ -3,8 +3,8 @@
 function preset(hloop, vloop, hborder, vborder, hsymmetry, vsymmetry, shortcuts, straightness, hall, wall, coverage, rooms) {
     document.getElementById("hloop").checked = hloop;
     document.getElementById("vloop").checked = vloop;
-    document.getElementById("hborder").checked = hborder;
-    document.getElementById("vborder").checked = vborder;
+    document.getElementById("hborder").value = hborder;
+    document.getElementById("vborder").value = vborder;
     document.getElementById("hsymmetry").checked = hsymmetry;
     document.getElementById("vsymmetry").checked = vsymmetry;
     document.getElementById("imperfection").value = shortcuts * 100;
@@ -92,29 +92,29 @@ function regenerate() {
     by the Hall and Wall size to alter the appearance. Mirroring breaks most of these guarantees.
   </p>
   <center id="preset">
-  <button onclick="preset(false, false, true,  true,  false, false, 0.00, 0.00, 3, 1, 1.00, 0.00)" id="labyrinth">Labyrinth</button>
-  <button onclick="preset(false, false, true,  true,  false, false, 0.00, 0.00, 1, 4, 0.20, 1.00)">Catacombs</button>
-  <button onclick="preset(false, false, false, false, false, false, 0.00, 0.00, 1, 2, 1.00, 0.15)">Hedge</button>
-  <button onclick="preset(false, false, true,  true,  false, false, 0.25, 0.00, 6, 1, 0.10, 0.50)">Palace</button>
-  <button onclick="preset(false, false, true,  true,  false, false, 0.75, 0.50, 1, 1, 0.15, 1.00)">Fortress</button>
-  <button onclick="preset(false, false, true,  true,  false, false, 0.05, 0.90, 1, 4, 0.20, 1.00)">Suburb</button>
-  <button onclick="preset(true,  true,  true,  true,  false, false, 0.60, 0.00, 1, 3, 1.00, 1.00)">City</button>
-  <button onclick="preset(true,  false, true,  true,  true,  false, 0.25, 0.80, 6, 1, 1.00, 0.00)">PAC-MAN</button>
-  <button onclick="preset(false, false, true,  true,  true,  false, 0.90, 0.10, 3, 1, 0.12, 1.00)">Starship</button>
-  <button onclick="preset(false, false, true,  true,  true,  true,  1.00, 0.95, 2, 1, 0.50, 1.00)">Garden</button>
-  <button onclick="preset(false, false, true,  true,  true,  false, 0.20, 1.00, 2, 1, 0.50, 0.10)">Forbidden</button>
+  <button onclick="preset(false, false, 1, 1, false, false, 0.00, 0.00, 3, 1, 1.00, 0.00)" id="labyrinth">Labyrinth</button>
+  <button onclick="preset(false, false, 1, 1, false, false, 0.00, 0.00, 1, 4, 0.20, 1.00)">Catacombs</button>
+  <button onclick="preset(false, false, 0, 0, false, false, 0.00, 0.00, 1, 2, 1.00, 0.15)">Hedge</button>
+  <button onclick="preset(false, false, 1, 1, false, false, 0.25, 0.00, 6, 1, 0.10, 0.50)">Palace</button>
+  <button onclick="preset(false, false, 1, 1, false, false, 0.75, 0.50, 1, 1, 0.15, 1.00)">Fortress</button>
+  <button onclick="preset(false, false, 1, 1, false, false, 0.05, 0.90, 1, 4, 0.20, 1.00)">Suburb</button>
+  <button onclick="preset(true,  true,  1, 1, false, false, 0.60, 0.00, 1, 3, 1.00, 1.00)">City</button>
+  <button onclick="preset(true,  false, 1, 1, true,  false, 0.25, 0.80, 6, 1, 1.00, 0.00)">PAC-MAN</button>
+  <button onclick="preset(false, false, 1, 1, true,  false, 0.90, 0.10, 3, 1, 0.12, 1.00)">Starship</button>
+  <button onclick="preset(false, false, 1, 1, true,  true,  1.00, 0.95, 2, 1, 0.50, 1.00)">Garden</button>
+  <button onclick="preset(false, false, 1, 1, true,  false, 0.20, 1.00, 2, 1, 0.50, 0.10)">Forbidden</button>
   </center>
   <hr noshade>
   <button onclick="regenerate()" style="height:40px; width: 40px; margin-right: 10px"><div style="transform: rotate(45deg); font-size: 200%">↻</div></button>
   <div style="display:inline-block; position: relative; top: 5px">
     Horizontal:
     <input type="checkbox" id="hloop" autocomplete="off" onchange="regenerate()"><label for="hwrap">Loop</label>
-    <input type="checkbox" id="hborder" autocomplete="off" onchange="regenerate()"><label for="hborder">Border</label>
     <input type="checkbox" id="hsymmetry" autocomplete="off" onchange="regenerate()"><label for="hsymmetry">Mirror</label>
-    <span style="margin-left: 150px">Vertical:</span>
+    <span style="padding-left:16px">Border</span> <input class="slider" type="range" min="0" max="2" value="1" autocomplete="off" onchange="regenerate()" id="hborder">
+    <span style="margin-left: 131px">Vertical:</span>
     <input type="checkbox" id="vloop" autocomplete="off" onchange="regenerate()"><label for="vwrap">Loop</label>
-    <input type="checkbox" id="vborder" autocomplete="off" onchange="regenerate()"><label for="vborder">Border</label>
     <input type="checkbox" id="vsymmetry" autocomplete="off" onchange="regenerate()"><label for="vsymmetry">Mirror</label>
+    <span style="padding-left:16px">Border</span> <input class="slider" type="range" min="0" max="2" value="1" autocomplete="off" onchange="regenerate()" id="vborder">
   <br><span>Shortcuts</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="imperfection">
   <span style="padding-left:16px">Straight</span> <input class="slider" type="range" min="0" max="100" value="0" autocomplete="off" onchange="regenerate()" id="straightness">
   <span style="padding-left:16px">Hall&nbsp;Size</span> <input class="slider" type="range" min="1" max="5" value="3" autocomplete="off" onchange="regenerate()" id="hallWidth">
