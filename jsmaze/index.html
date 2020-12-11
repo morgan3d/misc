@@ -47,10 +47,19 @@ function regenerate() {
     
     const deadEndArray = [];
     const w = 112, h = 60;
+    //const w = 28, h = 14;
     const maze = makeMaze(w, h, horizontal, vertical, straightness, imperfection, coverage, deadEndArray, hallWidth, wallWidth);
     
     if (rooms > 0) {
         addMapRooms(maze, hallWidth, wallWidth, horizontal, vertical, deadEndArray, rooms);
+    }
+
+    // Visualize dead ends
+    if (false) {
+        for (let i = 0; i < deadEndArray.length; ++i) {
+            const c = deadEndArray[i];
+            maze[c.x | 0][c.y | 0] = 'X';
+        }        
     }
     
     const display = document.getElementById('display');

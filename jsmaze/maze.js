@@ -415,14 +415,6 @@ function makeMaze(w, h, horizontal, vertical, straightness, imperfect, fill, dea
         }
     }
 
-    // Visualize dead ends
-    if (false) {
-        for (let i = 0; i < deadEndArray.length; ++i) {
-            const c = deadEndArray[i];
-            maze[c.x | 0][c.y | 0] = 'X';
-        }        
-    }
-    
     return maze;
 }
 
