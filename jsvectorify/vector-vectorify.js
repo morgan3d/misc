@@ -75,6 +75,10 @@ function vectorify(program, options) {
             },
         
         enter: function(node) {
+            if (options.throwErrors && node.errors && node.errors.length > 0) {
+                throw node.errors[0].original;
+            }
+            
             if ((node.type === 'UnaryExpression') && (node.argument.type !== 'Literal')) {
                 if (node.operator === '-') {
                     // Unary minus
