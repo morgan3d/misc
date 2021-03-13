@@ -1,5 +1,6 @@
-// Test error
-// vectorify('const a = 1;\nconst b = {x:a y:1};');
+//console.log(_recast.parse('const a = 1; const b = {x:a y:1};'));
+//vectorify('const a = 1;\nconst b = {x:a y:1};');
+
 
 function test(src, desired, options) {
     let actual = eval(vectorify(src, options));

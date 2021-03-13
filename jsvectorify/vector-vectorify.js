@@ -29,6 +29,8 @@ function vectorify(program, options) {
     if (options.throwErrors) {
         if (ast.program.errors && ast.program.errors.length > 0) {
             throw ast.program.errors[0].original;
+        } else if (ast.program.program && ast.program.program.errors && ast.program.program.errors.length > 0) {
+            throw ast.program.program.errors[0].original;
         }
     }
     
