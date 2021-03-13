@@ -160,7 +160,11 @@ defaults. The current options and defaults are:
    
    // String to prepend to generate the operator callback
    // function name.
-   operatorPrefix: '_'
+   operatorPrefix: '_',
+   
+   // If true, throw any parsing errors that are encountered. If
+   // false, recoverable errors are silenced.
+   throwErrors: true
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

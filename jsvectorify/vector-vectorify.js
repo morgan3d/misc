@@ -7,7 +7,8 @@ function vectorify(program, options) {
         assignmentReturnsUndefined: false,
         scalarEscapes: false,
         equalsCallback: undefined,
-        operatorPrefix: '_'
+        operatorPrefix: '_',
+        throwErrors: true
     }, options || {});
     
     let src, args;
@@ -25,6 +26,12 @@ function vectorify(program, options) {
 
     const ast = _recast.parse(src);
 
+    if (options.throwErrors) {
+        if (ast.program.errors && ast.program.errors.length > 0) {
+            throw ast.program.errors[0].original;
+        }
+    }
+    
     const _ = options.operatorPrefix;
     const opTable = Object.freeze({ '+': _ + 'add', '-': _ + 'sub', '*': _ + 'mul', '/': _ + 'div' });
 
@@ -47,7 +54,7 @@ function vectorify(program, options) {
             
         return false;
     }
-    
+
     ast.program = _estraverse.replace(ast.program, {
         // Wrap mutating operators on traversal *back up* the tree so
         // that we do not recursively process the same node

@@ -1,3 +1,6 @@
+// Test error
+// vectorify('const a = 1;\nconst b = {x:a y:1};');
+
 function test(src, desired, options) {
     let actual = eval(vectorify(src, options));
     console.assert(actual === desired, '"' + src + '" produced ' + actual + ', should have been ' + desired);
