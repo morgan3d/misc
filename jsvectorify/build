@@ -14,11 +14,12 @@ mkdir -p lib
 if [ "$installtools" == 1 ]
  then
    npm install browserify
-   npm install recast 
+   npm install recast
    npm install estraverse
    npm install uglify-js -g
    npm install @babel/core @babel/cli @babel/preset-env
    browserify need-recast.js -o tmp/src/recast.js
+   python3 patch-recast.py   
 fi
 
 cp vector-vectorify.js tmp/src/

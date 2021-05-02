@@ -1,4 +1,4 @@
-//console.log(_recast.parse('const a = 1; const b = {x:a y:1};'));
+console.log(_recast.parse('let a = {x:1}; let b = {...a};'));
 //vectorify('const a = 1;\nconst b = {x:a y:1};');
 
 
