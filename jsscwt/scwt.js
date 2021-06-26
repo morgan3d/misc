@@ -4,8 +4,8 @@ const wordArray  = ['red',     'blue',    'yellow',  'green'];
 const colorArray = ['#b23034', '#2941ae', '#e3b53f', '#419150'];
 
 const defaultOptions = {
-
-    instructions: 'Say the color of each word (do not read it)',
+    task: 'alternating',
+    instructions: 'Say the color of each word (ignore the text)',
 
     // If true, the color and the word can match
     allowColorMatch: false,
@@ -24,7 +24,7 @@ const defaultOptions = {
     fontFamily: 'helvetica'
 };
 
-let options = {...defaultOptions};
+let options = {...defaultOptions, ...JSON.parse(localStorage.getItem('options') || '{}')};
 let startTime;
 
 /* Inclusive. Slightly nonuniform distribution due to the set of all
@@ -36,10 +36,39 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function optionsToGui() {
+    document.getElementById(options.fontFamily).checked = true;
+    document.getElementById(options.task).checked = true;
+    document.getElementById('rows').value = options.rows;
+    document.getElementById('columns').value = options.columns;
+    document.getElementById('allowColorMatch').checked = options.allowColorMatch;
+    document.getElementById('allowDuplicateColors').checked = options.allowDuplicateColors;
+    document.getElementById('allowDuplicateWords').checked = options.allowDuplicateWords;
+}
+
+function guiToOptions() {
+    for (let e of document.querySelectorAll('input[name=task]')) {
+        if (e.checked) {
+            options.task = e.id;
+            options.instuctions = e.title;
+        }
+    }
+
+    for (let e of document.querySelectorAll('input[name=fontFamily]')) {
+        if (e.checked) { options.task = e.id; }
+    }
+
+    options.rows = Math.max(1, Math.min(10, parseInt(document.getElementById('rows').value)));
+    options.columns = Math.max(1, Math.min(10, parseInt(document.getElementById('columns').value)));
+    options.allowColorMatch = document.getElementById('allowColorMatch').checked;
+    options.allowDuplicateColors = document.getElementById('allowDuplicateColors').checked;
+    options.allowDuplicateWords = document.getElementById('allowDuplicateWords').checked;
+}
 
 function start() {
-
-    let s = `<center>${options.instructions}</center><center><table style="font-family: ${options.fontFamily}; font-weight: bold; font-size: ${options.fontSize}pt">`;
+    guiToOptions();
+    localStorage.setItem('options', JSON.stringify(options));
+    let s = `<center>${options.instructions} out loud. Proceed from left to right and top to bottom.</center><center><table style="font-family: ${options.fontFamily}; font-weight: bold; font-size: ${options.fontSize}pt">`;
     let prevRowColorIndex = [], prevRowWordIndex = [];
     for (let r = 0; r < options.rows; ++r) {
         let prevColorIndex, prevWordIndex;

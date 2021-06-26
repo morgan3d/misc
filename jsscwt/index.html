@@ -14,7 +14,7 @@
       }
     </style>
   </head>
-  <body style="font-family: Tahoma, Arial">
+  <body style="font-family: Tahoma, Arial" onload="optionsToGui()">
     <div style="position: absolute; visibility: visible; width: 100%" id="instructionsPane">
       <h1><center>Timed Stroop Test</center></h1>
 
@@ -22,9 +22,9 @@
         <table>
           <tr valign="top"><td width="100px">Task</td>
             <td>
-              <input name="task" id="words" type="radio"></input><label for="words">Words</label>
-              <br><input name="task" id="colors" type="radio"></input></input><label for="colors">Colors</label>
-              <br><input name="task" id="alternating" type="radio"></input><label for="alternating">Alternating</input>
+              <input name="task" id="words" type="radio" title="Read the words (ignore the colors)"></input><label for="words">Words</label>
+              <br><input name="task" id="colors" type="radio" title="Say the color of each word (ignore the text)"></input></input><label for="colors">Colors</label>
+              <br><input name="task" id="alternating" type="radio" title="Alternate saying the word and the color of the word"></input><label for="alternating">Alternating</input>
           </td></tr>
           <tr><td><label for="rows">Rows</label></td><td><input type="number" id="rows" min="1" max="7" style="width: 50px"></input></td></tr>
           <tr><td><label for="columns">Columns</label></td><td><input type="number" id="columns" min="1" max="7" style="width: 50px"></input></td></tr>
@@ -41,14 +41,6 @@
           <tr><td colspan=2><input type="checkbox" id="allowDuplicateWords"></input><label for="allowDuplicateWords">Allow duplicate words</label></td></tr>
         </table>
       </center>
-      <script>
-        document.getElementById('rows').value = options.rows;
-        document.getElementById('columns').value = options.columns;
-        document.getElementById('allowColorMatch').checked = options.allowColorMatch;
-        document.getElementById('allowDuplicateColors').checked = options.allowDuplicateColors;
-        document.getElementById('allowDuplicateWords').checked = options.allowDuplicateWords;
-      </script>
-      
       <br>
       <center><button onclick="start()">Start</button></center>
       <br>
