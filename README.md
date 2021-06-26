@@ -51,6 +51,7 @@ JavaScript
 - **jsloadmanager** - Caching and post-processing for recursive resource loading via XMLHttpRequest/fetch. 2018.
 - **jschat** - Minimal WebRTC video conference reference code
 - **jsremotegame** - Minimal WebRTC Canvas + Audio + Input streaming reference code
+- **jsscwt** - Psychology Stroop test with random task
 
 Java
 ==================================================================
@@ -84,7 +85,5 @@ TODO:
 
  <li><a href="http://cs.williams.edu/~morgan/cs136-s08/darwin2.0/">Darwin 2.0</a> - AI programming game with isometric 3D graphics using concurrency
  <li><a href="http://cs.williams.edu/~morgan/darwin/">Darwin 2.1</a> - AI programming game with isometric 3D graphics using coroutines (no explicit synchronization needed!)
-
-
 
 -->
