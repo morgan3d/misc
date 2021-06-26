@@ -2,11 +2,11 @@ This is an online JavaScript and HTML implementation of the Stroop
 Color Word Test from the psychology scientific literature, first
 described in:
 
-Stroop, J. R., [Studies of interference in serial verbal reactions](http://psychclassics.yorku.ca/Stroop/?c=012). J. Exp. Psychol. 18, 643–662, 1935. doi: 10.1037/h0054651
+Stroop, J. R., [Studies of interference in serial verbal reactions](http://psychclassics.yorku.ca/Stroop/). J. Exp. Psychol. 18, 643–662, 1935. doi: 10.1037/h0054651
 
 For an analysis of methods of scoring SCWT, see:
 
-Scarpina F, Tagini S., [The Stroop Color and Word Test](Scarpina F, Tagini S. The Stroop Color and Word Test. Front Psychol. 2017;8:557. Published 2017 Apr 12. doi:10.3389/fpsyg.2017.00557). Front Psychol. 2017;8:557. Published 2017 Apr 12. doi:10.3389/fpsyg.2017.00557
+Scarpina F, Tagini S., [The Stroop Color and Word Test](https://www.frontiersin.org/articles/10.3389/fpsyg.2017.00557/full). Front. Psychol. 2017;8:557. Published 2017 Apr 12. doi:10.3389/fpsyg.2017.00557
 
 
 This implementation does not compute a baseline. Instead, it is
