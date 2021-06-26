@@ -8,15 +8,19 @@ const defaultOptions = {
     instructions: 'Say the color of each word (ignore the text)',
 
     // If true, the color and the word can match
-    allowColorMatch: false,
+    allowColorMatch: true,
 
     // If true, a word horizontally or vertically adjacent
     // can be the same
     allowDuplicateWords: false,
 
+    // 3-word sequences with the same index (includes wrapping)
+    allowChains: false,
+
     // If true, a color horizontally or vertically adjacent
     // can be the same
     allowDuplicateColors: false,
+    
     showRowNumbers: true,
     rows: 5,
     columns: 7,
@@ -44,6 +48,7 @@ function optionsToGui() {
     document.getElementById('allowColorMatch').checked = options.allowColorMatch;
     document.getElementById('allowDuplicateColors').checked = options.allowDuplicateColors;
     document.getElementById('allowDuplicateWords').checked = options.allowDuplicateWords;
+    document.getElementById('allowChains').checked = options.allowChains;
 }
 
 function guiToOptions() {
@@ -63,36 +68,72 @@ function guiToOptions() {
     options.allowColorMatch = document.getElementById('allowColorMatch').checked;
     options.allowDuplicateColors = document.getElementById('allowDuplicateColors').checked;
     options.allowDuplicateWords = document.getElementById('allowDuplicateWords').checked;
+    options.allowChains = document.getElementById('allowChains').checked;
 }
+
 
 function start() {
     guiToOptions();
     localStorage.setItem('options', JSON.stringify(options));
-    let s = `<center>${options.instructions} out loud. Proceed from left to right and top to bottom.</center><center><table style="font-family: ${options.fontFamily}; font-weight: bold; font-size: ${options.fontSize}pt">`;
+    let s = `<center>${options.instructions} out loud. Proceed from left to right and top to bottom.</center><center><table style="font-family: ${options.fontFamily}; text-align: center; font-weight: bold; margin-top: 20px; font-size: ${options.fontSize}pt">`;
     let prevRowColorIndex = [], prevRowWordIndex = [];
+
+    // Queue of recent indices used
+    let chainIndex = [-1, -1];
+
+    if (options.task === 'alternating') {
+        s += '<tr valign=bottom style="font-weight: normal; font-size: 80%; color: #AAA">';
+        if (options.showRowNumbers) {
+            s += '<td></td>';
+        }
+        s += '<td>word</td><td>color</td><td>...</td></tr>';
+    }
+    
     for (let r = 0; r < options.rows; ++r) {
         let prevColorIndex, prevWordIndex;
-        s += `<tr style="height: ${options.fontSize * 4}pt">`;
+        s += `<tr valign=top style="height: ${options.fontSize * 4}pt">`;
 
         if (options.showRowNumbers) {
-            s += `<td style="color: #000; font-weight: normal; text-align: right">${r + 1}</td>`;
+            s += `<td style="color: #AAA; font-weight: normal; text-align: right">${r + 1}</td>`;
         }
         
         for (let c = 0; c < options.columns; ++c) {
             let colorIndex, wordIndex;
 
+            const sayWord = ((c + r) % 2) === 0;
+
+            const MAX_TRIES = 10;
+            let tries = 0;
             do {
-                colorIndex = randomInt(0, colorArray.length - 1);
-            } while (((colorIndex === prevColorIndex) ||
-                      (colorIndex === prevRowColorIndex[c])) &&
-                     ! options.allowDuplicateColors);
+                do {
+                    colorIndex = randomInt(0, colorArray.length - 1);
+                } while (((colorIndex === prevColorIndex) ||
+                          (colorIndex === prevRowColorIndex[c])) &&
+                         ! options.allowDuplicateColors);
             
-            do {
-                wordIndex = randomInt(0, wordArray.length - 1);
-            } while ((((wordIndex === prevWordIndex) ||
-                       (wordIndex === prevRowWordIndex[c])) && ! options.allowDuplicateWords) ||
-                     (colorIndex === wordIndex && ! options.allowColorMatch));
+                do {
+                    wordIndex = randomInt(0, wordArray.length - 1);
+                } while ((((wordIndex === prevWordIndex) ||
+                           (wordIndex === prevRowWordIndex[c])) && ! options.allowDuplicateWords) ||
+                         (colorIndex === wordIndex && ! options.allowColorMatch));
+
+                // Don't get stuck
+                ++tries;
+            } while (
+                (tries < MAX_TRIES) &&
+                ! options.allowChains &&
+                    (options.task === 'alternating') &&
+                    (chainIndex[0] === chainIndex[1]) &&
+                    ((sayWord && wordIndex === chainIndex[0]) ||
+                     (! sayWord && colorIndex === chainIndex[0])));
+
+            if (tries === MAX_TRIES) {
+                console.log('Exceeded max tries');
+            }
             
+            chainIndex[0] = chainIndex[1];
+            chainIndex[1] = sayWord ? wordIndex : colorIndex;
+                
             s += `<td style="text-align: center; color: ${colorArray[colorIndex]}; width: ${options.fontSize * 50}pt">${wordArray[wordIndex]}</td>`;
             
             prevColorIndex = colorIndex;
