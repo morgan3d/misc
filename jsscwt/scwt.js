@@ -134,12 +134,14 @@ function start() {
                 } while (((colorIndex === prevColorIndex) ||
                           (colorIndex === prevRowColorIndex[c])) &&
                          ! options.allowDuplicateColors);
-            
-                do {
-                    wordIndex = randomInt(0, wordArray.length - 1);
-                } while ((((wordIndex === prevWordIndex) ||
-                           (wordIndex === prevRowWordIndex[c])) && ! options.allowDuplicateWords) ||
-                         (colorIndex === wordIndex && ! options.allowColorMatch));
+
+                if (options.task !== 'colorBoxes') {
+                    do {
+                        wordIndex = randomInt(0, wordArray.length - 1);
+                    } while ((((wordIndex === prevWordIndex) ||
+                               (wordIndex === prevRowWordIndex[c])) && ! options.allowDuplicateWords) ||
+                             (colorIndex === wordIndex && ! options.allowColorMatch));
+                }
 
                 // Don't get stuck
                 ++tries;
@@ -152,13 +154,14 @@ function start() {
                      (! sayWord && colorIndex === chainIndex[0])));
 
             if (tries === MAX_TRIES) {
-                console.log('Exceeded max tries');
+                console.log('Note: exceeded max tries for generating a pattern');
             }
             
             chainIndex[0] = chainIndex[1];
             chainIndex[1] = sayWord ? wordIndex : colorIndex;
-                
-            s += `<td style="text-align: center; color: ${colorArray[colorIndex]}; width: ${options.fontSize * 50}pt">${wordArray[wordIndex]}</td>`;
+
+            const word = options.task === 'colorBoxes' ? '&#x2588;&#x2588;&#x2588;' : wordArray[wordIndex];
+            s += `<td style="text-align: center; color: ${colorArray[colorIndex]}; width: ${options.fontSize * 50}pt">${word}</td>`;
             
             prevColorIndex = colorIndex;
             prevRowColorIndex[c] = colorIndex;

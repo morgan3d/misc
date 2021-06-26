@@ -19,12 +19,18 @@
       <h1><center>Timed Stroop Test</center></h1>
 
       <center>
-        <table>
+        <style>
+          table#config td {
+            padding-top: 18px;
+          }
+        </style>
+        <table id="config" style="border-collapse: collapse">
           <tr valign="top"><td width="100px">Task</td>
             <td>
               <input name="task" id="words" type="radio" title="Read the words (ignore the colors)"></input><label for="words">Words</label>
               <br><input name="task" id="colors" type="radio" title="Say the color of each word (ignore the text)"></input></input><label for="colors">Colors</label>
-              <br><input name="task" id="alternating" type="radio" title="Alternate saying the word and the color of the word"></input><label for="alternating">Alternating</input>
+              <br><input name="task" id="colorBoxes" type="radio" title="Say the color of each box (no text)"></input></input><label for="colorBoxes">Color Boxes</label>
+              <br><input name="task" id="alternating" type="radio" title="Alternate saying the word and the color of the word"></input><label for="alternating">Alternating words and colors</input>
           </td></tr>
           <tr valign="top">
             <td>
@@ -35,13 +41,14 @@
               <br><input type="radio" name="colorSet" id="rgykp"></input><label for="rgykp">5: Red, Green, Yellow, Purple, Black</label>
             </td>
           </tr>
-          <tr><td><label for="rows">Rows</label></td><td><input type="number" id="rows" min="1" max="7" style="width: 50px"></input></td></tr>
-          <tr><td><label for="columns">Columns</label></td><td><input type="number" id="columns" min="1" max="7" style="width: 50px"></input></td></tr>
+          <tr><td>Size</td><td><input type="number" id="rows" min="1" max="7" style="text-align: right; width: 50px"></input> <label for="rows">rows</label> &times;
+              <input type="number" id="columns" min="1" max="7" style="text-align: right; width: 50px"></input> <label for="columns">columns</label></td></tr>
           <tr valign="top"><td>Font</td>
-            <td>
+            <td style="column-count: 2">
               <input name="font" id="tahoma" type="radio"></input><label style="font-family: Tahoma" for="tahoma">Tahoma</label>
               <br><input name="font" id="helvetica" type="radio"></input><label for="helvetica" style="font-family: Helvetica">Helvetica</label>
               <br><input name="font" id="monaco" type="radio"></input><label for="monaco" style="font-family: Monaco">Monaco</label>
+              <br><input name="font" id="courier" type="radio"></input><label for="times" style="font-family: Courier">Courier</label>
               <br><input name="font" id="times" type="radio"></input><label for="times" style="font-family: Times">Times</label>
               <br><input name="font" id="palatino" type="radio"></input><label for="palatino" style="font-family: Palatino">Palatino</label>
           </td></tr>
@@ -52,7 +59,9 @@
         </table>
       </center>
       <br>
+      <br>
       <center><button onclick="start()">Start</button></center>
+      <br>
       <br>
       <center style="font-size:10px">
         <div style="text-align: justify; width: 50%">
