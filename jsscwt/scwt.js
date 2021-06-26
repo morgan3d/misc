@@ -75,7 +75,7 @@ function guiToOptions() {
 function start() {
     guiToOptions();
     localStorage.setItem('options', JSON.stringify(options));
-    let s = `<center>${options.instructions} out loud. Proceed from left to right and top to bottom.</center><center><table style="font-family: ${options.fontFamily}; text-align: center; font-weight: bold; margin-top: 20px; font-size: ${options.fontSize}pt">`;
+    let s = `<center>${options.instructions} out loud. Proceed from left to right and top to bottom.</center><center><table id="grid" style="transition: 0.3s filter linear, 0.3s -webkit-filter linear; filter: blur(25px) saturate(0); font-family: ${options.fontFamily}; text-align: center; font-weight: bold; margin-top: 20px; font-size: ${options.fontSize}pt">`;
     let prevRowColorIndex = [], prevRowWordIndex = [];
 
     // Queue of recent indices used
@@ -146,19 +146,32 @@ function start() {
 
     s += '</table></center>\n';
 
-    s += `<center>Click, touch, or press any key when done</center>`;
+    s += `<center>Click, touch, or press any key when done.</center>`;
+
+    s += '<div id="startButton" style="position: absolute; top: 40%; width:100%; text-align: center"><button onclick="startTimer()">Begin</button></div>';
 
     document.getElementById('instructionsPane').style.visibility = 'hidden';
     const pane = document.getElementById('taskPane');
     pane.innerHTML = s;
     pane.style.visibility = 'visible';
-    
+
+}
+
+function startTimer() {
+    document.getElementById('grid').style.filter = 'none';
+    document.getElementById('startButton').remove();
     startTime = new Date().getTime();
 }
 
 function stop() {
     const stopTime = new Date().getTime();
     const durationMilliseconds = stopTime - startTime;
+    if (! startTime || durationMilliseconds < 1000) {
+        // Must be an accident
+        return;
+    }
+        
+    startTime = undefined;
     document.getElementById('taskPane').style.visibility = 'hidden';
     const resultPane = document.getElementById('resultPane');
     resultPane.style.visibility = 'visible';
