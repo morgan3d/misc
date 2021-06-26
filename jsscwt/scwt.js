@@ -21,10 +21,11 @@ const defaultOptions = {
     rows: 5,
     columns: 7,
     fontSize: 24,
-    fontFamily: 'Helvetica, Arial'
+    fontFamily: 'helvetica'
 };
 
-let startTime, options;
+let options = {...defaultOptions};
+let startTime;
 
 /* Inclusive. Slightly nonuniform distribution due to the set of all
    floats not mapping to the set of ints in this range, but good
@@ -36,8 +37,7 @@ function randomInt(min, max) {
 }
 
 
-function start(opt) {
-    options = {...defaultOptions, ...opt};
+function start() {
 
     let s = `<center>${options.instructions}</center><center><table style="font-family: ${options.fontFamily}; font-weight: bold; font-size: ${options.fontSize}pt">`;
     let prevRowColorIndex = [], prevRowWordIndex = [];
@@ -98,7 +98,7 @@ function stop() {
     const count = options.rows * options.columns;
     const rate = count / (durationMilliseconds / (60 * 1000));
 
-    let s = `<center>${count} words in `;
+    let s = `<center style="margin-top:40px">${count} words in `;
 
     if (min > 0) {
         s += `${min} min `;

@@ -3,8 +3,18 @@
   <head>
     <title>Timed Stroop Test</title>
     <script src="scwt.js"></script>
+    <style>
+      button {
+          font-size: 150%;
+      }
+
+      input[type=radio], input[type=checkbox] {
+          margin-right: 10px;
+          margin-left: 0px;
+      }
+    </style>
   </head>
-  <body>
+  <body style="font-family: Tahoma, Arial">
     <div style="position: absolute; visibility: visible; width: 100%" id="instructionsPane">
       <h1><center>Timed Stroop Test</center></h1>
 
@@ -12,20 +22,38 @@
         <table>
           <tr valign="top"><td width="100px">Task</td>
             <td>
-              <input type="radio">Words</input>
-              <br><input type="radio">Colors</input>
-              <br><input type="radio">Alternating</input>
+              <input name="task" id="words" type="radio"></input><label for="words">Words</label>
+              <br><input name="task" id="colors" type="radio"></input></input><label for="colors">Colors</label>
+              <br><input name="task" id="alternating" type="radio"></input><label for="alternating">Alternating</input>
           </td></tr>
           <tr><td><label for="rows">Rows</label></td><td><input type="number" id="rows" min="1" max="7" style="width: 50px"></input></td></tr>
           <tr><td><label for="columns">Columns</label></td><td><input type="number" id="columns" min="1" max="7" style="width: 50px"></input></td></tr>
+          <tr valign="top"><td>Font</td>
+            <td>
+              <input name="font" id="tahoma" type="radio"></input><label style="font-family: Tahoma" for="tahoma">Tahoma</label>
+              <br><input name="font" id="helvetica" type="radio"></input><label for="helvetica" style="font-family: Helvetica">Helvetica</label>
+              <br><input name="font" id="monaco" type="radio"></input><label for="monaco" style="font-family: Monaco">Monaco</label>
+              <br><input name="font" id="times" type="radio"></input><label for="times" style="font-family: Times">Times</label>
+              <br><input name="font" id="palatino" type="radio"></input><label for="palatino" style="font-family: Palatino">Palatino</label>
+          </td></tr>
           <tr><td colspan=2><input type="checkbox" id="allowColorMatch"></input><label for="allowColorMatch">Allow color-word match</label></td></tr>
-          <tr><td colspan=2><input type="checkbox" id="allowDuplicateColor"></input><label for="allowDuplicateColor">Allow duplicate colors</label></td></tr>
-          <tr><td colspan=2><input type="checkbox" id="allowDuplicateWord"></input><label for="allowDuplicateWord">Allow duplicate words</label></td></tr>
+          <tr><td colspan=2><input type="checkbox" id="allowDuplicateColors"></input><label for="allowDuplicateColors">Allow duplicate colors</label></td></tr>
+          <tr><td colspan=2><input type="checkbox" id="allowDuplicateWords"></input><label for="allowDuplicateWords">Allow duplicate words</label></td></tr>
         </table>
       </center>
-
+      <script>
+        document.getElementById('rows').value = options.rows;
+        document.getElementById('columns').value = options.columns;
+        document.getElementById('allowColorMatch').checked = options.allowColorMatch;
+        document.getElementById('allowDuplicateColors').checked = options.allowDuplicateColors;
+        document.getElementById('allowDuplicateWords').checked = options.allowDuplicateWords;
+      </script>
+      
       <br>
-      <center><button onclick="start({})">Start</button></center>
+      <center><button onclick="start()">Start</button></center>
+      <br>
+      <center style="font-size:10px">Open source by <a href="https://twitter.com/CasualEffects">@CasualEffects</a>, based on Stroop, J. R., <a href="http://psychclassics.yorku.ca/Stroop/?c=012">Studies of interference in serial verbal reactions</a>. J. Exp. Psychol. 18, 643–662, 1935. doi: 10.1037/h0054651</center>
+
     </div>
     <div style="position: absolute; visibility: hidden; width: 100%" id="taskPane" onclick="stop()" ontouch="stop()" onmousedown="stop()" onkeypress="stop()"></div>
     <div style="position: absolute; visibility: hidden; width: 100%" id="resultPane"></div>
