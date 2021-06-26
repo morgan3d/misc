@@ -50,7 +50,7 @@ function guiToOptions() {
     for (let e of document.querySelectorAll('input[name=task]')) {
         if (e.checked) {
             options.task = e.id;
-            options.instuctions = e.title;
+            options.instructions = e.title;
         }
     }
 
@@ -133,7 +133,7 @@ function stop() {
         s += `${min} min `;
     }
 
-    s += `${sec.toPrecision(2)} sec = ${rate.toPrecision(2)} words/min</center>`;
+    s += `${sec.toFixed(2)} sec = ${rate.toFixed(1)} words/min</center>`;
     console.log(s);
 
     s += '<br><center><button onclick="reset()">Reset</button></center>'
