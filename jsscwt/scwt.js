@@ -129,11 +129,13 @@ function start() {
             const MAX_TRIES = 10;
             let tries = 0;
             do {
-                do {
-                    colorIndex = randomInt(0, colorArray.length - 1);
-                } while (((colorIndex === prevColorIndex) ||
-                          (colorIndex === prevRowColorIndex[c])) &&
-                         ! options.allowDuplicateColors);
+                if (options.task !== 'blackWords') {
+                    do {
+                        colorIndex = randomInt(0, colorArray.length - 1);
+                    } while (((colorIndex === prevColorIndex) ||
+                              (colorIndex === prevRowColorIndex[c])) &&
+                             ! options.allowDuplicateColors);
+                }
 
                 if (options.task !== 'colorBoxes') {
                     do {
@@ -160,8 +162,9 @@ function start() {
             chainIndex[0] = chainIndex[1];
             chainIndex[1] = sayWord ? wordIndex : colorIndex;
 
+            const color = options.task === 'blackWords' ? '#000' : colorArray[colorIndex];
             const word = options.task === 'colorBoxes' ? '&#x2588;&#x2588;&#x2588;' : wordArray[wordIndex];
-            s += `<td style="text-align: center; color: ${colorArray[colorIndex]}; width: ${options.fontSize * 50}pt">${word}</td>`;
+            s += `<td style="text-align: center; color: ${color}; width: ${options.fontSize * 50}pt">${word}</td>`;
             
             prevColorIndex = colorIndex;
             prevRowColorIndex[c] = colorIndex;
