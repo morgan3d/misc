@@ -1,11 +1,24 @@
 'use strict';
 
-const wordArray  = ['red',     'blue',    'yellow',  'green'];
-const colorArray = ['#b23034', '#2941ae', '#e3b53f', '#419150'];
+/* Maps colorSet to stimuli */
+const stimulusTable = {
+    rgyb: {
+        wordArray:  ['red',     'green',   'yellow',  'blue'],
+        colorArray: ['#b23034', '#419150', '#e3b53f', '#2941ae']
+    },
+
+    rgykp: {
+        wordArray:  ['red',     'green',   'yellow',  'black',   'purple'],
+        colorArray: ['#b23034', '#419150', '#e3b53f', '#000000', '#c32fee']
+    }
+};
+
 
 const defaultOptions = {
     task: 'alternating',
     instructions: 'Say the color of each word (ignore the text)',
+
+    colorSet: 'rgykp',
 
     // If true, the color and the word can match
     allowColorMatch: true,
@@ -40,9 +53,11 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+
 function optionsToGui() {
     document.getElementById(options.fontFamily).checked = true;
     document.getElementById(options.task).checked = true;
+    document.getElementById(options.colorSet).checked = true;
     document.getElementById('rows').value = options.rows;
     document.getElementById('columns').value = options.columns;
     document.getElementById('allowColorMatch').checked = options.allowColorMatch;
@@ -50,6 +65,7 @@ function optionsToGui() {
     document.getElementById('allowDuplicateWords').checked = options.allowDuplicateWords;
     document.getElementById('allowChains').checked = options.allowChains;
 }
+
 
 function guiToOptions() {
     for (let e of document.querySelectorAll('input[name=task]')) {
@@ -61,6 +77,10 @@ function guiToOptions() {
 
     for (let e of document.querySelectorAll('input[name=fontFamily]')) {
         if (e.checked) { options.task = e.id; }
+    }
+
+    for (let e of document.querySelectorAll('input[name=colorSet]')) {
+        if (e.checked) { options.colorSet = e.id; }
     }
 
     options.rows = Math.max(1, Math.min(10, parseInt(document.getElementById('rows').value)));
@@ -88,6 +108,10 @@ function start() {
         }
         s += '<td>word</td><td>color</td><td>...</td></tr>';
     }
+
+    const stimulus = stimulusTable[options.colorSet];
+    const wordArray = stimulus.wordArray;
+    const colorArray = stimulus.colorArray;
     
     for (let r = 0; r < options.rows; ++r) {
         let prevColorIndex, prevWordIndex;
