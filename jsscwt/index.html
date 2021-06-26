@@ -4,8 +4,30 @@
     <title>Timed Stroop Test</title>
     <script src="scwt.js"></script>
   </head>
-  <body onload="start({})">
-    <div style="position: absolute" id="taskPane" onclick="stop()" ontouch="stop()" onmousedown="stop()" onkeypress="stop()"></div>
-    <div style="position: absolute" id="resultPane"></div>
+  <body>
+    <div style="position: absolute; visibility: visible; width: 100%" id="instructionsPane">
+      <h1><center>Timed Stroop Test</center></h1>
+
+      <center>
+        <table>
+          <tr valign="top"><td width="100px">Task</td>
+            <td>
+              <input type="radio">Words</input>
+              <br><input type="radio">Colors</input>
+              <br><input type="radio">Alternating</input>
+          </td></tr>
+          <tr><td><label for="rows">Rows</label></td><td><input type="number" id="rows" min="1" max="7" style="width: 50px"></input></td></tr>
+          <tr><td><label for="columns">Columns</label></td><td><input type="number" id="columns" min="1" max="7" style="width: 50px"></input></td></tr>
+          <tr><td colspan=2><input type="checkbox" id="allowColorMatch"></input><label for="allowColorMatch">Allow color-word match</label></td></tr>
+          <tr><td colspan=2><input type="checkbox" id="allowDuplicateColor"></input><label for="allowDuplicateColor">Allow duplicate colors</label></td></tr>
+          <tr><td colspan=2><input type="checkbox" id="allowDuplicateWord"></input><label for="allowDuplicateWord">Allow duplicate words</label></td></tr>
+        </table>
+      </center>
+
+      <br>
+      <center><button onclick="start({})">Start</button></center>
+    </div>
+    <div style="position: absolute; visibility: hidden; width: 100%" id="taskPane" onclick="stop()" ontouch="stop()" onmousedown="stop()" onkeypress="stop()"></div>
+    <div style="position: absolute; visibility: hidden; width: 100%" id="resultPane"></div>
   </body>
 </html>

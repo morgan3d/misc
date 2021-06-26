@@ -78,7 +78,7 @@ function start(opt) {
 
     s += `<center>Click, touch, or press any key when done</center>`;
 
-    document.getElementById('resultPane').style.visibility = 'hidden';
+    document.getElementById('instructionsPane').style.visibility = 'hidden';
     const pane = document.getElementById('taskPane');
     pane.innerHTML = s;
     pane.style.visibility = 'visible';
@@ -98,14 +98,23 @@ function stop() {
     const count = options.rows * options.columns;
     const rate = count / (durationMilliseconds / (60 * 1000));
 
-    let s = `${count} words in `;
+    let s = `<center>${count} words in `;
 
     if (min > 0) {
         s += `${min} min `;
     }
 
-    s += `${sec.toPrecision(2)} sec = ${rate.toPrecision(2)} words/min`;
+    s += `${sec.toPrecision(2)} sec = ${rate.toPrecision(2)} words/min</center>`;
     console.log(s);
 
+    s += '<br><center><button onclick="reset()">Reset</button></center>'
+    s = '<br><br>\n' + s;
+    
     resultPane.innerHTML = s;
+}
+
+
+function reset() {
+    document.getElementById('resultPane').style.visibility = 'hidden';
+    document.getElementById('instructionsPane').style.visibility = 'visible';
 }
