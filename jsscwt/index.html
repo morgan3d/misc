@@ -31,7 +31,7 @@
               <br><input name="task" id="colors" type="radio" title="Say the color of each word (ignore the text)"></input></input><label for="colors">Colors</label>
               <br><input name="task" id="colorBoxes" type="radio" title="Say the color of each box"></input></input><label for="colorBoxes">Color Boxes (no words)</label>
               <br><input name="task" id="blackWords" type="radio" title="Read the words"></input></input><label for="blackWords">Black Words (no colors)</label>
-              <br><input name="task" id="alternating" type="radio" title="Alternate read the word and saying the color of the word"></input><label for="alternating">Alternating words and colors</input>
+              <br><input name="task" id="alternating" type="radio" title="Alternate reading the word and saying its color"></input><label for="alternating">Alternating words and colors</input>
           </td></tr>
           <tr valign="top">
             <td>
@@ -53,10 +53,11 @@
               <br><input name="font" id="times" type="radio"></input><label for="times" style="font-family: Times">Times</label>
               <br><input name="font" id="palatino" type="radio"></input><label for="palatino" style="font-family: Palatino">Palatino</label>
           </td></tr>
-          <tr><td colspan=2><input type="checkbox" id="allowColorMatch"></input><label for="allowColorMatch">Allow color + word match</label></td></tr>
-          <tr><td colspan=2><input type="checkbox" id="allowDuplicateColors"></input><label for="allowDuplicateColors">Allow sequential repeated colors</label></td></tr>
-          <tr><td colspan=2><input type="checkbox" id="allowDuplicateWords"></input><label for="allowDuplicateWords">Allow sequential repeated words</label></td></tr>
-          <tr><td colspan=2><input type="checkbox" id="allowChains"></input><label for="allowChains">Allow three identical responses in sequence when alternating</label></td></tr>
+          <tr><td colspan=2><input type="checkbox" id="avoidColorMatch"></input><label for="avoidColorMatch">Avoid color + word match</label>
+              <br><input type="checkbox" id="avoidDuplicateColors"></input><label for="avoidDuplicateColors">Avoid repeated colors</label>
+              <br><input type="checkbox" id="avoidDuplicateWords"></input><label for="avoidDuplicateWords">Avoid repeated words</label>
+              <br><input type="checkbox" id="avoidChains"></input><label for="avoidChains">Avoid three identical responses in sequence when alternating</label>
+              <br><input type="checkbox" id="avoidVerticalPatterns"></input><label for="avoidVerticalPatterns">Avoid vertical color repetition</label></td></tr>
         </table>
       </center>
       <br>
